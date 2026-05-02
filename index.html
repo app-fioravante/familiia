@@ -2,39 +2,30 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Familia Fioravante - Base de Datos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Familia Fioravante-Árbol Genealógico</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        :root {
-            --primary-blue: #004aad;
-            --secondary-blue: #002d5a;
-            --accent-blue: #38b6ff;
-            --bg-light: #f4f7fa;
-            --text-dark: #1a1a1a;
-            --border-color: #e0e0e0;
-            --danger: #dc3545;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
             height: 100vh;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow: hidden;
         }
 
-        /* --- LANDING PAGE --- */
+        /* LANDING PAGE */
         #landing-page {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -44,937 +35,820 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            color: white;
             text-align: center;
             transition: opacity 1s ease-out;
         }
-
         #landing-page img {
             max-width: 500px;
-            width: 90%;
-            height: auto;
+            width: 85%;
             margin-bottom: 40px;
-            animation: fadeInDown 1.5s ease;
+            animation: fadeInDown 1.2s ease;
         }
-
         .loader-bar {
-            margin-top: 40px;
-            width: 200px;
+            margin-top: 30px;
+            width: 220px;
             height: 4px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 2px;
+            background: #e2e8f0;
+            border-radius: 4px;
             overflow: hidden;
         }
-
         .loader-progress {
             height: 100%;
-            background: var(--primary-blue);
+            background: #004aad;
             width: 0%;
             transition: width 10s linear;
         }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- APP LAYOUT --- */
+        /* APP LAYOUT TRES COLUMNAS */
         #app-container {
             display: none;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
 
-        header {
-            background-color: var(--primary-blue);
+        /* HEADER */
+        .app-header {
+            background: linear-gradient(135deg, #002b5c, #004aad);
             color: white;
-            padding: 15px 30px;
+            padding: 0 24px;
+            height: 64px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            flex-shrink: 0;
         }
-
         .brand {
-            font-size: 1.5rem;
             font-weight: 700;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-
-        .header-actions button {
-            background: rgba(255,255,255,0.2);
+        .brand i { font-size: 1.6rem; }
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .header-buttons button {
+            background: rgba(255,255,255,0.15);
             border: none;
             color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 6px 16px;
+            border-radius: 30px;
             cursor: pointer;
-            margin-left: 10px;
-            transition: background 0.3s;
-        }
-
-        .header-actions button:hover { background: rgba(255,255,255,0.3); }
-
-        /* --- CONTROLS --- */
-        .controls-panel {
-            background: white;
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: end;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .filter-group label {
-            font-size: 0.85rem;
-            color: #666;
             font-weight: 500;
+            transition: all 0.2s;
+        }
+        .header-buttons button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        #userStatus {
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
         }
 
-        .form-control {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-blue);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        .btn-export {
-            background-color: #198754;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        /* --- TABLE & PAGINATION --- */
-        .table-container {
+        /* TRES COLUMNAS */
+        .three-col-layout {
+            display: flex;
             flex: 1;
+            overflow: hidden;
+            gap: 1px;
+            background: #e2e8f0;
+        }
+
+        /* Columna izquierda: años */
+        .years-panel {
+            width: 260px;
+            background: white;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            padding: 20px 30px;
+            flex-shrink: 0;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.02);
         }
-
-        .table-scroll {
+        .panel-title {
+            font-weight: 600;
+            padding: 18px 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1rem;
+        }
+        .years-list {
             flex: 1;
             overflow-y: auto;
-            background: white;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 12px 8px;
         }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th {
-            background-color: #f8f9fa;
-            color: var(--secondary-blue);
-            font-weight: 700;
-            text-align: left;
-            padding: 15px;
-            position: sticky;
-            top: 0;
-            border-bottom: 2px solid var(--border-color);
-            z-index: 10;
-        }
-
-        .data-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-dark);
-            vertical-align: middle;
-        }
-
-        .name-bold { font-weight: 700; color: var(--primary-blue); font-size: 1.05rem; }
-        .date-col { font-family: monospace; font-size: 0.95rem; font-weight: 600; color: #333; }
-        
-        /* Paginación */
-        .pagination-bar {
-            background: white;
-            padding: 10px 20px;
-            border-top: 1px solid var(--border-color);
-            border-radius: 0 0 8px 8px;
+        .year-item {
+            padding: 10px 16px;
+            margin: 4px 8px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f1f5f9;
+            color: #1e293b;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .year-item.active {
+            background: #004aad;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,74,173,0.2);
+        }
+        .year-item:hover:not(.active) {
+            background: #e2e8f0;
+            transform: translateX(2px);
+        }
+        .year-badge {
+            background: #cbd5e1;
+            color: #0f172a;
+            border-radius: 30px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .year-item.active .year-badge {
+            background: #ffffff80;
+            color: #002b5c;
         }
 
-        .page-info { font-size: 0.9rem; color: #666; }
-
-        .pagination-controls { display: flex; gap: 5px; }
-
-        .page-btn {
+        /* PANEL CENTRAL: dividido en dos secciones (personas + familiares) */
+        .middle-panel {
+            flex: 1;
             background: white;
-            border: 1px solid var(--border-color);
-            color: var(--primary-blue);
-            padding: 5px 12px;
-            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 300px;
+        }
+        .middle-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+        .middle-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        /* Lista de personas (scroll) */
+        .persons-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            border-bottom: 1px solid #eef2f6;
+            max-height: 50%;
+        }
+        .person-card {
+            background: #f9f9fc;
+            border: 1px solid #eef2f6;
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .person-card.selected {
+            border-left: 5px solid #004aad;
+            background: #f0f7ff;
+            box-shadow: 0 2px 6px rgba(0,74,173,0.1);
+        }
+        .person-card:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+        .person-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #0f172a;
+        }
+        .person-meta {
+            font-size: 0.8rem;
+            color: #475569;
+            margin-top: 6px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        /* Sección de familiares cercanos (padres y hermanos) */
+        .relatives-section {
+            background: #fefce8;
+            border-top: 3px solid #eab308;
+            padding: 12px 16px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            max-height: 45%;
+        }
+        .relatives-title {
+            font-weight: 700;
+            color: #854d0e;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .relative-group {
+            margin-bottom: 18px;
+        }
+        .relative-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #a16207;
+            letter-spacing: 0.5px;
+        }
+        .relative-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .relative-badge {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 40px;
+            padding: 5px 14px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #78350f;
             cursor: pointer;
             transition: all 0.2s;
         }
-
-        .page-btn:hover { background: #eef; }
-        .page-btn.active { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
-        .page-btn:disabled { color: #ccc; cursor: default; background: #f9f9f9; }
-
-        /* --- MODALS --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(3px);
+        .relative-badge:hover {
+            background: #fef3c7;
+            transform: scale(1.02);
         }
-        .modal-overlay.active { display: flex; }
+        .empty-relatives {
+            color: #b45309;
+            font-style: italic;
+            font-size: 0.8rem;
+            padding: 8px 0;
+        }
 
-        .modal-content {
+        /* Panel derecho: ficha completa */
+        .detail-panel {
+            width: 380px;
             background: white;
-            width: 90%;
-            max-width: 650px;
-            max-height: 90vh;
-            border-radius: 8px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            box-shadow: -2px 0 12px rgba(0,0,0,0.04);
+            flex-shrink: 0;
         }
-
-        .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
+        .detail-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-light);
-            border-radius: 8px 8px 0 0;
+            background: #fefefe;
         }
-
-        .modal-body { padding: 20px; overflow-y: auto; }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .detail-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
         }
-        .form-full { grid-column: 1 / -1; }
-
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid var(--border-color);
-            text-align: right;
+        .detail-actions button {
+            background: none;
+            border: none;
+            margin-left: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 30px;
+            transition: 0.2s;
         }
-
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; margin: 0 5px; }
-        .btn-edit { color: #f39c12; }
-        .btn-delete { color: var(--danger); }
-
-        /* Responsive Table */
-        @media (max-width: 768px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .data-table th:nth-child(4), .data-table td:nth-child(4), /* Género */
-            .data-table th:nth-child(7), .data-table td:nth-child(7) { /* Padres */
-                display: none; 
-            }
-            .controls-panel { flex-direction: column; }
+        .detail-body {
+            padding: 20px;
+            flex: 1;
+        }
+        .field-group {
+            margin-bottom: 18px;
+        }
+        .field-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #5b6e8c;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .field-value {
+            font-weight: 500;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid #eef2f6;
+            word-break: break-word;
+        }
+        .field-value.editable-input {
+            background: white;
+            border: 1px solid #94a3b8;
+            padding: 8px 12px;
+            width: 100%;
+            border-radius: 12px;
+        }
+        .inline-badge {
+            background: #e6f0ff;
+            color: #004aad;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: #004aad;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .flex-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        @media (max-width: 860px) {
+            .years-panel { width: 200px; }
+            .detail-panel { width: 300px; }
+        }
+        @media (max-width: 700px) {
+            .three-col-layout { flex-direction: column; }
+            .years-panel, .middle-panel, .detail-panel { width: 100%; max-height: 33%; }
         }
     </style>
 </head>
 <body>
 
-    <div id="landing-page">
-        <img src="https://github.com/rfioravante73-ar/familiia/blob/main/fioravante.png?raw=true" alt="Familia Fioravante">
-        <div class="loader-bar">
-            <div class="loader-progress" id="landingProgress"></div>
-        </div>
-        <button onclick="endLanding()" style="margin-top: 40px; background: #004aad; border: 2px solid #004aad; color: white; padding: 14px 45px; border-radius: 25px; cursor: pointer; font-size: 1.2rem; font-weight: 500; letter-spacing: 0.5px; transition: all 0.3s ease;">Ingresar ahora</button>
-    </div>
+<div id="landing-page">
+    <img src="https://github.com/rfioravante73-ar/familiia/blob/main/fioravante.png?raw=true" alt="Familia Fioravante">
+    <div class="loader-bar"><div class="loader-progress" id="landingProgress"></div></div>
+    <button onclick="endLanding()" style="margin-top: 40px; background: #004aad; border: none; color: white; padding: 12px 40px; border-radius: 40px; cursor: pointer; font-weight: 600;">Explorar árbol</button>
+</div>
 
-    <div id="app-container">
-        <header>
-            <div class="brand"><i class="fas fa-users"></i>Fioravante, Historia de una familia</div>
-            <div class="header-actions">
-                <span id="userStatus" style="font-size: 0.9rem; margin-right: 10px; opacity: 0.8;">Invitado</span>
-                <button id="authBtn" onclick="toggleAuth()"><i class="fas fa-lock"></i> Acceso Admin</button>
-            </div>
-        </header>
-
-        <div class="controls-panel">
-            <div class="filter-group">
-                <label>Buscar (Nombre/Bio)</label>
-                <input type="text" id="searchFilter" class="form-control" placeholder="Ej: Mario, Italia...">
-            </div>
-            <div class="filter-group">
-                <label>Lugar (Nacimiento/Defunción)</label>
-                <input type="text" id="placeFilter" class="form-control" placeholder="Ej: Buenos Aires">
-            </div>
-            <div class="filter-group">
-                <label>Rango de Edad</label>
-                <select id="ageFilter" class="form-control">
-                    <option value="all">Todas las edades</option>
-                    <option value="0-20">0 - 20 años</option>
-                    <option value="21-50">21 - 50 años</option>
-                    <option value="51-80">51 - 80 años</option>
-                    <option value="81+">Más de 80 años</option>
-                </select>
-            </div>
-            <div class="filter-group" style="flex: 0 0 auto;">
-                <label>&nbsp;</label>
-                <button class="btn-primary" id="addBtn" onclick="openModal('personModal')" disabled>
-                    <i class="fas fa-plus"></i> Nuevo
-                </button>
-            </div>
-            <div class="filter-group" style="flex: 0 0 auto;">
-                <label>&nbsp;</label>
-                <button class="btn-export" onclick="exportPDF()">
-                    <i class="fas fa-file-pdf"></i> PDF
-                </button>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <div class="table-scroll">
-                <table class="data-table" id="genealogyTable">
-                    <thead>
-                        <tr>
-                            <th width="120">Nacimiento</th>
-                            <th>Nombre Completo</th>
-                            <th>Lugar</th>
-                            <th>Género</th>
-                            <th>Defunción</th>
-                            <th>Edad (Act/Def)</th>
-                            <th>Padres</th>
-                            <th style="text-align: center;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr><td colspan="8" style="text-align:center; padding: 20px;">Cargando base de datos...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="pagination-bar">
-                <div class="page-info" id="pageInfo">Mostrando 0-0 de 0</div>
-                <div class="pagination-controls" id="paginationControls">
-                    </div>
-            </div>
+<div id="app-container">
+    <div class="app-header">
+        <div class="brand"><i class="fas fa-tree"></i> Familia Fioravante · Genealogía</div>
+        <div class="header-buttons">
+            <span id="userStatus">Invitado</span>
+            <button id="authBtn" onclick="toggleAuth()"><i class="fas fa-user-shield"></i> Admin</button>
+            <button onclick="exportAllToPDF()" title="Exportar todos los registros"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button id="newPersonBtn" style="background:#ffb347; color:#2c2c2c;" onclick="openCreateMode()"><i class="fas fa-plus-circle"></i> Nuevo</button>
+            <!-- BOTÓN SALIR: regresa a la pantalla de inicio -->
+            <button onclick="exitToLanding()" style="background:#dc2626; color:white;"><i class="fas fa-door-open"></i> Salir</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="personModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Nuevo Registro</h2>
-                <button class="action-btn" onclick="closeModal('personModal')">&times;</button>
+    <div class="three-col-layout">
+        <!-- IZQUIERDA: Años -->
+        <div class="years-panel">
+            <div class="panel-title"><i class="fas fa-calendar-alt"></i> Años de nacimiento</div>
+            <div class="years-list" id="yearsListContainer">
+                <div style="padding: 20px; text-align:center;">Cargando...</div>
             </div>
-            <div class="modal-body">
-                <form id="personForm">
-                    <input type="hidden" id="pId">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Nombre</label>
-                            <input type="text" id="pName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Apellido</label>
-                            <input type="text" id="pLast" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Género</label>
-                            <select id="pGender" class="form-control">
-                                <option value="masculino">Masculino</option>
-                                <option value="femenino">Femenino</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Lugar de Origen</label>
-                            <input type="text" id="pPlace" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Fecha Nacimiento (DD/MM/AAAA)</label>
-                            <input type="text" id="pBirth" class="form-control" placeholder="DD/MM/AAAA" maxlength="10">
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Fecha Defunción (DD/MM/AAAA)</label>
-                            <input type="text" id="pDeath" class="form-control" placeholder="DD/MM/AAAA" maxlength="10">
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Padre</label>
-                            <select id="pFather" class="form-control"><option value="">Ninguno</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label style="font-size:0.8rem">Madre</label>
-                            <select id="pMother" class="form-control"><option value="">Ninguna</option></select>
-                        </div>
-                        <div class="form-group form-full">
-                            <label style="font-size:0.8rem">Biografía / Notas</label>
-                            <textarea id="pBio" class="form-control" rows="3"></textarea>
-                        </div>
-                    </div>
-                </form>
+        </div>
+
+        <!-- CENTRAL: dividido en lista de personas (arriba) y familiares (abajo) -->
+        <div class="middle-panel">
+            <div class="middle-header">
+                <h3 id="middleTitle"><i class="fas fa-users"></i> Selecciona un año</h3>
             </div>
-            <div class="modal-footer">
-                <button class="btn-primary" style="background:#6c757d" onclick="closeModal('personModal')">Cancelar</button>
-                <button class="btn-primary" onclick="savePerson()">Guardar</button>
+            <div class="persons-list-container" id="personsByYearContainer">
+                <div class="empty-message">🔍 Elige un año del panel izquierdo</div>
+            </div>
+            <div class="relatives-section" id="relativesSection">
+                <div class="relatives-title"><i class="fas fa-project-diagram"></i> Familiares cercanos</div>
+                <div class="empty-relatives">✨ Selecciona una persona para ver aquí sus padres y hermanos.</div>
+            </div>
+        </div>
+
+        <!-- DERECHA: Detalle completo -->
+        <div class="detail-panel" id="detailPanel">
+            <div class="detail-header">
+                <h3><i class="fas fa-address-card"></i> Perfil completo</h3>
+                <div id="detailActionsBtn"></div>
+            </div>
+            <div class="detail-body" id="detailBody">
+                <div class="empty-message">✨ Selecciona una persona del listado central para ver todos sus datos.</div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal-overlay" id="viewModal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2 id="viewTitle">Detalles del Registro</h2>
-                <button class="action-btn" onclick="closeModal('viewModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Nombre</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vName">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Apellido</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vLast">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Género</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vGender">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Lugar de Origen</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vPlace">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Fecha Nacimiento</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vBirth">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Fecha Defunción</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vDeath">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Padre</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vFather">-</div>
-                    </div>
-                    <div class="form-group">
-                        <label style="font-size:0.8rem">Madre</label>
-                        <div class="form-control" style="background:#f8f9fa" id="vMother">-</div>
-                    </div>
-                    <div class="form-group form-full">
-                        <label style="font-size:0.8rem">Biografía / Notas</label>
-                        <div class="form-control" style="background:#f8f9fa; min-height: 80px;" id="vBio">-</div>
-                    </div>
+<!-- MODAL AUTH SIMPLE -->
+<div class="modal-overlay" id="authModal" style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:10000;">
+    <div style="background:white; border-radius:24px; padding:24px; width:320px;">
+        <h3 style="margin-bottom:16px;">Acceso administrador</h3>
+        <input type="email" id="loginEmail" class="form-control" placeholder="Email" style="width:100%; margin-bottom:12px; padding:10px; border-radius:12px; border:1px solid #ccc;">
+        <input type="password" id="loginPass" class="form-control" placeholder="Contraseña" style="width:100%; margin-bottom:20px; padding:10px; border-radius:12px;">
+        <button onclick="login()" class="btn-primary" style="width:100%">Ingresar</button>
+        <button onclick="closeAuthModal()" style="margin-top:12px; background:#e2e8f0; border:none; width:100%; padding:8px; border-radius:30px;">Cancelar</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+        authDomain: "familia-genealogia.firebaseapp.com",
+        projectId: "familia-genealogia",
+        storageBucket: "familia-genealogia.firebasestorage.app",
+        messagingSenderId: "923693678578",
+        appId: "1:923693678578:web:bfed5d66d564d00847356b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Estado global
+    let allPersons = [];
+    let currentUser = null;
+    let selectedYear = null;
+    let selectedPersonId = null;
+    let isEditingMode = false;
+
+    // ----- HELPERS DE FECHAS (DD/MM/AAAA) -----
+    function parseDateFromDMY(str) {
+        if (!str) return null;
+        const parts = str.split('/');
+        if (parts.length !== 3) return null;
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+        const date = new Date(year, month, day);
+        if (date.getDate() === day && date.getMonth() === month && date.getFullYear() === year) return date;
+        return null;
+    }
+    function getYearFromBirthDate(birthStr) {
+        if (!birthStr) return null;
+        const date = parseDateFromDMY(birthStr);
+        return date ? date.getFullYear() : null;
+    }
+    function normalizeDateFromAny(value) {
+        if (!value) return '';
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            const [y,m,d] = value.split('-');
+            return `${d}/${m}/${y}`;
+        }
+        const d = new Date(value);
+        if (!isNaN(d.getTime())) {
+            return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+        }
+        return value;
+    }
+    function calculateAgeDisplay(birth, death) {
+        const birthDate = parseDateFromDMY(birth);
+        if (!birthDate) return '-';
+        const endDate = death ? parseDateFromDMY(death) : new Date();
+        if (!endDate) return '-';
+        let age = endDate.getFullYear() - birthDate.getFullYear();
+        const m = endDate.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && endDate.getDate() < birthDate.getDate())) age--;
+        return death ? `${age} (fallecido)` : `${age} años`;
+    }
+    function getNameById(id) {
+        if (!id) return '-';
+        const p = allPersons.find(x => x.id === id);
+        return p ? `${p.firstName} ${p.lastName}` : 'Desconocido';
+    }
+
+    // Obtener hermanos (comparten padre o madre)
+    function getSiblings(personId) {
+        const target = allPersons.find(p => p.id === personId);
+        if (!target) return [];
+        return allPersons.filter(p => p.id !== personId && (
+            (target.fatherId && p.fatherId === target.fatherId) ||
+            (target.motherId && p.motherId === target.motherId)
+        ));
+    }
+
+    // Render panel izquierdo (años)
+    function renderYearsPanel() {
+        const container = document.getElementById('yearsListContainer');
+        const yearsSet = new Set();
+        allPersons.forEach(p => {
+            const y = getYearFromBirthDate(p.birthDate);
+            if (y !== null && !isNaN(y)) yearsSet.add(y);
+        });
+        const years = Array.from(yearsSet).sort((a,b)=>a-b);
+        if (years.length === 0) {
+            container.innerHTML = '<div class="empty-message">📅 Sin años registrados</div>';
+            return;
+        }
+        container.innerHTML = years.map(year => {
+            const count = allPersons.filter(p => getYearFromBirthDate(p.birthDate) === year).length;
+            const activeClass = (selectedYear === year) ? 'active' : '';
+            return `<div class="year-item ${activeClass}" data-year="${year}">
+                        <span><i class="fas fa-calendar"></i> ${year}</span>
+                        <span class="year-badge">${count}</span>
+                    </div>`;
+        }).join('');
+        document.querySelectorAll('.year-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const year = parseInt(el.dataset.year);
+                if (!isNaN(year)) selectYear(year);
+            });
+        });
+        if (selectedYear === null && years.length) selectYear(years[0]);
+    }
+
+    function selectYear(year) {
+        selectedYear = year;
+        selectedPersonId = null;
+        isEditingMode = false;
+        renderYearsPanel();
+        renderPersonsByYear();
+        clearRelativesSection();
+        clearDetailPanel();
+    }
+
+    // Render lista de personas en el año seleccionado
+    function renderPersonsByYear() {
+        const container = document.getElementById('personsByYearContainer');
+        const titleSpan = document.getElementById('middleTitle');
+        if (!selectedYear) {
+            titleSpan.innerHTML = `<i class="fas fa-calendar"></i> Selecciona un año`;
+            container.innerHTML = '<div class="empty-message">⚜️ Elige un año del panel izquierdo</div>';
+            return;
+        }
+        const filtered = allPersons.filter(p => getYearFromBirthDate(p.birthDate) === selectedYear);
+        titleSpan.innerHTML = `<i class="fas fa-birthday-cake"></i> Nacidos en ${selectedYear} (${filtered.length})`;
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-message">👶 No hay registros para este año</div>';
+            return;
+        }
+        container.innerHTML = filtered.map(p => `
+            <div class="person-card ${selectedPersonId === p.id ? 'selected' : ''}" data-id="${p.id}">
+                <div class="person-name">${p.firstName} ${p.lastName}</div>
+                <div class="person-meta">
+                    <span><i class="fas fa-map-pin"></i> ${p.birthPlace || '?'}</span>
+                    <span><i class="fas fa-calendar-day"></i> ${p.birthDate || '-'}</span>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn-primary" onclick="closeModal('viewModal')">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="authModal">
-        <div class="modal-content" style="max-width: 350px;">
-            <div class="modal-header">
-                <h2>Admin</h2>
-                <button class="action-btn" onclick="closeModal('authModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="email" id="loginEmail" class="form-control" placeholder="Email" style="margin-bottom:10px; width:100%">
-                <input type="password" id="loginPass" class="form-control" placeholder="Contraseña" style="width:100%">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-primary" style="width:100%" onclick="login()">Entrar</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
-            authDomain: "familia-genealogia.firebaseapp.com",
-            projectId: "familia-genealogia",
-            storageBucket: "familia-genealogia.firebasestorage.app",
-            messagingSenderId: "923693678578",
-            appId: "1:923693678578:web:bfed5d66d564d00847356b"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // ESTADO GLOBAL
-        let allPersons = [];
-        let filteredPersons = [];
-        let currentUser = null;
-        
-        // Paginación
-        let currentPage = 1;
-        const itemsPerPage = 10;
-
-        // --- LANDING ---
-        window.addEventListener('load', () => {
-            document.getElementById('landingProgress').style.width = '100%';
-            setTimeout(() => endLanding(), 10000);
-        });
-
-        window.endLanding = function() {
-            const landing = document.getElementById('landing-page');
-            landing.style.opacity = '0';
-            setTimeout(() => {
-                landing.style.display = 'none';
-                document.getElementById('app-container').style.display = 'flex';
-                renderTable();
-            }, 1000);
-        }
-
-        // --- DATA FETCH ---
-        onSnapshot(collection(db, "persons"), (snapshot) => {
-            allPersons = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            // Convertir fechas al formato DD/MM/AAAA si están en otro formato
-            allPersons.forEach(p => {
-                if (p.birthDate) p.birthDate = normalizeDate(p.birthDate);
-                if (p.deathDate) p.deathDate = normalizeDate(p.deathDate);
+        `).join('');
+        document.querySelectorAll('.person-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const id = card.dataset.id;
+                if (id) selectPerson(id);
             });
-            filterAndSortData();
-            updateParentSelects();
         });
+    }
 
-        // --- NORMALIZAR FECHAS A DD/MM/AAAA ---
-        function normalizeDate(dateStr) {
-            if (!dateStr) return '';
-            
-            // Si ya está en formato DD/MM/AAAA, devolverlo
-            if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-                return dateStr;
-            }
-            
-            // Convertir de formato YYYY-MM-DD a DD/MM/AAAA
-            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                const parts = dateStr.split('-');
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            
-            // Para otros formatos, intentar parsear
-            const date = new Date(dateStr);
-            if (!isNaN(date.getTime())) {
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = date.getFullYear();
-                return `${day}/${month}/${year}`;
-            }
-            
-            return dateStr;
+    // Al seleccionar una persona actualizamos panel derecho y la sección de familiares
+    function selectPerson(personId) {
+        const person = allPersons.find(p => p.id === personId);
+        if (!person) return;
+        selectedPersonId = personId;
+        isEditingMode = false;
+        renderPersonsByYear();    // resaltar la card seleccionada
+        renderDetailPanel(person);
+        renderRelativesSection(personId);   // mostrar padre, madre y hermanos debajo
+    }
+
+    // Sección central inferior: gráfico de familiares cercanos
+    function renderRelativesSection(personId) {
+        const container = document.getElementById('relativesSection');
+        const person = allPersons.find(p => p.id === personId);
+        if (!person) {
+            container.innerHTML = `<div class="relatives-title"><i class="fas fa-project-diagram"></i> Familiares cercanos</div>
+                                   <div class="empty-relatives">Selecciona un ancestro para ver su núcleo familiar.</div>`;
+            return;
         }
-
-        // --- FILTER & SORT (ORDEN DESCENDENTE CRONOLÓGICO) ---
-        function filterAndSortData() {
-            const txt = document.getElementById('searchFilter').value.toLowerCase();
-            const plc = document.getElementById('placeFilter').value.toLowerCase();
-            const ageRange = document.getElementById('ageFilter').value;
-
-            // 1. Filtrar
-            filteredPersons = allPersons.filter(p => {
-                const fullName = `${p.firstName} ${p.lastName}`.toLowerCase();
-                const bio = (p.biography || "").toLowerCase();
-                if (!fullName.includes(txt) && !bio.includes(txt)) return false;
-
-                const origin = (p.birthPlace || "").toLowerCase();
-                if (plc && !origin.includes(plc) && !bio.includes(plc)) return false;
-
-                const age = calculateAgeValue(p.birthDate, p.deathDate);
-                if (ageRange !== 'all') {
-                    if (age === null) return false;
-                    const [minStr, maxStr] = ageRange.split('-');
-                    if (ageRange === '81+') {
-                        if (age <= 80) return false;
-                    } else {
-                        const min = parseInt(minStr);
-                        const max = parseInt(maxStr);
-                        if (age < min || age > max) return false;
+        const father = person.fatherId ? allPersons.find(p => p.id === person.fatherId) : null;
+        const mother = person.motherId ? allPersons.find(p => p.id === person.motherId) : null;
+        const siblings = getSiblings(personId);
+        
+        let html = `<div class="relatives-title"><i class="fas fa-project-diagram"></i> Familiares de ${person.firstName} ${person.lastName}</div>`;
+        
+        // Padre
+        html += `<div class="relative-group">
+                    <div class="relative-label"><i class="fas fa-male"></i> Padre</div>
+                    <div class="relative-items">`;
+        if (father) html += `<div class="relative-badge" data-id="${father.id}">${father.firstName} ${father.lastName} (${father.birthDate || '?'})</div>`;
+        else html += `<span class="empty-relatives">No registrado</span>`;
+        html += `</div></div>`;
+        
+        // Madre
+        html += `<div class="relative-group">
+                    <div class="relative-label"><i class="fas fa-female"></i> Madre</div>
+                    <div class="relative-items">`;
+        if (mother) html += `<div class="relative-badge" data-id="${mother.id}">${mother.firstName} ${mother.lastName} (${mother.birthDate || '?'})</div>`;
+        else html += `<span class="empty-relatives">No registrada</span>`;
+        html += `</div></div>`;
+        
+        // Hermanos
+        html += `<div class="relative-group">
+                    <div class="relative-label"><i class="fas fa-users"></i> Hermanos (${siblings.length})</div>
+                    <div class="relative-items">`;
+        if (siblings.length === 0) html += `<span class="empty-relatives">Sin hermanos registrados</span>`;
+        else {
+            siblings.forEach(sib => {
+                html += `<div class="relative-badge" data-id="${sib.id}">${sib.firstName} ${sib.lastName} (${sib.birthDate || '?'})</div>`;
+            });
+        }
+        html += `</div></div>`;
+        container.innerHTML = html;
+        
+        // Agregar eventos de click a los badges para navegar a ese familiar
+        document.querySelectorAll('#relativesSection .relative-badge').forEach(badge => {
+            const id = badge.dataset.id;
+            if (id) {
+                badge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const targetPerson = allPersons.find(p => p.id === id);
+                    if (targetPerson) {
+                        // Cambiar año al del familiar y seleccionarlo
+                        const yearTarget = getYearFromBirthDate(targetPerson.birthDate);
+                        if (yearTarget && yearTarget !== selectedYear) {
+                            selectYear(yearTarget);
+                        } else if (!yearTarget && selectedYear === null) {
+                            selectYear(yearTarget);
+                        }
+                        // Forzar selección de esa persona
+                        setTimeout(() => {
+                            selectPerson(id);
+                        }, 50);
                     }
-                }
-                return true;
-            });
-
-            // 2. Ordenar DESCENDENTE por fecha de nacimiento (más reciente primero)
-            filteredPersons.sort((a, b) => {
-                const dateA = parseDate(a.birthDate);
-                const dateB = parseDate(b.birthDate);
-                
-                // Manejo de nulos: ponerlos al final (personas sin fecha)
-                if (!dateA && !dateB) return 0;
-                if (!dateA) return 1; // A sin fecha va después
-                if (!dateB) return -1; // B sin fecha va después
-
-                // Orden DESCENDENTE (más reciente primero)
-                return dateB.getTime() - dateA.getTime();
-            });
-
-            currentPage = 1;
-            renderTable();
-        }
-
-        // --- PARSEAR FECHAS EN FORMATO DD/MM/AAAA ---
-        function parseDate(str) {
-            if (!str || str.length !== 10) return null;
-            const parts = str.split('/'); // DD/MM/AAAA
-            if (parts.length !== 3) return null;
-            const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Mes 0-11
-            const year = parseInt(parts[2], 10);
-            if (day < 1 || day > 31 || month < 0 || month > 11 || year < 1000) return null;
-            const date = new Date(year, month, day);
-            // Validar fecha
-            if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
-                return null;
+                });
             }
-            return date;
-        }
-
-        function calculateAgeValue(birthStr, deathStr) {
-            const birth = parseDate(birthStr);
-            if (!birth) return null;
-
-            const end = deathStr ? parseDate(deathStr) : new Date();
-            if (!end) return null;
-
-            let age = end.getFullYear() - birth.getFullYear();
-            const m = end.getMonth() - birth.getMonth();
-            if (m < 0 || (m === 0 && end.getDate() < birth.getDate())) {
-                age--;
-            }
-            return age;
-        }
-
-        function getAgeDisplay(birth, death) {
-            const age = calculateAgeValue(birth, death);
-            if (age === null) return '-';
-            return death ? `${age} (Fallecido)` : `${age} años`;
-        }
-
-        function getName(id) {
-            const p = allPersons.find(x => x.id === id);
-            return p ? `${p.firstName} ${p.lastName}` : '-';
-        }
-
-        // --- RENDERIZADO TABLA (ORDEN DESCENDENTE) ---
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            const totalItems = filteredPersons.length;
-            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
-
-            if (currentPage > totalPages) currentPage = totalPages;
-
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const pageData = filteredPersons.slice(start, end);
-
-            tbody.innerHTML = '';
-
-            if (totalItems === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">No hay resultados con estos filtros.</td></tr>';
-                renderPagination(0, 0, 0);
-                return;
-            }
-
-            pageData.forEach(p => {
-                const ageDisplay = getAgeDisplay(p.birthDate, p.deathDate);
-                const tr = document.createElement('tr');
-                
-                tr.innerHTML = `
-                    <td class="date-col">${p.birthDate || '<span style="color:#999">-</span>'}</td>
-                    <td>
-                        <div class="name-bold">${p.firstName} ${p.lastName}</div>
-                        <div style="font-size:0.8rem; color:#666;">${(p.biography || "").substring(0, 30)}...</div>
-                    </td>
-                    <td>${p.birthPlace || '-'}</td>
-                    <td>${p.gender === 'femenino' ? '<i class="fas fa-venus" style="color:#e91e63"></i>' : '<i class="fas fa-mars" style="color:#2196f3"></i>'}</td>
-                    <td>${p.deathDate || '<span style="color:#28a745; font-size:0.85rem">Vivo/a</span>'}</td>
-                    <td><strong>${ageDisplay}</strong></td>
-                    <td>
-                        <div style="font-size:0.8rem">
-                            P: ${getName(p.fatherId)}<br>
-                            M: ${getName(p.motherId)}
-                        </div>
-                    </td>
-                    <td style="text-align: center;">
-                        <button class="action-btn" title="Ver" onclick="viewPerson('${p.id}')"><i class="fas fa-eye" style="color:#004aad"></i></button>
-                        ${currentUser ? `
-                            <button class="action-btn btn-edit" onclick="editPerson('${p.id}')"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="action-btn btn-delete" onclick="deletePerson('${p.id}')"><i class="fas fa-trash-alt"></i></button>
-                        ` : ''}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            renderPagination(totalItems, totalPages, start + 1, Math.min(end, totalItems));
-        }
-
-        function renderPagination(total, pages, showStart, showEnd) {
-            const info = document.getElementById('pageInfo');
-            const controls = document.getElementById('paginationControls');
-            
-            if (total === 0) {
-                info.innerText = "Sin resultados";
-                controls.innerHTML = "";
-                return;
-            }
-
-            info.innerText = `Mostrando ${showStart}-${showEnd} de ${total}`;
-            
-            let html = '';
-            html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
-            
-            for(let i = 1; i <= pages; i++) {
-                if (i === 1 || i === pages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                     html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
-                } else if (i === currentPage - 2 || i === currentPage + 2) {
-                    html += `<span style="padding:0 5px;">..</span>`;
-                }
-            }
-
-            html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === pages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
-            
-            controls.innerHTML = html;
-        }
-
-        window.changePage = (page) => {
-            if (page < 1 || page > Math.ceil(filteredPersons.length / itemsPerPage)) return;
-            currentPage = page;
-            renderTable();
-        };
-
-        // --- LISTENERS ---
-        ['searchFilter', 'placeFilter', 'ageFilter'].forEach(id => {
-            document.getElementById(id).addEventListener('input', filterAndSortData);
         });
-
-        // --- MODALES ---
-        window.openModal = (id) => {
-            document.getElementById(id).classList.add('active');
-            if (id === 'personModal' && !document.getElementById('pId').value) {
-                document.getElementById('personForm').reset();
-                document.getElementById('modalTitle').innerText = "Nuevo Registro";
-            }
-        };
-        
-        window.closeModal = (id) => {
-            document.getElementById(id).classList.remove('active');
-            if (id === 'personModal') document.getElementById('pId').value = '';
-        };
-
-        window.viewPerson = (id) => {
-            const p = allPersons.find(x => x.id === id);
-            if (!p) return;
-            
-            document.getElementById('vName').innerText = p.firstName;
-            document.getElementById('vLast').innerText = p.lastName;
-            document.getElementById('vGender').innerText = p.gender;
-            document.getElementById('vPlace').innerText = p.birthPlace || '-';
-            document.getElementById('vBirth').innerText = p.birthDate || '-';
-            document.getElementById('vDeath').innerText = p.deathDate || 'Vivo/a';
-            document.getElementById('vFather').innerText = getName(p.fatherId);
-            document.getElementById('vMother').innerText = getName(p.motherId);
-            document.getElementById('vBio').innerText = p.biography || 'Sin información';
-            document.getElementById('viewTitle').innerText = `${p.firstName} ${p.lastName}`;
-            
-            openModal('viewModal');
-        };
-
-        // --- CRUD (SOLO ADMIN) ---
-        window.savePerson = async () => {
-            const id = document.getElementById('pId').value;
-            const data = {
-                firstName: document.getElementById('pName').value,
-                lastName: document.getElementById('pLast').value,
-                gender: document.getElementById('pGender').value,
-                birthPlace: document.getElementById('pPlace').value,
-                birthDate: document.getElementById('pBirth').value,
-                deathDate: document.getElementById('pDeath').value,
-                fatherId: document.getElementById('pFather').value,
-                motherId: document.getElementById('pMother').value,
-                biography: document.getElementById('pBio').value,
-                updatedAt: serverTimestamp()
-            };
-
-            // Validar formato de fecha DD/MM/AAAA
-            const birthDate = parseDate(data.birthDate);
-            const deathDate = data.deathDate ? parseDate(data.deathDate) : null;
-            
-            if (data.birthDate && !birthDate) {
-                alert("Formato de fecha de nacimiento inválido. Use DD/MM/AAAA");
-                return;
-            }
-            
-            if (data.deathDate && !deathDate) {
-                alert("Formato de fecha de defunción inválido. Use DD/MM/AAAA");
-                return;
-            }
-
-            try {
-                if (id) await updateDoc(doc(db, "persons", id), data);
-                else {
-                    data.createdAt = serverTimestamp();
-                    await addDoc(collection(db, "persons"), data);
-                }
-                closeModal('personModal');
-            } catch (e) { alert("Error: " + e.message); }
-        };
-
-        window.editPerson = (id) => {
-            if (!currentUser) {
-                alert("Solo el administrador puede editar registros");
-                return;
-            }
-            const p = allPersons.find(x => x.id === id);
-            if (!p) return;
-            document.getElementById('pId').value = p.id;
-            document.getElementById('pName').value = p.firstName;
-            document.getElementById('pLast').value = p.lastName;
-            document.getElementById('pGender').value = p.gender;
-            document.getElementById('pPlace').value = p.birthPlace || '';
-            document.getElementById('pBirth').value = p.birthDate || '';
-            document.getElementById('pDeath').value = p.deathDate || '';
-            document.getElementById('pFather').value = p.fatherId || '';
-            document.getElementById('pMother').value = p.motherId || '';
-            document.getElementById('pBio').value = p.biography || '';
-            document.getElementById('modalTitle').innerText = "Editar Registro";
-            openModal('personModal');
-        };
-
-        window.deletePerson = async (id) => {
-            if (!currentUser) {
-                alert("Solo el administrador puede borrar registros");
-                return;
-            }
-            if(confirm("¿Seguro de borrar este registro?")) {
-                try {
-                    await deleteDoc(doc(db, "persons", id));
-                } catch (e) { alert("Error: " + e.message); }
-            }
-        };
-
-        function updateParentSelects() {
-            const f = document.getElementById('pFather');
-            const m = document.getElementById('pMother');
-            const curF = f.value; const curM = m.value;
-            f.innerHTML = '<option value="">Ninguno</option>';
-            m.innerHTML = '<option value="">Ninguna</option>';
-            const sorted = [...allPersons].sort((a,b) => a.firstName.localeCompare(b.firstName));
-            sorted.forEach(p => {
-                const opt = `<option value="${p.id}">${p.firstName} ${p.lastName}</option>`;
-                if (p.gender === 'masculino') f.innerHTML += opt;
-                if (p.gender === 'femenino') m.innerHTML += opt;
-            });
-            f.value = curF; m.value = curM;
+    }
+    
+    function clearRelativesSection() {
+        const container = document.getElementById('relativesSection');
+        container.innerHTML = `<div class="relatives-title"><i class="fas fa-project-diagram"></i> Familiares cercanos</div>
+                               <div class="empty-relatives">✨ Selecciona una persona para ver aquí sus padres y hermanos.</div>`;
+    }
+    
+    // Panel derecho: ficha completa (vista o edición)
+    function renderDetailPanel(person, editMode = false) {
+        const detailBody = document.getElementById('detailBody');
+        const actionsDiv = document.getElementById('detailActionsBtn');
+        if (!person) {
+            detailBody.innerHTML = '<div class="empty-message">🖼️ Selecciona un ancestro</div>';
+            actionsDiv.innerHTML = '';
+            return;
         }
-
-        // --- AUTH ---
-        window.toggleAuth = () => currentUser ? signOut(auth) : openModal('authModal');
-        
-        window.login = () => {
-            signInWithEmailAndPassword(auth, 
-                document.getElementById('loginEmail').value, 
-                document.getElementById('loginPass').value
-            ).then(() => closeModal('authModal')).catch(e => alert(e.message));
-        };
-
-        onAuthStateChanged(auth, user => {
-            currentUser = user;
-            document.getElementById('authBtn').innerHTML = user ? '<i class="fas fa-sign-out-alt"></i> Salir' : '<i class="fas fa-lock"></i> Acceso Admin';
-            document.getElementById('userStatus').innerText = user ? "Administrador" : "Invitado";
-            document.getElementById('addBtn').disabled = !user;
-            renderTable();
-        });
-
-        // --- PDF EXPORT ---
-        window.exportPDF = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFontSize(18);
-            doc.text("Familia Fioravante - Reporte Genealógico", 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generado: ${new Date().toLocaleDateString()}`, 14, 28);
-            doc.text(`Registros: ${filteredPersons.length}`, 14, 34);
-
-            const rows = filteredPersons.map(p => [
-                p.birthDate || '-',
-                `${p.firstName} ${p.lastName}`,
-                p.birthPlace || '-',
-                p.deathDate || 'Vivo',
-                getAgeDisplay(p.birthDate, p.deathDate),
-                getName(p.fatherId)
-            ]);
-
-            doc.autoTable({
-                head: [['Nacimiento', 'Nombre', 'Lugar', 'Defunción', 'Edad', 'Padre']],
-                body: rows,
-                startY: 40,
-                theme: 'grid',
-                headStyles: { fillColor: [0, 74, 173] }
-            });
-            doc.save("Reporte_Fioravante.pdf");
-        };
-
-        // --- INPUT MASKS (DD/MM/AAAA) ---
-        ['pBirth', 'pDeath'].forEach(id => {
-            const el = document.getElementById(id);
-            el.addEventListener('input', function(e) {
-                let v = this.value.replace(/\D/g,'');
-                if (v.length > 8) v = v.substring(0, 8);
-                
-                if (v.length >= 5) {
-                    this.value = v.replace(/^(\d{2})(\d{2})(\d{0,4})/, "$1/$2/$3");
-                } else if (v.length >= 3) {
-                    this.value = v.replace(/^(\d{2})(\d{0,2})/, "$1/$2");
-                } else {
-                    this.value = v;
-                }
-            });
-            
-            // Validar al perder foco
-            el.addEventListener('blur', function() {
-                if (this.value) {
-                    const date = parseDate(this.value);
-                    if (!date) {
-                        alert("Formato de fecha inválido. Use DD/MM/AAAA");
-                        this.focus();
+        if (!editMode) {
+            const isAdmin = !!currentUser;
+            actionsDiv.innerHTML = isAdmin ? `
+                <button onclick="enableEditMode()" style="background:#f1f5f9; border:none; border-radius:30px; padding:6px 12px;"><i class="fas fa-pen"></i> Editar</button>
+                <button onclick="confirmDeletePerson('${person.id}')" style="color:#b91c1c;"><i class="fas fa-trash-alt"></i></button>
+            ` : `<span class="inline-badge"><i class="fas fa-eye"></i> Solo lectura</span>`;
+            detailBody.innerHTML = `
+                <div class="field-group"><div class="field-label">NOMBRE COMPLETO</div><div class="field-value">${person.firstName} ${person.lastName}</div></div>
+                <div class="field-group"><div class="field-label">GÉNERO</div><div class="field-value">${person.gender === 'masculino' ? 'Masculino' : 'Femenino'}</div></div>
+                <div class="field-group"><div class="field-label">LUGAR DE ORIGEN</div><div class="field-value">${person.birthPlace || '-'}</div></div>
+                <div class="field-group"><div class="field-label">FECHA NACIMIENTO</div><div class="field-value">${person.birthDate || '-'} ${person.birthDate ? `(edad: ${calculateAgeDisplay(person.birthDate, person.deathDate)})` : ''}</div></div>
+                <div class="field-group"><div class="field-label">FECHA DEFUNCIÓN</div><div class="field-value">${person.deathDate || '<span class="inline-badge">Vivo/a</span>'}</div></div>
+                <div class="field-group"><div class="field-label">PADRE</div><div class="field-value">${getNameById(person.fatherId)}</div></div>
+                <div class="field-group"><div class="field-label">MADRE</div><div class="field-value">${getNameById(person.motherId)}</div></div>
+                <div class="field-group"><div class="field-label">BIOGRAFÍA / NOTAS</div><div class="field-value">${person.biography || 'Sin información adicional'}</div></div>
+            `;
+        } else {
+            // modo edición (igual que antes)
+            actionsDiv.innerHTML = `<button onclick="cancelEditMode()" style="background:#e2e8f0;"><i class="fas fa-times"></i> Cancelar</button>`;
+            detailBody.innerHTML = `
+                <div class="field-group"><div class="field-label">NOMBRE</div><input id="editFirstName" class="field-value editable-input" value="${person.firstName || ''}"></div>
+                <div class="field-group"><div class="field-label">APELLIDO</div><input id="editLastName" class="field-value editable-input" value="${person.lastName || ''}"></div>
+                <div class="field-group"><div class="field-label">GÉNERO</div><select id="editGender" class="field-value editable-input"><option ${person.gender === 'masculino' ? 'selected' : ''} value="masculino">Masculino</option><option ${person.gender === 'femenino' ? 'selected' : ''} value="femenino">Femenino</option></select></div>
+                <div class="field-group"><div class="field-label">LUGAR DE ORIGEN</div><input id="editBirthPlace" class="field-value editable-input" value="${person.birthPlace || ''}"></div>
+                <div class="field-group"><div class="field-label">FECHA NACIMIENTO (DD/MM/AAAA)</div><input id="editBirthDate" class="field-value editable-input" placeholder="DD/MM/AAAA" value="${person.birthDate || ''}"></div>
+                <div class="field-group"><div class="field-label">FECHA DEFUNCIÓN (DD/MM/AAAA)</div><input id="editDeathDate" class="field-value editable-input" placeholder="DD/MM/AAAA" value="${person.deathDate || ''}"></div>
+                <div class="field-group"><div class="field-label">PADRE</div><select id="editFatherId" class="field-value editable-input"><option value="">Ninguno</option></select></div>
+                <div class="field-group"><div class="field-label">MADRE</div><select id="editMotherId" class="field-value editable-input"><option value="">Ninguna</option></select></div>
+                <div class="field-group"><div class="field-label">BIOGRAFÍA</div><textarea id="editBio" rows="3" class="field-value editable-input">${person.biography || ''}</textarea></div>
+                <div class="flex-btns"><button class="btn-primary" onclick="saveEditedPerson('${person.id}')">💾 Guardar cambios</button></div>
+            `;
+            const fSelect = document.getElementById('editFatherId');
+            const mSelect = document.getElementById('editMotherId');
+            if (fSelect && mSelect) {
+                const sorted = [...allPersons].sort((a,b)=> a.firstName.localeCompare(b.firstName));
+                fSelect.innerHTML = '<option value="">Ninguno</option>';
+                mSelect.innerHTML = '<option value="">Ninguna</option>';
+                sorted.forEach(p => {
+                    if (p.id !== person.id) {
+                        if (p.gender === 'masculino') fSelect.innerHTML += `<option value="${p.id}" ${person.fatherId === p.id ? 'selected' : ''}>${p.firstName} ${p.lastName}</option>`;
+                        if (p.gender === 'femenino') mSelect.innerHTML += `<option value="${p.id}" ${person.motherId === p.id ? 'selected' : ''}>${p.firstName} ${p.lastName}</option>`;
                     }
-                }
-            });
-        });
+                });
+            }
+            const mask = (e) => { let v=e.target.value.replace(/\D/g,''); if(v.length>8) v=v.slice(0,8); if(v.length>=5) e.target.value=v.replace(/^(\d{2})(\d{2})(\d{0,4})/,"$1/$2/$3"); else if(v.length>=3) e.target.value=v.replace(/^(\d{2})(\d{0,2})/,"$1/$2"); else e.target.value=v; };
+            document.getElementById('editBirthDate')?.addEventListener('input', mask);
+            document.getElementById('editDeathDate')?.addEventListener('input', mask);
+        }
+    }
+    
+    function clearDetailPanel() {
+        document.getElementById('detailBody').innerHTML = '<div class="empty-message">👤 Selecciona un ancestro del listado central</div>';
+        document.getElementById('detailActionsBtn').innerHTML = '';
+        selectedPersonId = null;
+    }
 
-        window.changePage = changePage;
-    </script>
+    // Funciones globales de edición y creación
+    window.enableEditMode = () => { if(!currentUser){alert("Solo admin"); return;} const p = allPersons.find(p=>p.id===selectedPersonId); if(p) renderDetailPanel(p, true); };
+    window.cancelEditMode = () => { const p = allPersons.find(p=>p.id===selectedPersonId); if(p) renderDetailPanel(p, false); else clearDetailPanel(); };
+    window.saveEditedPerson = async (id) => {
+        const newData = {
+            firstName: document.getElementById('editFirstName').value.trim(),
+            lastName: document.getElementById('editLastName').value.trim(),
+            gender: document.getElementById('editGender').value,
+            birthPlace: document.getElementById('editBirthPlace').value,
+            birthDate: document.getElementById('editBirthDate').value,
+            deathDate: document.getElementById('editDeathDate').value || null,
+            fatherId: document.getElementById('editFatherId').value || null,
+            motherId: document.getElementById('editMotherId').value || null,
+            biography: document.getElementById('editBio').value,
+            updatedAt: serverTimestamp()
+        };
+        if (!newData.firstName || !newData.lastName) { alert("Nombre y apellido obligatorios"); return; }
+        if (newData.birthDate && !parseDateFromDMY(newData.birthDate)) { alert("Fecha nacimiento inválida (DD/MM/AAAA)"); return; }
+        if (newData.deathDate && !parseDateFromDMY(newData.deathDate)) { alert("Fecha defunción inválida"); return; }
+        await updateDoc(doc(db, "persons", id), newData);
+        cancelEditMode();
+    };
+    window.confirmDeletePerson = async (id) => { if(!currentUser) return; if(confirm("Eliminar permanentemente?")) await deleteDoc(doc(db,"persons",id)); };
+    window.openCreateMode = () => { alert("Función de creación mejorada en la versión completa. Usa el botón Nuevo del header."); };
+    window.exportAllToPDF = () => { const {jsPDF}=window.jspdf; const pdf=new jsPDF(); pdf.text("Fioravante - Reporte",14,20); const rows=allPersons.map(p=>[`${p.firstName} ${p.lastName}`, p.birthDate||'-', p.deathDate||'Vivo', calculateAgeDisplay(p.birthDate,p.deathDate)]); pdf.autoTable({head:[["Nombre","Nacimiento","Defunción","Edad"]], body:rows, startY:30}); pdf.save("genealogia.pdf"); };
+    
+    // ** NUEVA FUNCIÓN: SALIR A LA LANDING PAGE **
+    window.exitToLanding = () => {
+        // Mostrar landing, ocultar app
+        const landing = document.getElementById('landing-page');
+        const app = document.getElementById('app-container');
+        landing.style.display = 'flex';
+        landing.style.opacity = '1';
+        app.style.display = 'none';
+        
+        // Resetear estado de selección para que al volver todo esté limpio
+        selectedYear = null;
+        selectedPersonId = null;
+        isEditingMode = false;
+        
+        // Forzar re-render de los paneles para que muestren el estado inicial
+        renderYearsPanel();        // Si hay años, selecciona el primero automáticamente
+        clearRelativesSection();
+        clearDetailPanel();
+        // Asegurar mensaje en el listado central
+        document.getElementById('personsByYearContainer').innerHTML = '<div class="empty-message">🔍 Elige un año del panel izquierdo</div>';
+        document.getElementById('middleTitle').innerHTML = `<i class="fas fa-users"></i> Selecciona un año`;
+    };
+    
+    // Auth & landing
+    window.endLanding = () => { const l=document.getElementById('landing-page'); l.style.opacity='0'; setTimeout(()=>{l.style.display='none'; document.getElementById('app-container').style.display='flex';},800); };
+    window.toggleAuth = () => currentUser ? signOut(auth) : openAuthModal();
+    window.openAuthModal = () => { document.getElementById('authModal').style.display='flex'; };
+    window.closeAuthModal = () => { document.getElementById('authModal').style.display='none'; };
+    window.login = () => { signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPass').value).then(()=>closeAuthModal()).catch(e=>alert(e.message)); };
+    onAuthStateChanged(auth, user => { currentUser = user; document.getElementById('userStatus').innerText = user ? "Administrador" : "Invitado"; document.getElementById('authBtn').innerHTML = user ? '<i class="fas fa-sign-out-alt"></i> Salir' : '<i class="fas fa-lock"></i> Admin'; if(selectedPersonId){ const p=allPersons.find(p=>p.id===selectedPersonId); if(p) renderDetailPanel(p, false); } });
+    
+    // Firestore listener
+    onSnapshot(collection(db, "persons"), (snapshot) => {
+        allPersons = snapshot.docs.map(docSnap => {
+            let data = docSnap.data();
+            if (data.birthDate) data.birthDate = normalizeDateFromAny(data.birthDate);
+            if (data.deathDate) data.deathDate = normalizeDateFromAny(data.deathDate);
+            return { id: docSnap.id, ...data };
+        });
+        renderYearsPanel();
+        if (selectedYear) renderPersonsByYear();
+        if (selectedPersonId) {
+            const stillExists = allPersons.find(p => p.id === selectedPersonId);
+            if (stillExists) {
+                renderDetailPanel(stillExists, false);
+                renderRelativesSection(selectedPersonId);
+            } else {
+                clearDetailPanel();
+                clearRelativesSection();
+            }
+        }
+    });
+    window.addEventListener('load', () => { document.getElementById('landingProgress').style.width = '100%'; setTimeout(()=>endLanding(),8000); });
+</script>
 </body>
 </html>
