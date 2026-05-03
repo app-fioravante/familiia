@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Genealogía Fioravante - Mapas de Ciudades</title>
+    <!-- Google Fonts: Inter + Dancing Script (desde index.html) -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Inter:opsz,wght@14..32,300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS y JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Firebase SDK (versión estable) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Paleta de colores TOMADA DE INDEX.HTML */
+        :root {
+            --primary: #2C423F;      /* verde oscuro elegante */
+            --accent: #C47D57;       /* terracota / cálido */
+            --text-light: #F7F4EF;
+            --bg-soft: #FAF8F5;      /* fondo claro tipo pergamino */
+            --border-light: #E5E0D8;
+            --font-main: 'Inter', sans-serif;
+            --font-fancy: 'Dancing Script', cursive;
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: var(--bg-soft);
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ========= PANEL IZQUIERDO (HEREDADOS DE INDEX) ========= */
+        .sidebar {
+            width: 340px;
+            background-color: var(--primary);
+            color: var(--text-light);
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0 20px 0;
+            overflow-y: auto;
+            z-index: 10;
+            backdrop-filter: blur(0px);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar h1 {
+            font-family: var(--font-fancy);
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            padding: 0 24px 12px 24px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFFFFF 0%, #D4D0C8 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            padding: 0 20px 20px 20px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-family: var(--font-main);
+            font-weight: 500;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 60px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: white;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .filter-input::placeholder {
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 400;
+        }
+
+        .filter-input:focus {
+            border-color: var(--accent);
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(196, 125, 87, 0.25);
+        }
+
+        .city-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 16px 20px 16px;
+        }
+
+        .city-item {
+            background: rgba(255, 255, 255, 0.08);
+            margin-bottom: 10px;
+            padding: 12px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .city-item:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .city-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .city-count {
+            background: rgba(0, 0, 0, 0.35);
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-light);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ========= ÁREA DEL MAPA ========= */
+        .map-area {
+            flex: 1;
+            position: relative;
+            background: #e9e4db;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* LOADING con estilo elegante */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 66, 63, 0.9);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            color: white;
+            font-weight: 500;
+            flex-direction: column;
+            gap: 16px;
+            font-family: var(--font-main);
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========= PANEL LATERAL DERECHO (FIJO / SLIDE-IN) ========= */
+        .ancestor-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 380px;
+            max-width: 90vw;
+            height: 100%;
+            background: var(--primary);
+            color: var(--text-light);
+            box-shadow: -8px 0 28px rgba(0, 0, 0, 0.4);
+            z-index: 300;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+            border-left: 4px solid var(--accent);
+            font-family: var(--font-main);
+        }
+
+        .ancestor-panel.active {
+            transform: translateX(0);
+        }
+
+        .panel-header {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 22px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel-header h2 {
+            font-family: var(--font-fancy);
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin: 0;
+            word-break: break-word;
+            color: white;
+            letter-spacing: -0.3px;
+        }
+
+        .panel-close-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: var(--text-light);
+            font-size: 1.8rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+
+        .panel-close-btn:hover {
+            background: var(--accent);
+            transform: scale(1.02);
+            color: white;
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 20px;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .person-row {
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 12px;
+            padding: 14px 18px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            transition: all 0.2s;
+            backdrop-filter: blur(2px);
+        }
+
+        .person-row:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateX(-4px);
+        }
+
+        .person-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            letter-spacing: -0.2px;
+        }
+
+        .person-year {
+            font-weight: 500;
+            color: #FFE0B5;
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 12px;
+            border-radius: 30px;
+        }
+
+        .panel-footer {
+            padding: 16px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            text-align: right;
+        }
+
+        .btn-cerrar {
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            padding: 8px 22px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: var(--font-main);
+        }
+
+        .btn-cerrar:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .panel-empty {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 40px 20px;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* MODAL FLOTANTE CRÉDITOS (IDÉNTICO AL INDEX) */
+        .floating-credit-modal {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #FFFFFF;
+            border-left: 5px solid var(--accent);
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            padding: 12px 20px;
+            z-index: 1000;
+            max-width: 260px;
+            font-family: var(--font-main);
+            font-size: 0.8rem;
+            line-height: 1.45;
+            color: #1E2A2A;
+            background-color: #fefcf9;
+            transition: opacity 0.2s;
+            text-align: center;
+            backdrop-filter: blur(2px);
+        }
+        .floating-credit-modal .credit-line {
+            display: block;
+            text-align: center;
+        }
+        .floating-credit-modal strong {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+            .sidebar h1 {
+                font-size: 1.7rem;
+                padding: 0 16px 10px 16px;
+            }
+            .city-item {
+                padding: 8px 14px;
+            }
+            .ancestor-panel {
+                width: 100vw;
+            }
+            .panel-header h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- Panel izquierdo: lista de ciudades + buscador -->
+    <aside class="sidebar">
+        <h1>Ciudades Natales</h1>
+        <div class="search-box">
+            <input type="text" id="citySearchInput" class="filter-input" placeholder="🔍 Buscar ciudad...">
+        </div>
+        <div id="cityListContainer" class="city-list">
+            <div style="padding: 30px; text-align: center; color: rgba(255,255,255,0.7);">⏳ Cargando ciudades...</div>
+        </div>
+    </aside>
+
+    <!-- Mapa principal -->
+    <main class="map-area">
+        <div id="map"></div>
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <div>Geolocalizando & construyendo mapa familiar...</div>
+        </div>
+
+        <!-- PANEL LATERAL INFORMATIVO (fijo al hacer click en ciudad) -->
+        <div id="ancestorPanel" class="ancestor-panel">
+            <div class="panel-header">
+                <h2 id="panelCityTitle">🌿 Ancestros</h2>
+                <button class="panel-close-btn" id="closePanelBtn">&times;</button>
+            </div>
+            <div class="panel-body" id="panelBodyContent">
+                <div class="panel-empty">Selecciona una ciudad para ver los nacidos allí</div>
+            </div>
+            <div class="panel-footer">
+                <button class="btn-cerrar" id="closePanelFooterBtn">Cerrar</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal flotante de créditos inspirado en index.html (desaparece en 5s) -->
+<div id="infoCreditModal" class="floating-credit-modal">
+    <span class="credit-line"><strong>Diseño y Programación:</strong></span>
+    <span class="credit-line">Rómulo Fioravante</span>
+    <span class="credit-line"><strong>Versión:</strong> 1.0.2026 · Mapa Familiar</span>
+    <span class="credit-line">Posadas-Misiones</span>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // CONFIGURACIÓN FIREBASE (misma credencial que index.html)
+    // --------------------------------------------------------------
+    const firebaseConfig = {
+        apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+        authDomain: "familia-genealogia.firebaseapp.com",
+        projectId: "familia-genealogia",
+        storageBucket: "familia-genealogia.firebasestorage.app",
+        messagingSenderId: "923693678578",
+        appId: "1:923693678578:web:bfed5d66d564d00847356b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ---------- VARIABLES GLOBALES ----------
+    let map = null;
+    let allCities = [];        // { id, name, lat, lng, count, persons: [] }
+    let markersLayer = null;
+    let mapInitialized = false;
+
+    // DOM elements
+    const cityListContainer = document.getElementById('cityListContainer');
+    const searchInput = document.getElementById('citySearchInput');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const ancestorPanel = document.getElementById('ancestorPanel');
+    const panelCityTitle = document.getElementById('panelCityTitle');
+    const panelBodyContent = document.getElementById('panelBodyContent');
+    const closePanelBtn = document.getElementById('closePanelBtn');
+    const closePanelFooterBtn = document.getElementById('closePanelFooterBtn');
+
+    // Helper: Normalización (sin tildes, minúsculas)
+    function normalizeString(str) {
+        if (!str) return '';
+        return str.toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^\w\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function cityMatches(cityName, searchTerm) {
+        if (!searchTerm) return true;
+        const normCity = normalizeString(cityName);
+        const normSearch = normalizeString(searchTerm);
+        return normCity.includes(normSearch);
+    }
+
+    // Escape para inyección segura
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Renderiza la lista de ciudades en el sidebar
+    function renderCityList(filterText = '') {
+        if (!allCities.length) {
+            cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">🌍 No hay ciudades con datos genealógicos aún.</div>';
+            return;
+        }
+        let filtered = allCities.filter(city => cityMatches(city.name, filterText));
+        if (filtered.length === 0) {
+            cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">🔍 Ninguna ciudad coincide con tu búsqueda.</div>';
+            return;
+        }
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        let html = '';
+        filtered.forEach(city => {
+            html += `
+                <div class="city-item" data-id="${escapeHtml(city.id)}">
+                    <span class="city-name">${escapeHtml(city.name)}</span>
+                    <span class="city-count">${city.count} ${city.count === 1 ? 'persona' : 'personas'}</span>
+                </div>
+            `;
+        });
+        cityListContainer.innerHTML = html;
+
+        // Asignar evento click a cada ciudad para mostrar panel + centrar mapa
+        document.querySelectorAll('.city-item').forEach(el => {
+            const id = el.getAttribute('data-id');
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const city = allCities.find(c => c.id === id);
+                if (!city) return;
+                // Centrar mapa en la ciudad si tiene coordenadas
+                if (city.lat && city.lng && map) {
+                    map.setView([city.lat, city.lng], 12);
+                }
+                // Abrir panel lateral con información DETALLADA (fijo)
+                openAncestorPanel(city);
+            });
+        });
+    }
+
+    // Función para ABRIR panel con la lista de ancestros (fijo hasta que se cierre manualmente)
+    function openAncestorPanel(city) {
+        // Actualizar título del panel
+        panelCityTitle.textContent = `${city.name}  •  ${city.count} ${city.count === 1 ? 'ancestro' : 'ancestros'}`;
+        
+        if (!city.persons || city.persons.length === 0) {
+            panelBodyContent.innerHTML = '<div class="panel-empty">📜 No hay registros de nacimiento detallados para esta ciudad.</div>';
+        } else {
+            // Ordenar por nombre o año
+            const sorted = [...city.persons].sort((a, b) => {
+                if (a.fullName && b.fullName) return a.fullName.localeCompare(b.fullName);
+                return 0;
+            });
+            let rowsHtml = '';
+            sorted.forEach(person => {
+                const nameSafe = escapeHtml(person.fullName || 'Nombre no registrado');
+                const yearSafe = person.birthYear ? escapeHtml(String(person.birthYear)) : 'año desconocido';
+                rowsHtml += `
+                    <div class="person-row">
+                        <span class="person-name">👤 ${nameSafe}</span>
+                        <span class="person-year">📅 ${yearSafe}</span>
+                    </div>
+                `;
+            });
+            panelBodyContent.innerHTML = rowsHtml;
+        }
+        // Asegurar que el panel se muestre (clase active)
+        ancestorPanel.classList.add('active');
+    }
+
+    // Cerrar panel lateral completamente
+    function closeAncestorPanel() {
+        ancestorPanel.classList.remove('active');
+    }
+
+    // Eventos de cierre del panel (X y botón footer)
+    closePanelBtn.addEventListener('click', closeAncestorPanel);
+    closePanelFooterBtn.addEventListener('click', closeAncestorPanel);
+    // Cerrar con tecla ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && ancestorPanel.classList.contains('active')) {
+            closeAncestorPanel();
+        }
+    });
+
+    // Actualizar marcadores en el mapa (usando filtro de búsqueda)
+    function updateMarkers() {
+        if (!map || !allCities.length) return;
+        if (markersLayer) {
+            map.removeLayer(markersLayer);
+        }
+        markersLayer = L.layerGroup().addTo(map);
+        const searchTerm = searchInput.value.trim();
+        let filtered = allCities.filter(city => cityMatches(city.name, searchTerm));
+        filtered.forEach(city => {
+            if (city.lat && city.lng) {
+                const popupHtml = `
+                    <b style="font-family: 'Inter'; color: #2C423F;">📍 ${escapeHtml(city.name)}</b><br>
+                    <span style="font-size:0.85rem;">👥 ${city.count} habitante(s) registrado(s)</span><br>
+                    <i style="font-size:0.75rem;">Haz clic en la lista para detalles</i>
+                `;
+                const marker = L.marker([city.lat, city.lng], {
+                    riseOnHover: true
+                }).bindPopup(popupHtml);
+                marker.addTo(markersLayer);
+            }
+        });
+        // Ajustar vista solo si es la primera vez o si hay filtro vacío y se desea ver todas
+        if (filtered.length > 0 && !searchTerm && mapInitialized) {
+            const group = L.featureGroup();
+            filtered.forEach(city => {
+                if (city.lat && city.lng) group.addLayer(L.marker([city.lat, city.lng]));
+            });
+            if (group.getLayers().length) {
+                map.fitBounds(group.getBounds().pad(0.15));
+            }
+        }
+    }
+
+    // Geocodificación usando Nominatim (con delay para respetar política)
+    async function geocodeCity(cityName) {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityName)}&format=json&limit=1&addressdetails=0`;
+        try {
+            const response = await fetch(url, {
+                headers: { 'User-Agent': 'FioravanteGenealogy/1.0' }
+            });
+            const data = await response.json();
+            if (data && data.length > 0) {
+                return {
+                    lat: parseFloat(data[0].lat),
+                    lng: parseFloat(data[0].lon)
+                };
+            }
+            return null;
+        } catch (error) {
+            console.warn(`Error geocodificando ${cityName}:`, error);
+            return null;
+        }
+    }
+
+    // Cargar y procesar datos desde Firestore (colección "persons")
+    async function loadAndGeocodeCities() {
+        try {
+            const snapshot = await db.collection("persons").get();
+            if (snapshot.empty) {
+                cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">📭 No hay personas en el árbol genealógico aún.</div>';
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                return;
+            }
+
+            const cityMap = new Map(); // key: nombre normalizado, value: objeto acumulador
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                let birthPlace = data.birthPlace ? data.birthPlace.trim() : null;
+                if (!birthPlace) return; // ignorar personas sin lugar de nacimiento
+
+                const normKey = normalizeString(birthPlace);
+                // Construir nombre completo
+                let fullName = data.fullName || '';
+                if (!fullName && (data.firstName || data.lastName)) {
+                    fullName = [data.firstName, data.lastName].filter(Boolean).join(' ');
+                }
+                if (!fullName && data.name) fullName = data.name;
+                if (!fullName) fullName = 'Ancestro sin nombre';
+
+                let birthYear = data.birthYear ? data.birthYear : null;
+                if (!birthYear && data.birthDate) {
+                    try {
+                        if (data.birthDate && typeof data.birthDate.toDate === 'function') {
+                            birthYear = data.birthDate.toDate().getFullYear();
+                        } else if (typeof data.birthDate === 'string') {
+                            const parsed = new Date(data.birthDate);
+                            if (!isNaN(parsed)) birthYear = parsed.getFullYear();
+                        }
+                    } catch (e) {}
+                }
+
+                const personInfo = {
+                    id: doc.id,
+                    fullName: fullName,
+                    birthYear: birthYear
+                };
+
+                if (cityMap.has(normKey)) {
+                    const entry = cityMap.get(normKey);
+                    entry.count += 1;
+                    entry.persons.push(personInfo);
+                } else {
+                    cityMap.set(normKey, {
+                        rawName: birthPlace,
+                        count: 1,
+                        persons: [personInfo]
+                    });
+                }
+            });
+
+            if (cityMap.size === 0) {
+                cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">🌎 No se encontraron ciudades asociadas (campo birthPlace vacío).</div>';
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                return;
+            }
+
+            // Mostrar loading overlay con progreso
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+            }
+            const totalCities = cityMap.size;
+            let processed = 0;
+            const citiesArray = [];
+
+            for (let [normKey, cityInfo] of cityMap.entries()) {
+                processed++;
+                if (loadingOverlay) {
+                    loadingOverlay.innerHTML = `<div class="spinner"></div><div>🗺️ Geocodificando: ${processed}/${totalCities} · ${escapeHtml(cityInfo.rawName)}</div>`;
+                }
+                const coords = await geocodeCity(cityInfo.rawName);
+                if (coords) {
+                    citiesArray.push({
+                        id: normKey,
+                        name: cityInfo.rawName,
+                        lat: coords.lat,
+                        lng: coords.lng,
+                        count: cityInfo.count,
+                        persons: cityInfo.persons
+                    });
+                } else {
+                    // Si no se geocode, igual mostramos ciudad pero sin marcador? O la omitimos del mapa pero en lista?
+                    // Para mantener lista completa, la agregamos SIN coordenadas (para que aparezca en sidebar pero no en mapa)
+                    citiesArray.push({
+                        id: normKey,
+                        name: cityInfo.rawName,
+                        lat: null,
+                        lng: null,
+                        count: cityInfo.count,
+                        persons: cityInfo.persons
+                    });
+                }
+                // Pequeña pausa para respetar límites de Nominatim
+                await new Promise(r => setTimeout(r, 180));
+            }
+
+            allCities = citiesArray;
+            if (loadingOverlay) {
+                if (allCities.length === 0) {
+                    loadingOverlay.innerHTML = `<div>⚠️ No se pudo localizar ninguna ciudad. Verifica los nombres.</div>`;
+                    setTimeout(() => { if (loadingOverlay) loadingOverlay.style.display = 'none'; }, 2000);
+                } else {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+
+            // Renderizar lista y actualizar mapa
+            renderCityList('');
+            if (mapInitialized && map) {
+                updateMarkers();
+                // Zoom a las ciudades con coordenadas válidas
+                const validCities = allCities.filter(c => c.lat && c.lng);
+                if (validCities.length) {
+                    const bounds = L.latLngBounds(validCities.map(c => [c.lat, c.lng]));
+                    if (bounds.isValid()) map.fitBounds(bounds.pad(0.1));
+                } else if (map) {
+                    map.setView([-27.3666, -55.8969], 5); // vista aproximada a Misiones/Argentina
+                }
+            }
+        } catch (error) {
+            console.error("Error crítico al cargar datos:", error);
+            cityListContainer.innerHTML = `<div style="padding:20px; color:#ffaa88;">⚠️ Error conectando con la base: ${error.message}</div>`;
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+        }
+    }
+
+    // Inicializar mapa Leaflet
+    function initMap() {
+        map = L.map('map').setView([-27.3666, -55.8969], 5); // centro aproximado Argentina
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
+            subdomains: 'abcd',
+            maxZoom: 18,
+            minZoom: 3
+        }).addTo(map);
+        mapInitialized = true;
+        if (allCities.length > 0) {
+            updateMarkers();
+            const citiesWithCoords = allCities.filter(c => c.lat && c.lng);
+            if (citiesWithCoords.length) {
+                const bounds = L.latLngBounds(citiesWithCoords.map(c => [c.lat, c.lng]));
+                if (bounds.isValid()) map.fitBounds(bounds.pad(0.1));
+            }
+        }
+    }
+
+    // Evento de búsqueda en tiempo real
+    searchInput.addEventListener('input', () => {
+        renderCityList(searchInput.value);
+        if (mapInitialized) updateMarkers();
+    });
+
+    // MODAL FLOTANTE: desaparece luego de 5 segundos (como en index)
+    const creditModal = document.getElementById('infoCreditModal');
+    if (creditModal) {
+        setTimeout(() => {
+            if (creditModal && creditModal.remove) {
+                creditModal.remove();
+            } else if (creditModal && creditModal.style) {
+                creditModal.style.display = 'none';
+            }
+        }, 5000);
+    }
+
+    // EJECUCIÓN PRINCIPAL: carga y luego mapa
+    (async () => {
+        await loadAndGeocodeCities();
+        initMap();
+    })();
+</script>
+</body>
+</html>
