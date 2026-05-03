@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fioravante · Archivos Genealógicos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #2C423F;
+            --accent: #C47D57;
+            --font-main: 'Inter', sans-serif;
+            --bg-soft: #FAF8F5;
+            --alert-red: #b91c1c;
+            --alert-red-dark: #7f1a1a;
+        }
+        body, html { height: 100%; width: 100%; background: var(--bg-soft); font-family: var(--font-main); overflow: hidden; }
+        .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+        .main-empty { flex: 1; }
+        .bottom-panel {
+            background-color: var(--primary);
+            padding: 0 2rem;
+            height: 85px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+            gap: 1rem;
+        }
+        .menu-wrapper { position: relative; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .menu-creative {
+            width: 54px; height: 54px; background: #FFFFFF; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; z-index: 5;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .menu-light-aura {
+            position: absolute; width: 62px; height: 62px; border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0%, var(--accent) 50%, transparent 100%);
+            animation: rotateLight 2s linear infinite; filter: blur(4px); opacity: 0.8; z-index: 1;
+        }
+        @keyframes rotateLight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .lupa-icon { width: 24px; height: 24px; position: relative; animation: lupa-searching 5s infinite ease-in-out; }
+        .lupa-circle { width: 18px; height: 18px; border: 2.5px solid var(--primary); border-radius: 50%; position: absolute; top:0; left:0; }
+        .lupa-handle { width: 9px; height: 3px; background-color: var(--primary); position: absolute; bottom: 2px; right: 0; transform: rotate(45deg); border-radius: 5px; }
+        @keyframes lupa-searching { 0%,100%{transform:translate(0,0);} 25%{transform:translate(2px,-2px) rotate(5deg);} 50%{transform:translate(-1px,2px) rotate(-5deg);} 75%{transform:translate(-2px,-1px) rotate(3deg);} }
+        .menu-open .lupa-circle { border-color: var(--accent); }
+        .menu-open .lupa-handle { background-color: var(--accent); }
+
+        .main-genealogy-text {
+            flex: 1;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: clamp(0.85rem, 4.5vw, 1.2rem);
+            color: #F7F4EF;
+            line-height: 1.35;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        .main-genealogy-text strong {
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #E6DFD3 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ========== BOTÓN SALIR ROJO DESTACADO ========== */
+        .btn-exit {
+            background: var(--alert-red);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
+            letter-spacing: 0.3px;
+        }
+        .btn-exit:hover {
+            background: var(--alert-red-dark);
+            transform: scale(0.96);
+            box-shadow: 0 1px 3px rgba(127, 26, 26, 0.5);
+        }
+
+        .floating-menu {
+            position: fixed; bottom: 100px; left: 20px;
+            background: rgba(250, 248, 245, 0.98); backdrop-filter: blur(15px); border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 0.8rem 0; min-width: 250px;
+            transform: translateY(20px) scale(0.95); opacity: 0; visibility: hidden;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(196, 125, 87, 0.15); z-index: 200;
+        }
+        .floating-menu.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .floating-menu ul { list-style: none; }
+        .floating-menu li {
+            padding: 14px 24px; color: var(--primary); font-weight: 500; cursor: pointer;
+            transition: all 0.3s ease; font-size: 0.95rem;
+        }
+        .floating-menu ul:hover li { opacity: 0.3; }
+        .floating-menu ul:hover li:hover { opacity: 1; background: #F3EBE6; padding-left: 30px; }
+
+        /* ========== MODAL ROJO DE ADVERTENCIA ========== */
+        .alert-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+        }
+        .alert-modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .alert-modal {
+            background: #fffaf7;
+            width: 280px;
+            max-width: 85vw;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.35);
+            text-align: center;
+            padding: 1.5rem 1.2rem 1.2rem;
+            border-left: 7px solid var(--alert-red);
+            transform: scale(0.92);
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .alert-modal-overlay.active .alert-modal {
+            transform: scale(1);
+        }
+        .alert-icon {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .alert-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--alert-red);
+            margin-bottom: 0.6rem;
+            font-family: 'Inter', sans-serif;
+        }
+        .alert-message {
+            font-size: 0.9rem;
+            color: #2d2a24;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+        .alert-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .alert-btn {
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .alert-btn-cancel {
+            background: #e9e5df;
+            color: #2C423F;
+        }
+        .alert-btn-cancel:hover {
+            background: #dbd4cc;
+            transform: scale(0.96);
+        }
+        .alert-btn-confirm {
+            background: var(--alert-red);
+            color: white;
+            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.3);
+        }
+        .alert-btn-confirm:hover {
+            background: var(--alert-red-dark);
+            transform: scale(0.96);
+        }
+
+        @media (max-width: 768px) {
+            .bottom-panel { padding: 0 1rem; height: 80px; }
+            .menu-wrapper { transform: scale(0.9); }
+            .btn-exit { padding: 6px 18px; font-size: 0.8rem; }
+            .alert-modal { width: 260px; padding: 1.2rem 1rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="main-empty"></div>
+    <div class="bottom-panel">
+        <div class="menu-wrapper">
+            <div class="menu-light-aura"></div>
+            <div class="menu-creative" id="creativeMenuBtn">
+                <div class="lupa-icon"><div class="lupa-circle"></div><div class="lupa-handle"></div></div>
+            </div>
+        </div>
+        <div class="main-genealogy-text">
+            Genealogía de la Familia <strong>Fioravante</strong> (Argentina) · Resguardando nuestra historia
+        </div>
+        <button class="btn-exit" id="exitButton">Salir</button>
+    </div>
+</div>
+<div class="floating-menu" id="floatingMenu">
+    <ul>
+        <li data-section="origen">Origen del Apellido</li>
+        <li data-section="argentina">Argentina</li>
+        <li data-section="brasil">Brasil</li>
+        <li data-section="italia">Italia</li>
+        <li data-section="mapas">Mapas</li>
+        <li data-section="recuerdos">Recuerdos</li>
+        <li data-section="contacto">Contacto</li>
+    </ul>
+</div>
+
+<!-- MODAL ROJO DE ADVERTENCIA (estructura oculta) -->
+<div id="alertModal" class="alert-modal-overlay">
+    <div class="alert-modal">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-title">Cerrar sesión</div>
+        <div class="alert-message">¿Estás seguro? Se finalizará tu acceso a los archivos genealógicos.</div>
+        <div class="alert-actions">
+            <button class="alert-btn alert-btn-cancel" id="modalCancelBtn">Cancelar</button>
+            <button class="alert-btn alert-btn-confirm" id="modalConfirmBtn">Sí, salir</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Misma configuración Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+        authDomain: "familia-genealogia.firebaseapp.com",
+        projectId: "familia-genealogia",
+        storageBucket: "familia-genealogia.firebasestorage.app",
+        messagingSenderId: "923693678578",
+        appId: "1:923693678578:web:bfed5d66d564d00847356b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Verificar autenticación: si no hay usuario, redirigir a index.html
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = "index.html";
+        }
+    });
+
+    // Menú flotante y efectos (original)
+    const menuBtn = document.getElementById('creativeMenuBtn');
+    const floatingMenu = document.getElementById('floatingMenu');
+    let isMenuOpen = false;
+
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isMenuOpen = !isMenuOpen;
+        menuBtn.classList.toggle('menu-open', isMenuOpen);
+        floatingMenu.classList.toggle('active', isMenuOpen);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (isMenuOpen && !menuBtn.contains(e.target) && !floatingMenu.contains(e.target)) {
+            isMenuOpen = false;
+            menuBtn.classList.remove('menu-open');
+            floatingMenu.classList.remove('active');
+        }
+    });
+
+    // Acciones del menú (toast) intactas
+    floatingMenu.querySelectorAll('li').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const text = item.innerText;
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+                background: var(--primary); color: var(--accent); padding: 12px 28px;
+                border-radius: 50px; font-size: 0.85rem; z-index: 1000;
+                border: 1px solid var(--accent); font-family: 'Inter', sans-serif;
+                font-weight: 500; backdrop-filter: blur(8px); white-space: nowrap; pointer-events: none;
+            `;
+            toast.innerHTML = `📜 ${text} — Próximamente disponible`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+            isMenuOpen = false;
+            menuBtn.classList.remove('menu-open');
+            floatingMenu.classList.remove('active');
+        });
+    });
+
+    // ----- MODAL ROJO DE ALERTA SOBRE EL BOTÓN SALIR -----
+    const modalOverlay = document.getElementById('alertModal');
+    const cancelBtn = document.getElementById('modalCancelBtn');
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+
+    // Función para mostrar modal centrado (apariencia roja sobre el botón)
+    function showAlertModal() {
+        modalOverlay.classList.add('active');
+    }
+
+    function closeAlertModal() {
+        modalOverlay.classList.remove('active');
+    }
+
+    // Al hacer clic en "Salir" (rojo) mostramos la advertencia, sin cerrar sesión directamente
+    const exitBtn = document.getElementById('exitButton');
+    exitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showAlertModal();
+    });
+
+    // Si el usuario cancela, simplemente cierra el modal
+    cancelBtn.addEventListener('click', () => {
+        closeAlertModal();
+    });
+
+    // Si el usuario confirma: cerrar sesión, mostrar toast y redirigir
+    confirmBtn.addEventListener('click', async () => {
+        closeAlertModal();
+        // Mostrar toast de despedida antes de redirigir
+        const toastExit = document.createElement('div');
+        toastExit.style.cssText = `
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: #2C423F; color: #F7F4EF; padding: 12px 28px;
+            border-radius: 50px; font-size: 0.85rem; z-index: 1001;
+            border: 1px solid var(--accent); font-family: 'Inter', sans-serif;
+            font-weight: 500; backdrop-filter: blur(8px); white-space: nowrap;
+        `;
+        toastExit.innerHTML = `🕊️ Cerrando sesión · Hasta pronto, Familia Fioravante`;
+        document.body.appendChild(toastExit);
+        
+        try {
+            await auth.signOut();
+            setTimeout(() => {
+                toastExit.remove();
+                window.location.href = "index.html";
+            }, 1200);
+        } catch (error) {
+            console.error("Error al cerrar sesión", error);
+            toastExit.innerHTML = `❌ Error al cerrar sesión · Intenta nuevamente`;
+            setTimeout(() => toastExit.remove(), 2000);
+        }
+    });
+
+    // Cerrar modal si se hace clic fuera del contenido (en el overlay)
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+            closeAlertModal();
+        }
+    });
+
+    // Prevenir cierre accidental con escape (opcional pero amigable)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+            closeAlertModal();
+        }
+    });
+</script>
+</body>
+</html>
