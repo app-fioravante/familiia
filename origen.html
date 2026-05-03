@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fioravante · Origen del Apellido</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #F5F7F5;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal de dos columnas */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background: #F5F7F5;
+        }
+
+        /* COLUMNA IZQUIERDA: ahora en columna flex para poder empujar las tarjetas abajo */
+        .left-panel {
+            flex: 1.2;
+            background: #FFFFFF;
+            border-right: 5px solid #2A5C4A;
+            padding: 3rem 2.5rem;
+            overflow-y: auto;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TÍTULO e información: ocupan el espacio natural */
+        .title-origen {
+            font-family: 'Inter', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #1C3F32;
+            margin-bottom: 2rem;
+            letter-spacing: -0.5px;
+            border-left: 5px solid #2A5C4A;
+            padding-left: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .info-text {
+            font-family: 'Inter', sans-serif;
+            color: #1E2E28;
+            line-height: 1.65;
+            font-size: 1.05rem;
+            font-weight: 400;
+            flex-shrink: 0; /* evita que se comprima demasiado */
+        }
+
+        .info-text p {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-text strong {
+            color: #246148;
+            font-weight: 700;
+        }
+
+        .highlight-quote {
+            background: #EEF4F1;
+            border-left: 4px solid #2A5C4A;
+            padding: 1.2rem 1.5rem;
+            margin: 1.8rem 0;
+            border-radius: 12px;
+            font-style: normal;
+            font-weight: 500;
+            color: #1A3C2F;
+        }
+
+        .primer-aparicion {
+            margin-top: 2rem;
+            padding-top: 0.8rem;
+            border-top: 2px dashed #CBDCD4;
+        }
+
+        /* --- CONTENEDOR DE TARJETAS: empujado hacia abajo con margin-top: auto --- */
+        .cards-modules {
+            display: flex;
+            flex-wrap: nowrap;      /* fuerza una sola línea en desktop */
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-top: auto;       /* clave: empuja las tarjetas a la parte inferior */
+            padding-top: 2rem;      /* separación respecto al contenido superior */
+            width: 100%;
+        }
+
+        /* Tarjetas más grandes, destacadas, sin iconos */
+        .card-module {
+            background: #FCFEFD;
+            border-radius: 24px;
+            padding: 1.2rem 0.8rem;
+            flex: 1;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.2px;
+            color: #1C3F32;
+            border: 1.5px solid #D0E0D8;
+            transition: all 0.25s ease;
+            cursor: default;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(135deg, #FFFFFF, #F6FAF8);
+            min-width: 0;          /* permite que se encojan si es necesario */
+        }
+
+        .card-module:hover {
+            transform: translateY(-6px);
+            border-color: #2A5C4A;
+            box-shadow: 0 16px 28px rgba(42, 92, 74, 0.15);
+            background: #FFFFFF;
+        }
+
+        /* Aseguramos que en desktop las tarjetas sean más grandes tipográficamente */
+        @media (min-width: 1000px) {
+            .card-module {
+                font-size: 1.1rem;
+                padding: 1.3rem 0.5rem;
+            }
+        }
+
+        /* En tablets: pueden seguir en línea, pero si no hay espacio se ajustan con wrap? No, preferimos mantener línea pero reducimos gap */
+        @media (max-width: 999px) and (min-width: 701px) {
+            .cards-modules {
+                gap: 1rem;
+            }
+            .card-module {
+                font-size: 0.9rem;
+                padding: 1rem 0.3rem;
+            }
+        }
+
+        /* COLUMNA CENTRAL VACÍA */
+        .center-panel {
+            flex: 0.9;
+            background: #F5F7F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .empty-placeholder {
+            text-align: center;
+            color: #5E7A6C;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: -0.2px;
+            background: rgba(42, 92, 74, 0.06);
+            padding: 1rem 2rem;
+            border-radius: 48px;
+            backdrop-filter: blur(2px);
+        }
+
+        .empty-placeholder span {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 1.2rem;
+            color: #2A5C4A;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* Scroll personalizado */
+        .left-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+        .left-panel::-webkit-scrollbar-track {
+            background: #E2EBE7;
+            border-radius: 10px;
+        }
+        .left-panel::-webkit-scrollbar-thumb {
+            background: #2A5C4A;
+            border-radius: 10px;
+        }
+
+        /* Responsive: móviles */
+        @media (max-width: 780px) {
+            .app-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .left-panel {
+                flex: auto;
+                border-right: none;
+                border-bottom: 5px solid #2A5C4A;
+                padding: 1.8rem 1.5rem;
+                display: flex;
+                flex-direction: column;
+            }
+            .center-panel {
+                flex: auto;
+                min-height: 200px;
+                background: #F5F7F5;
+            }
+            .title-origen {
+                font-size: 2rem;
+                padding-left: 1rem;
+            }
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+            /* En móvil, las tarjetas deben poder estar en una línea si es posible, pero si son muy pequeñas las hacemos wrap? 
+               El diseño original pide "una única línea", incluso en móvil intentaremos mantener línea con scroll horizontal si es necesario */
+            .cards-modules {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                gap: 0.8rem;
+                margin-top: auto;
+            }
+            .card-module {
+                flex: 0 0 auto;
+                min-width: 140px;
+                font-size: 0.85rem;
+                padding: 0.9rem 0.5rem;
+            }
+        }
+
+        /* Animación suave */
+        .left-panel, .center-panel {
+            animation: fadeSlideUp 0.45s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- COLUMNA IZQUIERDA: contenido + tarjetas ancladas abajo -->
+    <div class="left-panel">
+        <h1 class="title-origen">Origen del Apellido</h1>
+        <div class="info-text">
+            <p>
+                <strong>El apellido Fioravante es absolutamente cautivador.</strong><br>
+                Proviene del encantador nombre "Fiore", que se deriva del latín 
+                <em>flos, floris</em>, ¡lo que significa <strong>"flor de flor"</strong>!<br>
+                Un legado lleno de belleza y significado impresionante.
+            </p>
+
+            <div class="highlight-quote">
+                “Andrea da Barberino interpreta a Fioravante en el sentido de  
+                <strong>«deja que esta flor avance»</strong>”
+            </div>
+
+            <div class="primer-aparicion">
+                <p><strong>Primera aparición del apellido</strong></p>
+                <p>
+                    El apellido Fioravante se encontró por primera vez en 
+                    <strong>Pistoia (Toscana - Italia)</strong>, cuando un Fioravante era miembro 
+                    del consejo de gobierno de la ciudad.
+                </p>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR DE TARJETAS: siempre en una línea, más grandes y en la parte inferior -->
+        <div class="cards-modules">
+            <div class="card-module">Referencias Históricas</div>
+            <div class="card-module">Otros apellidos similares</div>
+            <div class="card-module">Heráldica</div>
+            <div class="card-module">Personajes ilustres</div>
+        </div>
+    </div>
+
+    <!-- COLUMNA CENTRAL: vacía (reservada) -->
+    <div class="center-panel">
+        <div class="empty-placeholder">
+            <span>✦</span>
+            Espacio reservado<br>para el árbol genealógico
+        </div>
+    </div>
+</div>
+</body>
+</html>
