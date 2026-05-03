@@ -270,15 +270,7 @@
             font-size: 0.8rem;
             text-align: center;
         }
-        @media (max-width: 700px) {
-            .photo-item {
-                width: 120px;
-            }
-            .photo-item img {
-                height: 120px;
-            }
-        }
-
+        
         /* Botones de acción */
         .action-buttons {
             display: flex;
@@ -391,6 +383,225 @@
                 break-inside: avoid;
             }
         }
+        
+        /* ========== RESPONSIVE: MÓVILES Y TABLETS (≤ 768px) ========== */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+            
+            .app-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            /* Panel izquierdo (lista) ocupa todo el ancho, sin borde lateral */
+            .left-panel {
+                flex: none;
+                width: 100%;
+                border-right: none;
+                border-bottom: 5px solid #2A5C4A;
+                padding: 0 0.9rem 1.2rem 0.9rem;
+                max-height: 60vh;
+                overflow-y: auto;
+            }
+            
+            /* Panel derecho (detalles) resto de la pantalla */
+            .right-panel {
+                flex: 1;
+                width: 100%;
+                padding: 1.2rem 1rem 1.5rem 1rem;
+                overflow-y: auto;
+            }
+            
+            /* Ajustes del header sticky en móvil */
+            .sticky-header {
+                padding: 0.9rem 0 0.6rem 0;
+                margin-bottom: 0.6rem;
+            }
+            
+            .title-row {
+                gap: 0.7rem;
+            }
+            
+            .title-origen {
+                font-size: 1.4rem;
+                padding-left: 0.8rem;
+                border-left-width: 4px;
+            }
+            
+            .btn-reset-list {
+                padding: 0.4rem 1rem;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+            
+            /* Grupos de años */
+            .year-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .group-title {
+                font-size: 1.2rem;
+                padding: 0.2rem 1rem;
+                margin-bottom: 0.8rem;
+            }
+            
+            .group-cards {
+                gap: 0.7rem;
+            }
+            
+            .card-module {
+                padding: 0.7rem 0.9rem;
+                min-height: 70px;
+                border-radius: 18px;
+            }
+            
+            .birth-year-badge {
+                font-size: 0.75rem;
+                top: 6px;
+                left: 10px;
+                padding: 0.15rem 0.6rem;
+            }
+            
+            .full-name-card {
+                font-size: 0.85rem;
+                margin-top: 0.2rem;
+            }
+            
+            /* Detalles derecha */
+            .details-container {
+                padding: 1.2rem 1.2rem;
+                border-radius: 28px;
+                gap: 0.9rem;
+            }
+            
+            .detail-text {
+                font-size: 0.95rem;
+            }
+            
+            .detail-text strong:first-of-type {
+                font-size: 1.2rem;
+            }
+            
+            .detail-highlight {
+                padding: 1rem 1.2rem;
+                margin: 0.8rem 0;
+            }
+            
+            /* Botones acción más táctiles */
+            .action-buttons {
+                gap: 0.8rem;
+                justify-content: flex-end;
+                margin-bottom: 0.8rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            /* Galería fotos en móvil */
+            .photos-container {
+                gap: 0.8rem;
+                justify-content: center;
+                margin-top: 1rem;
+            }
+            
+            .photo-item {
+                width: 105px;
+            }
+            
+            .photo-item img {
+                height: 105px;
+            }
+            
+            .photo-placeholder {
+                height: 105px;
+                font-size: 0.7rem;
+            }
+            
+            /* Modal responsive */
+            .modal-content {
+                width: 92%;
+                max-width: 92%;
+                padding: 1.5rem;
+                border-radius: 28px;
+                max-height: 90vh;
+            }
+            
+            .modal-content h3 {
+                font-size: 1.3rem;
+                margin-bottom: 1rem;
+            }
+            
+            .form-group input, 
+            .form-group textarea, 
+            .form-group select {
+                padding: 0.7rem;
+                font-size: 0.9rem;
+            }
+            
+            .photos-section h4 {
+                font-size: 1rem;
+            }
+            
+            .modal-buttons {
+                gap: 0.8rem;
+                margin-top: 1.2rem;
+            }
+            
+            /* Mensaje vacío más compacto */
+            .empty-detail {
+                padding: 1.5rem;
+                font-size: 0.95rem;
+            }
+        }
+        
+        /* Ajuste fino para pantallas muy pequeñas (≤ 480px) */
+        @media (max-width: 480px) {
+            .title-origen {
+                font-size: 1.2rem;
+            }
+            
+            .btn-reset-list {
+                font-size: 0.7rem;
+                padding: 0.35rem 0.9rem;
+            }
+            
+            .card-module {
+                padding: 0.6rem 0.7rem;
+            }
+            
+            .birth-year-badge {
+                font-size: 0.7rem;
+                top: 5px;
+                left: 8px;
+            }
+            
+            .full-name-card {
+                font-size: 0.8rem;
+            }
+            
+            .details-container {
+                padding: 1rem;
+            }
+            
+            .detail-text {
+                font-size: 0.9rem;
+            }
+            
+            .photo-item {
+                width: 85px;
+            }
+            
+            .photo-item img {
+                height: 85px;
+            }
+        }
+        
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(8px);}
             to { opacity: 1; transform: translateY(0);}
