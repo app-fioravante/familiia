@@ -343,12 +343,12 @@
         { label: "2001 — Actualidad", min: 2001, max: 3000 }
     ];
 
-    // Función para extraer año
+    // Función para extraer año desde diferentes formatos de fecha
     function extractYear(birthDate) {
         if (!birthDate) return null;
         if (typeof birthDate === 'object' && birthDate !== null && 'seconds' in birthDate) {
             const date = new Date(birthDate.seconds * 1000);
-            return date.getFullYear();
+            return date.getUTCFullYear();
         }
         if (typeof birthDate === 'string') {
             const match = birthDate.match(/\d{4}/);
@@ -358,26 +358,38 @@
         return null;
     }
 
-    // Formateo a DD/MM/AAAA con zona horaria Argentina (UTC-3)
+    /**
+     * Formatea una fecha (Timestamp de Firestore, string ISO o número)
+     * a DD/MM/AAAA usando UTC para mostrar exactamente el valor guardado,
+     * sin desplazamiento por zona horaria.
+     */
     function formatDateToDMY(dateValue) {
         if (!dateValue) return 'Desconocida';
+        
         let d;
         if (typeof dateValue === 'object' && dateValue !== null && 'seconds' in dateValue) {
+            // Es un Timestamp de Firestore (segundos desde epoch UTC)
             d = new Date(dateValue.seconds * 1000);
         } else if (typeof dateValue === 'string') {
             d = new Date(dateValue);
-            if (isNaN(d.getTime())) return dateValue;
+            if (isNaN(d.getTime())) return dateValue; // devuelve el string original si no se puede parsear
         } else if (typeof dateValue === 'number') {
             d = new Date(dateValue);
         } else {
             return String(dateValue);
         }
+        
         if (isNaN(d.getTime())) return 'Fecha inválida';
-        // Usar toLocaleDateString con zona Argentina para evitar desfase
-        return d.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', year: 'numeric', month: '2-digit', day: '2-digit' });
+        
+        // Extraer componentes UTC para evitar cualquier desfase horario
+        const day = d.getUTCDate().toString().padStart(2, '0');
+        const month = (d.getUTCMonth() + 1).toString().padStart(2, '0');
+        const year = d.getUTCFullYear();
+        
+        return `${day}/${month}/${year}`;
     }
 
-    // Convertir fecha YYYY-MM-DD (input date) a Timestamp de Firebase (UTC)
+    // Convertir fecha YYYY-MM-DD (input date) a Timestamp de Firebase (UTC, medio día)
     function dateInputToTimestamp(dateString) {
         if (!dateString) return null;
         const [year, month, day] = dateString.split('-');
@@ -395,8 +407,11 @@
         const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim() || "Ancestro sin nombre";
         const birthYearDisplay = person.birthYear ? person.birthYear : (extractYear(person.birthDate) || "?");
         const birthPlace = person.birthPlace ? person.birthPlace : "No especificado";
+        
+        // Usar la función que respeta UTC para mostrar la fecha exacta
         const deathDateFormatted = person.deathDate ? formatDateToDMY(person.deathDate) : "—";
         const birthDateFormatted = person.birthDate ? formatDateToDMY(person.birthDate) : "Desconocida";
+        
         let genderText = "";
         if (person.gender === 'female') genderText = "Mujer";
         else if (person.gender === 'male') genderText = "Hombre";
@@ -429,13 +444,15 @@
         });
     }
 
-    // Abrir modal con datos actuales
+    // Abrir modal con datos actuales (carga respetando UTC para los campos date)
     function openEditModal(docId, person) {
         currentSelectedId = docId;
         currentPersonData = { ...person };
         document.getElementById('editFirstName').value = person.firstName || '';
         document.getElementById('editLastName').value = person.lastName || '';
-        // Convertir birthDate a YYYY-MM-DD si existe
+        
+        // Convertir birthDate a YYYY-MM-DD usando UTC para que el input <date> muestre
+        // exactamente la fecha guardada (sin desfase horario)
         let birthDateStr = '';
         if (person.birthDate) {
             let d;
@@ -445,11 +462,16 @@
                 d = new Date(person.birthDate);
             }
             if (d && !isNaN(d.getTime())) {
-                birthDateStr = d.toISOString().split('T')[0];
+                // Obtener componentes UTC para construir YYYY-MM-DD
+                const year = d.getUTCFullYear();
+                const month = (d.getUTCMonth() + 1).toString().padStart(2, '0');
+                const day = d.getUTCDate().toString().padStart(2, '0');
+                birthDateStr = `${year}-${month}-${day}`;
             }
         }
         document.getElementById('editBirthDate').value = birthDateStr;
         document.getElementById('editBirthPlace').value = person.birthPlace || '';
+        
         let deathDateStr = '';
         if (person.deathDate) {
             let d2;
@@ -459,7 +481,10 @@
                 d2 = new Date(person.deathDate);
             }
             if (d2 && !isNaN(d2.getTime())) {
-                deathDateStr = d2.toISOString().split('T')[0];
+                const year = d2.getUTCFullYear();
+                const month = (d2.getUTCMonth() + 1).toString().padStart(2, '0');
+                const day = d2.getUTCDate().toString().padStart(2, '0');
+                deathDateStr = `${year}-${month}-${day}`;
             }
         }
         document.getElementById('editDeathDate').value = deathDateStr;
@@ -481,7 +506,8 @@
         const birthDateInput = document.getElementById('editBirthDate').value;
         if (birthDateInput) {
             updatedData.birthDate = dateInputToTimestamp(birthDateInput);
-            const year = new Date(birthDateInput).getFullYear();
+            // Extraer el año desde el string YYYY-MM-DD (solo año)
+            const year = parseInt(birthDateInput.split('-')[0], 10);
             updatedData.birthYear = year;
         } else {
             updatedData.birthDate = null;
