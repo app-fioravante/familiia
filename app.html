@@ -2,13 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Fioravante · Archivos Genealógicos</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         :root {
             --primary: #2C423F;
             --accent: #C47D57;
@@ -17,293 +23,323 @@
             --alert-red: #b91c1c;
             --alert-red-dark: #7f1a1a;
         }
-        body, html { height: 100%; width: 100%; background: var(--bg-soft); font-family: var(--font-main); overflow: hidden; }
-        .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-        .main-empty { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        
-        /* Contenedor de la imagen centrado */
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            background: var(--bg-soft);
+            font-family: var(--font-main);
+            overflow: hidden;
+            position: fixed;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Área principal flexible */
+        .main-empty {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 16px;
+            width: 100%;
+        }
+
+        /* Contenedor imagen centrada */
         .image-container {
-            max-width: 90%;
-            max-height: 70%;
+            max-width: 95%;
+            width: auto;
             text-align: center;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 28px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            margin: auto;
         }
+
         .family-image {
             max-width: 100%;
             max-height: 55vh;
             width: auto;
             height: auto;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(196, 125, 87, 0.2);
-            transition: transform 0.3s ease;
-        }
-        .family-image:hover {
-            transform: scale(1.01);
-        }
-        .image-caption {
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: var(--primary);
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-        }
-        @media (max-width: 768px) {
-            .image-container { max-width: 95%; padding: 12px; }
-            .family-image { max-height: 45vh; }
+            border-radius: 20px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(196, 125, 87, 0.25);
+            transition: transform 0.25s ease;
+            object-fit: contain;
         }
 
-        /* Estilos para el contenedor del iframe */
+        .family-image:active {
+            transform: scale(0.99);
+        }
+
+        .image-caption {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 500;
+            opacity: 0.75;
+        }
+
+        /* Iframe responsivo */
         .iframe-container {
             width: 100%;
             height: 100%;
             display: none;
             background: white;
-            border-radius: 16px;
+            border-radius: 24px;
             overflow: hidden;
             position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
         }
+
         .iframe-container iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
 
+        /* Panel inferior fijo */
         .bottom-panel {
             background-color: var(--primary);
-            padding: 0 2rem;
-            height: 85px;
+            padding: 0 1rem;
+            min-height: 75px;
+            height: auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
+            gap: 0.75rem;
+            box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.12);
             flex-shrink: 0;
-            gap: 1rem;
+            width: 100%;
         }
-        .menu-wrapper { position: relative; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .menu-creative {
-            width: 54px; height: 54px; background: #FFFFFF; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; z-index: 5;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .menu-light-aura {
-            position: absolute; width: 62px; height: 62px; border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0%, var(--accent) 50%, transparent 100%);
-            animation: rotateLight 2s linear infinite; filter: blur(4px); opacity: 0.8; z-index: 1;
-        }
-        @keyframes rotateLight { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .lupa-icon { width: 24px; height: 24px; position: relative; animation: lupa-searching 5s infinite ease-in-out; }
-        .lupa-circle { width: 18px; height: 18px; border: 2.5px solid var(--primary); border-radius: 50%; position: absolute; top:0; left:0; }
-        .lupa-handle { width: 9px; height: 3px; background-color: var(--primary); position: absolute; bottom: 2px; right: 0; transform: rotate(45deg); border-radius: 5px; }
-        @keyframes lupa-searching { 0%,100%{transform:translate(0,0);} 25%{transform:translate(2px,-2px) rotate(5deg);} 50%{transform:translate(-1px,2px) rotate(-5deg);} 75%{transform:translate(-2px,-1px) rotate(3deg);} }
-        .menu-open .lupa-circle { border-color: var(--accent); }
-        .menu-open .lupa-handle { background-color: var(--accent); }
 
-        /* Área de bienvenida (similar al ejemplo) */
+        /* Botón menú creativo */
+        .menu-wrapper {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .menu-creative {
+            width: 50px;
+            height: 50px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .menu-light-aura {
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0%, var(--accent) 50%, transparent 100%);
+            animation: rotateLight 2s linear infinite;
+            filter: blur(5px);
+            opacity: 0.75;
+            z-index: 1;
+        }
+
+        @keyframes rotateLight {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .lupa-icon {
+            width: 22px;
+            height: 22px;
+            position: relative;
+        }
+
+        .lupa-circle {
+            width: 16px;
+            height: 16px;
+            border: 2.5px solid var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .lupa-handle {
+            width: 8px;
+            height: 3px;
+            background-color: var(--primary);
+            position: absolute;
+            bottom: 1px;
+            right: -1px;
+            transform: rotate(45deg);
+            border-radius: 4px;
+        }
+
+        /* Área de bienvenida */
         .welcome-area {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex: 1;
             min-width: 0;
             cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 48px;
-            transition: background 0.2s ease;
+            padding: 6px 10px;
+            border-radius: 60px;
+            transition: background 0.2s;
         }
-        .welcome-area:hover {
-            background: rgba(255,255,255,0.1);
+
+        .welcome-area:active {
+            background: rgba(255, 255, 255, 0.15);
         }
+
         .welcome-avatar {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background-color: var(--accent);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
             text-transform: uppercase;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
+
         .welcome-text {
             font-family: 'Inter', sans-serif;
             color: #F7F4EF;
-            line-height: 1.3;
+            line-height: 1.2;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
         .welcome-greeting {
             font-weight: 700;
-            font-size: clamp(0.85rem, 4vw, 1.1rem);
+            font-size: clamp(0.8rem, 4vw, 1rem);
             letter-spacing: -0.2px;
         }
+
         .edit-hint {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             opacity: 0.7;
-            margin-left: 6px;
+            margin-left: 5px;
             font-weight: normal;
         }
-        /* Texto fijo a la derecha (Archivo Genealógico) */
+
+        /* Título fijo derecha */
         .genealogy-title-right {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: clamp(0.75rem, 3vw, 0.95rem);
+            font-size: clamp(0.65rem, 3vw, 0.9rem);
             color: #F7F4EF;
             text-align: right;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-            flex-shrink: 0;
-            background: rgba(0,0,0,0.2);
+            letter-spacing: 0.2px;
+            white-space: normal;
+            flex-shrink: 1;
+            background: rgba(0, 0, 0, 0.2);
             padding: 6px 12px;
             border-radius: 40px;
             backdrop-filter: blur(2px);
-        }
-        @media (max-width: 640px) {
-            .bottom-panel { padding: 0 1rem; gap: 0.75rem; }
-            .welcome-avatar { width: 38px; height: 38px; font-size: 1.1rem; }
-            .welcome-greeting { font-size: 0.8rem; }
-            .genealogy-title-right { font-size: 0.65rem; padding: 4px 8px; white-space: normal; text-align: center; }
-            .menu-wrapper { transform: scale(0.85); }
+            line-height: 1.2;
         }
 
-        /* Botón salir rojo */
+        /* Botón salir */
         .btn-exit {
             background: var(--alert-red);
             border: none;
-            padding: 10px 24px;
+            padding: 8px 18px;
             border-radius: 40px;
             color: white;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.25s ease;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
-            letter-spacing: 0.3px;
-        }
-        .btn-exit:hover {
-            background: var(--alert-red-dark);
-            transform: scale(0.96);
-            box-shadow: 0 1px 3px rgba(127, 26, 26, 0.5);
-        }
-
-        .floating-menu {
-            position: fixed; bottom: 100px; left: 20px;
-            background: rgba(250, 248, 245, 0.98); backdrop-filter: blur(15px); border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 0.8rem 0; min-width: 250px;
-            transform: translateY(20px) scale(0.95); opacity: 0; visibility: hidden;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(196, 125, 87, 0.15); z-index: 200;
-        }
-        .floating-menu.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-        .floating-menu ul { list-style: none; }
-        .floating-menu li {
-            padding: 14px 24px; color: var(--primary); font-weight: 500; cursor: pointer;
-            transition: all 0.3s ease; font-size: 0.95rem;
-        }
-        .floating-menu ul:hover li { opacity: 0.3; }
-        .floating-menu ul:hover li:hover { opacity: 1; background: #F3EBE6; padding-left: 30px; }
-
-        /* Modal rojo de advertencia (salir) */
-        .alert-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(3px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0.2s, opacity 0.2s;
-        }
-        .alert-modal-overlay.active {
-            visibility: visible;
-            opacity: 1;
-        }
-        .alert-modal {
-            background: #fffaf7;
-            width: 280px;
-            max-width: 85vw;
-            border-radius: 28px;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.35);
-            text-align: center;
-            padding: 1.5rem 1.2rem 1.2rem;
-            border-left: 7px solid var(--alert-red);
-            transform: scale(0.92);
-            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
-        .alert-modal-overlay.active .alert-modal {
-            transform: scale(1);
-        }
-        .alert-icon {
-            font-size: 2.8rem;
-            margin-bottom: 0.5rem;
-        }
-        .alert-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--alert-red);
-            margin-bottom: 0.6rem;
-            font-family: 'Inter', sans-serif;
-        }
-        .alert-message {
-            font-size: 0.9rem;
-            color: #2d2a24;
-            margin-bottom: 1.5rem;
-            line-height: 1.4;
-            font-weight: 500;
-        }
-        .alert-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .alert-btn {
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
+            transition: all 0.2s ease;
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .alert-btn-cancel {
-            background: #e9e5df;
-            color: #2C423F;
-        }
-        .alert-btn-cancel:hover {
-            background: #dbd4cc;
-            transform: scale(0.96);
-        }
-        .alert-btn-confirm {
-            background: var(--alert-red);
-            color: white;
-            box-shadow: 0 2px 8px rgba(185, 28, 28, 0.3);
-        }
-        .alert-btn-confirm:hover {
-            background: var(--alert-red-dark);
-            transform: scale(0.96);
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
+            white-space: nowrap;
         }
 
-        /* MODAL PARA EDITAR NOMBRE Y APELLIDO (similar estilo al ejemplo) */
+        .btn-exit:active {
+            transform: scale(0.96);
+            background: var(--alert-red-dark);
+        }
+
+        /* Menú flotante responsivo */
+        .floating-menu {
+            position: fixed;
+            bottom: 90px;
+            left: 15px;
+            right: 15px;
+            max-width: 320px;
+            background: rgba(250, 248, 245, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
+            padding: 0.6rem 0;
+            transform: translateY(20px) scale(0.96);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            border: 1px solid rgba(196, 125, 87, 0.2);
+            z-index: 200;
+        }
+
+        .floating-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .floating-menu ul {
+            list-style: none;
+        }
+
+        .floating-menu li {
+            padding: 14px 24px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 1rem;
+            border-radius: 20px;
+            margin: 2px 8px;
+        }
+
+        .floating-menu li:active {
+            background: #F3EBE6;
+            padding-left: 30px;
+        }
+
+        /* Modales responsivos */
+        .alert-modal-overlay,
         .edit-name-modal-overlay {
             position: fixed;
             top: 0;
@@ -312,121 +348,257 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(5px);
-            z-index: 1100;
+            z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
             visibility: hidden;
             opacity: 0;
-            transition: visibility 0.2s, opacity 0.2s;
+            transition: 0.2s;
         }
+
+        .alert-modal-overlay.active,
         .edit-name-modal-overlay.active {
             visibility: visible;
             opacity: 1;
         }
+
+        .alert-modal {
+            background: #fffaf7;
+            width: 85%;
+            max-width: 300px;
+            border-radius: 32px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            padding: 1.5rem 1.2rem;
+            border-left: 6px solid var(--alert-red);
+            transform: scale(0.92);
+            transition: transform 0.2s;
+        }
+
         .edit-name-modal {
             background: #ffffff;
-            width: 340px;
-            max-width: 90vw;
-            border-radius: 28px;
-            box-shadow: 0 25px 40px rgba(0,0,0,0.3);
-            padding: 1.8rem 1.5rem 1.5rem;
+            width: 85%;
+            max-width: 340px;
+            border-radius: 32px;
+            padding: 1.6rem 1.2rem;
             text-align: center;
             transform: scale(0.92);
-            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: transform 0.2s;
         }
+
+        .alert-modal-overlay.active .alert-modal,
         .edit-name-modal-overlay.active .edit-name-modal {
             transform: scale(1);
         }
-        .edit-name-modal h3 {
-            font-size: 1.4rem;
+
+        .alert-title {
+            font-size: 1.3rem;
             font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 1.2rem;
+            color: var(--alert-red);
         }
-        .input-group {
-            margin-bottom: 1rem;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ddd;
-            border-radius: 40px;
-            font-family: 'Inter', sans-serif;
+
+        .alert-message {
             font-size: 0.9rem;
-            outline: none;
-            transition: border 0.2s;
+            margin: 12px 0 20px;
         }
-        .input-group input:focus {
-            border-color: var(--accent);
-        }
+
+        .alert-actions,
         .modal-buttons {
             display: flex;
             gap: 12px;
             justify-content: center;
-            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
-        .modal-save-btn {
-            background: var(--primary);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .modal-save-btn:hover {
-            background: #1f2f2c;
-            transform: scale(0.96);
-        }
+
+        .alert-btn,
+        .modal-save-btn,
         .modal-cancel-btn {
-            background: #e9e5df;
-            border: none;
             padding: 8px 20px;
             border-radius: 40px;
-            color: var(--primary);
             font-weight: 600;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: 0.2s;
+            border: none;
         }
-        .modal-cancel-btn:hover {
-            background: #dbd4cc;
-            transform: scale(0.96);
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 60px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+
+        /* Toast personalizado para móvil */
+        .custom-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            z-index: 1500;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+            max-width: 90vw;
+            white-space: normal;
+            text-align: center;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Ajustes específicos móviles (pantallas < 600px) */
+        @media (max-width: 640px) {
+            .bottom-panel {
+                padding: 0 0.8rem;
+                gap: 0.5rem;
+                min-height: 70px;
+            }
+
+            .menu-wrapper {
+                width: 48px;
+                height: 48px;
+            }
+
+            .menu-creative {
+                width: 44px;
+                height: 44px;
+            }
+
+            .menu-light-aura {
+                width: 52px;
+                height: 52px;
+            }
+
+            .welcome-avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+
+            .welcome-greeting {
+                font-size: 0.75rem;
+            }
+
+            .genealogy-title-right {
+                font-size: 0.6rem;
+                padding: 4px 8px;
+                white-space: normal;
+                line-height: 1.2;
+                max-width: 110px;
+            }
+
+            .btn-exit {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+
+            .floating-menu {
+                left: 10px;
+                right: 10px;
+                bottom: 80px;
+                max-width: none;
+                width: auto;
+            }
+
+            .floating-menu li {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+
+            .image-container {
+                padding: 14px;
+                border-radius: 24px;
+            }
+
+            .family-image {
+                max-height: 45vh;
+            }
+
+            .custom-toast {
+                font-size: 0.75rem;
+                padding: 8px 16px;
+                bottom: 90px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-area {
+                gap: 6px;
+                padding: 4px 8px;
+            }
+
+            .welcome-avatar {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+
+            .genealogy-title-right {
+                display: none; /* oculto en pantallas muy pequeñas para ganar espacio */
+            }
+
+            .bottom-panel {
+                justify-content: space-between;
+            }
+
+            .btn-exit {
+                padding: 6px 12px;
+            }
+        }
+
+        /* Escritorio: mantener todo igual (sin cambios disruptivos) */
+        @media (min-width: 1024px) {
+            .floating-menu {
+                left: 20px;
+                right: auto;
+                bottom: 100px;
+                min-width: 260px;
+            }
+
+            .genealogy-title-right {
+                display: block;
+                white-space: nowrap;
+            }
+
+            .bottom-panel {
+                padding: 0 2rem;
+            }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
-    <!-- Contenedor principal con la imagen centrada -->
     <div class="main-empty">
         <div class="image-container">
-            <img class="family-image" src="https://github.com/rfioravante73-ar/familiia/blob/main/fioravante.png?raw=true" alt="Archivo Genealógico Fioravante" onerror="this.onerror=null;this.src='https://placehold.co/400x300/2C423F/FFFFFF?text=Fioravante';">
+            <img class="family-image" src="https://github.com/rfioravante73-ar/familiia/blob/main/fioravante.png?raw=true" alt="Archivo Genealógico Fioravante" onerror="this.onerror=null;this.src='https://placehold.co/500x350/2C423F/FFFFFF?text=Fioravante';">
         </div>
-        <!-- Nuevo contenedor para el iframe -->
         <div id="iframeContainer" class="iframe-container">
             <iframe id="webIframe" title="Contenido externo" src="about:blank"></iframe>
         </div>
     </div>
 
-    <!-- Panel inferior -->
     <div class="bottom-panel">
         <div class="menu-wrapper">
             <div class="menu-light-aura"></div>
             <div class="menu-creative" id="creativeMenuBtn">
-                <div class="lupa-icon"><div class="lupa-circle"></div><div class="lupa-handle"></div></div>
+                <div class="lupa-icon">
+                    <div class="lupa-circle"></div>
+                    <div class="lupa-handle"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Área de bienvenida (click para abrir modal de edición) -->
         <div class="welcome-area" id="welcomeArea">
             <div class="welcome-avatar" id="welcomeAvatar">👤</div>
             <div class="welcome-text">
@@ -434,7 +606,6 @@
             </div>
         </div>
 
-        <!-- Texto fijo en la esquina derecha (como "Sistema Digital" en el ejemplo) -->
         <div class="genealogy-title-right">
             Archivo Genealógico <strong>Fioravante</strong> · Argentina
         </div>
@@ -445,6 +616,7 @@
 
 <div class="floating-menu" id="floatingMenu">
     <ul>
+        <li data-section="arbol">Árbol completo</li>
         <li data-section="origen">Origen del Apellido</li>
         <li data-section="argentina">Argentina</li>
         <li data-section="brasil">Brasil</li>
@@ -455,7 +627,7 @@
     </ul>
 </div>
 
-<!-- MODAL ROJO DE ADVERTENCIA (salir) -->
+<!-- Modal de salida -->
 <div id="alertModal" class="alert-modal-overlay">
     <div class="alert-modal">
         <div class="alert-icon">⚠️</div>
@@ -468,7 +640,7 @@
     </div>
 </div>
 
-<!-- MODAL PARA EDITAR NOMBRE Y APELLIDO -->
+<!-- Modal para editar nombre -->
 <div id="editNameModal" class="edit-name-modal-overlay">
     <div class="edit-name-modal">
         <h3>Editar nombre completo</h3>
@@ -488,7 +660,7 @@
 </div>
 
 <script>
-    // Configuración de Firebase
+    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
         authDomain: "familia-genealogia.firebaseapp.com",
@@ -500,7 +672,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Elementos
+    // Elementos DOM
     const welcomeArea = document.getElementById('welcomeArea');
     const welcomeAvatar = document.getElementById('welcomeAvatar');
     const welcomeGreeting = document.getElementById('welcomeGreeting');
@@ -510,36 +682,41 @@
     const saveEditBtn = document.getElementById('saveEditBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-    // Elementos para el iframe
     const imageContainer = document.querySelector('.image-container');
     const iframeContainer = document.getElementById('iframeContainer');
     const webIframe = document.getElementById('webIframe');
 
-    // Función para mostrar la imagen principal y ocultar el iframe
+    // Funciones de UI
     function showImage() {
-        imageContainer.style.display = 'flex'; // Asegurar que se muestre la imagen
-        iframeContainer.style.display = 'none';
-        webIframe.src = 'about:blank'; // Limpiar el iframe
+        if (imageContainer) imageContainer.style.display = 'flex';
+        if (iframeContainer) iframeContainer.style.display = 'none';
+        if (webIframe) webIframe.src = 'about:blank';
     }
 
-    // Función para mostrar el iframe con una URL específica
     function showIframe(url) {
-        imageContainer.style.display = 'none';
-        iframeContainer.style.display = 'block';
-        webIframe.src = url;
+        if (imageContainer) imageContainer.style.display = 'none';
+        if (iframeContainer) iframeContainer.style.display = 'block';
+        if (webIframe) webIframe.src = url;
     }
 
-    // Función para mostrar el modal con los datos actuales
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        toast.style.background = isError ? '#b91c1c' : 'var(--primary)';
+        toast.style.color = '#fff';
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2300);
+    }
+
+    // Modal de edición
     function openEditModal() {
         const user = auth.currentUser;
         if (!user) return;
         let fullName = user.displayName || "";
-        // Separar en nombre y apellido (primera palabra como nombre, resto como apellido)
         const parts = fullName.trim().split(' ');
-        let firstName = parts[0] || "";
-        let lastName = parts.slice(1).join(' ') || "";
-        editFirstName.value = firstName;
-        editLastName.value = lastName;
+        editFirstName.value = parts[0] || "";
+        editLastName.value = parts.slice(1).join(' ') || "";
         editModal.classList.add('active');
     }
 
@@ -547,14 +724,13 @@
         editModal.classList.remove('active');
     }
 
-    // Guardar nombre y apellido en Firebase
     async function saveFullName() {
         const user = auth.currentUser;
         if (!user) return;
         const firstName = editFirstName.value.trim();
         const lastName = editLastName.value.trim();
         if (firstName === "" && lastName === "") {
-            alert("Debes ingresar al menos un nombre.");
+            showToast("Debes ingresar al menos un nombre", true);
             return;
         }
         const fullName = `${firstName} ${lastName}`.trim();
@@ -562,31 +738,19 @@
             await user.updateProfile({ displayName: fullName });
             actualizarBienvenida(user);
             closeEditModal();
-            // Mostrar un toast de confirmación
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-                background: var(--primary); color: var(--accent); padding: 8px 20px;
-                border-radius: 50px; font-size: 0.8rem; z-index: 1000;
-                font-family: 'Inter', sans-serif; font-weight: 500;
-                backdrop-filter: blur(8px); pointer-events: none;
-            `;
-            toast.innerHTML = `✅ Nombre actualizado: ${fullName}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
+            showToast(`✅ Nombre actualizado: ${fullName}`);
         } catch (error) {
-            console.error("Error al actualizar nombre:", error);
-            alert("No se pudo actualizar el nombre. Intenta nuevamente.");
+            console.error(error);
+            showToast("Error al actualizar nombre", true);
         }
     }
 
-    // Actualizar UI de bienvenida
     function actualizarBienvenida(user) {
         if (!user) return;
         let nombreCompleto = user.displayName;
         if (!nombreCompleto || nombreCompleto.trim() === "") {
             nombreCompleto = user.email.split('@')[0];
-            welcomeGreeting.innerHTML = `¡Hola, ${nombreCompleto}! <span class="edit-hint">(click para editar)</span>`;
+            welcomeGreeting.innerHTML = `¡Hola, ${nombreCompleto}! <span class="edit-hint">(editar)</span>`;
         } else {
             welcomeGreeting.innerHTML = `¡Hola, ${nombreCompleto}! <span class="edit-hint">✎</span>`;
         }
@@ -594,20 +758,17 @@
         welcomeAvatar.textContent = inicial;
     }
 
-    // Evento al hacer clic en el área de bienvenida -> abrir modal
     welcomeArea.addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita que el panel inferior regrese a inicio
+        e.stopPropagation();
         openEditModal();
     });
-
-    // Botones del modal
     saveEditBtn.addEventListener('click', saveFullName);
     cancelEditBtn.addEventListener('click', closeEditModal);
     editModal.addEventListener('click', (e) => {
         if (e.target === editModal) closeEditModal();
     });
 
-    // Escuchar cambios de autenticación
+    // Auth
     auth.onAuthStateChanged((user) => {
         if (!user) {
             window.location.href = "index.html";
@@ -616,13 +777,13 @@
         actualizarBienvenida(user);
     });
 
-    // --- Menú flotante (sin cambios) ---
+    // Menú flotante
     const menuBtn = document.getElementById('creativeMenuBtn');
     const floatingMenu = document.getElementById('floatingMenu');
     let isMenuOpen = false;
 
     menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita que el panel inferior regrese a inicio
+        e.stopPropagation();
         isMenuOpen = !isMenuOpen;
         menuBtn.classList.toggle('menu-open', isMenuOpen);
         floatingMenu.classList.toggle('active', isMenuOpen);
@@ -636,30 +797,17 @@
         }
     });
 
-    // Acciones del menú
+    // Acciones del menú (con nuevo elemento "Árbol completo")
     floatingMenu.querySelectorAll('li').forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             const text = item.innerText;
             
-            // Verificar si es la opción "Origen del Apellido"
             if (text === 'Origen del Apellido') {
-                // Mostrar el iframe con la URL específica
                 showIframe('https://rfioravante73-ar.github.io/familiia/origen.html');
             } else {
-                // Para las demás opciones, mostrar el mensaje temporal y volver a la imagen
                 showImage();
-                const toast = document.createElement('div');
-                toast.style.cssText = `
-                    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-                    background: var(--primary); color: var(--accent); padding: 12px 28px;
-                    border-radius: 50px; font-size: 0.85rem; z-index: 1000;
-                    border: 1px solid var(--accent); font-family: 'Inter', sans-serif;
-                    font-weight: 500; backdrop-filter: blur(8px); white-space: nowrap; pointer-events: none;
-                `;
-                toast.innerHTML = `📜 ${text} — Próximamente disponible`;
-                document.body.appendChild(toast);
-                setTimeout(() => toast.remove(), 2500);
+                showToast(`📜 ${text} — Próximamente disponible`);
             }
             
             isMenuOpen = false;
@@ -668,36 +816,29 @@
         });
     });
 
-    // ----- MODAL ROJO PARA SALIR -----
-    const modalOverlay = document.getElementById('alertModal');
-    const cancelBtn = document.getElementById('modalCancelBtn');
-    const confirmBtn = document.getElementById('modalConfirmBtn');
+    // Modal de salida (rojo)
+    const alertModal = document.getElementById('alertModal');
+    const cancelModalBtn = document.getElementById('modalCancelBtn');
+    const confirmModalBtn = document.getElementById('modalConfirmBtn');
     const exitBtn = document.getElementById('exitButton');
 
-    function showAlertModal() { modalOverlay.classList.add('active'); }
-    function closeAlertModal() { modalOverlay.classList.remove('active'); }
+    function showAlertModal() { alertModal.classList.add('active'); }
+    function closeAlertModal() { alertModal.classList.remove('active'); }
 
     exitBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita que el panel inferior regrese a inicio
+        e.stopPropagation();
         e.preventDefault();
         showAlertModal();
     });
 
-    cancelBtn.addEventListener('click', () => { closeAlertModal(); });
-
-    confirmBtn.addEventListener('click', async () => {
+    cancelModalBtn.addEventListener('click', closeAlertModal);
+    confirmModalBtn.addEventListener('click', async () => {
         closeAlertModal();
         const toastExit = document.createElement('div');
-        toastExit.style.cssText = `
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: #2C423F; color: #F7F4EF; padding: 12px 28px;
-            border-radius: 50px; font-size: 0.85rem; z-index: 1001;
-            border: 1px solid var(--accent); font-family: 'Inter', sans-serif;
-            font-weight: 500; backdrop-filter: blur(8px); white-space: nowrap;
-        `;
+        toastExit.className = 'custom-toast';
+        toastExit.style.background = '#2C423F';
         toastExit.innerHTML = `🕊️ Cerrando sesión · Hasta pronto, Familia Fioravante`;
         document.body.appendChild(toastExit);
-        
         try {
             await auth.signOut();
             setTimeout(() => {
@@ -705,28 +846,23 @@
                 window.location.href = "index.html";
             }, 1200);
         } catch (error) {
-            console.error("Error al cerrar sesión", error);
             toastExit.innerHTML = `❌ Error al cerrar sesión · Intenta nuevamente`;
             setTimeout(() => toastExit.remove(), 2000);
         }
     });
 
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) closeAlertModal();
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeAlertModal();
+    alertModal.addEventListener('click', (e) => {
+        if (e.target === alertModal) closeAlertModal();
     });
 
-    // ----- NUEVO: Regresar a la pantalla principal al hacer clic en el panel inferior (si no es un elemento interactivo) -----
+    // Regresar a imagen al hacer clic en panel inferior (excepto elementos con stopPropagation)
     const bottomPanel = document.querySelector('.bottom-panel');
     bottomPanel.addEventListener('click', (e) => {
-        // Solo ejecuta showImage si el clic fue directamente en el panel o en elementos no interactivos.
-        // Los elementos que ya tienen stopPropagation no llegarán aquí.
-        showImage();
+        if (!e.target.closest('.welcome-area') && !e.target.closest('.menu-wrapper') && !e.target.closest('.btn-exit')) {
+            showImage();
+        }
     });
 
-    // Aseguramos que la imagen sea visible al cargar (por si acaso)
     showImage();
 </script>
 </body>
