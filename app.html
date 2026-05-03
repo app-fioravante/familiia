@@ -485,7 +485,8 @@
             }
             .welcome-area {
                 max-width: 70%;
-                padding: 4px 8px;
+                padding: 4px 8px 4px 2px;   /* padding izquierdo reducido */
+                margin-left: -0.25rem;        /* pegado al icono de la lupa */
             }
             .genealogy-title-right {
                 font-size: 0.6rem;
@@ -783,6 +784,8 @@
                 showIframe('https://rfioravante73-ar.github.io/familiia/arbol.html');
             } else if (text === 'Origen del Apellido') {
                 showIframe('https://rfioravante73-ar.github.io/familiia/origen.html');
+            } else if (text === 'Mapas') {
+                showIframe('https://rfioravante73-ar.github.io/familiia/mapas.html');
             } else {
                 showImage();
                 showToast(`📜 ${text} — Próximamente disponible`);
