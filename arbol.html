@@ -37,44 +37,82 @@
             flex: 0.85;
             background: #FFFFFF;
             border-right: 5px solid #2A5C4A;
-            padding: 1.5rem 1rem 1.5rem 1.2rem;
+            padding: 0 1rem 1.5rem 1.2rem;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             height: 100%;
         }
 
+        /* CONTENEDOR STICKY PARA TÍTULO + BOTÓN */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: #FFFFFF;
+            z-index: 15;
+            padding: 1.2rem 0 0.8rem 0;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #E2EBE7;
+        }
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
         .title-origen {
             font-family: 'Inter', sans-serif;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #1C3F32;
-            margin-bottom: 1.8rem;
             letter-spacing: -0.3px;
             border-left: 5px solid #2A5C4A;
             padding-left: 1rem;
             line-height: 1.2;
+            margin: 0;
             cursor: pointer;
             transition: opacity 0.2s;
+            flex-shrink: 0;
         }
         .title-origen:hover {
             opacity: 0.85;
         }
 
+        /* Botón reiniciar listado */
+        .btn-reset-list {
+            background: #F0F5F2;
+            border: 1.5px solid #C2D2CA;
+            color: #1C3F32;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-reset-list:hover {
+            background: #E2EBE7;
+            transform: scale(0.97);
+            border-color: #2A5C4A;
+        }
+
         .year-group {
-            margin-bottom: 2.2rem;
+            margin-bottom: 2rem;
             animation: fadeSlideUp 0.3s ease;
         }
 
         .group-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: #10261E;
             background: #EFF5F2;
             display: inline-block;
-            padding: 0.4rem 1.2rem;
+            padding: 0.3rem 1.1rem;
             border-radius: 60px;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             letter-spacing: -0.3px;
             border-left: 4px solid #2A5C4A;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -86,7 +124,6 @@
             gap: 0.85rem;
         }
 
-        /* Base de la tarjeta - sin fondo fijo aquí */
         .card-module {
             position: relative;
             border-radius: 20px;
@@ -99,16 +136,14 @@
             transition: all 0.2s ease;
             cursor: pointer;
             min-height: 85px;
-            /* El fondo lo definen las clases específicas de género */
         }
 
-        /* Colores según género (fondo) */
         .card-module.card-male {
-            background: #C7E9FF;   /* celeste suave */
+            background: #C7E9FF;
             border-color: #9AC9E8;
         }
         .card-module.card-female {
-            background: #FFD6E8;   /* rosa pastel */
+            background: #FFD6E8;
             border-color: #F6C1DA;
         }
         .card-module.card-default {
@@ -116,30 +151,26 @@
             border-color: #D0E0D8;
         }
 
-        /* Tarjeta seleccionada: mantiene el fondo original (sin sobrescribir background) */
         .card-module.selected-card {
             border: 3px solid #132A21;
             box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
             transform: scale(1.01);
-            /* No se define background para que conserve el de la clase de género */
         }
 
-        /* Tarjeta no seleccionada (atenuada): mantiene el color fondo original */
         .card-module.dimmed-card {
             opacity: 0.7;
             filter: grayscale(0.15);
             border-color: #C2D2CA;
-            /* No se define background para que se mantenga el rosa/celeste */
         }
 
         .birth-year-badge {
             position: absolute;
             top: 8px;
             left: 12px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 800;
             background: rgba(42, 92, 74, 0.2);
-            padding: 0.25rem 0.8rem;
+            padding: 0.2rem 0.7rem;
             border-radius: 40px;
             color: #174432;
         }
@@ -343,7 +374,7 @@
         }
         
         @media print {
-            .left-panel, .action-buttons, .modal, .title-origen {
+            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list {
                 display: none !important;
             }
             .right-panel {
@@ -369,7 +400,13 @@
 <body>
 <div class="app-container">
     <div class="left-panel">
-        <h1 class="title-origen">Árbol Genealógico</h1>
+        <!-- HEADER FIJO (STICKY) con título + botón reiniciar -->
+        <div class="sticky-header">
+            <div class="title-row">
+                <h1 class="title-origen">Árbol Genealógico</h1>
+                <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
+            </div>
+        </div>
         <div id="groupsContainer" class="groups-list">Cargando ancestros...</div>
     </div>
     <div class="right-panel">
@@ -487,6 +524,55 @@
         return null;
     }
 
+    // Función para convertir Timestamp/string a objeto Date UTC
+    function parseDateToUTC(dateValue) {
+        if (!dateValue) return null;
+        let d;
+        if (typeof dateValue === 'object' && dateValue !== null && 'seconds' in dateValue) {
+            d = new Date(dateValue.seconds * 1000);
+        } else if (typeof dateValue === 'string') {
+            d = new Date(dateValue);
+            if (isNaN(d.getTime())) return null;
+        } else if (typeof dateValue === 'number') {
+            d = new Date(dateValue);
+        } else {
+            return null;
+        }
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    // Calcular edad: si existe deathDate -> edad al morir, si no -> edad actual (basado en hoy)
+    function calculateAgeString(birthDate, deathDate) {
+        const birthDateObj = parseDateToUTC(birthDate);
+        if (!birthDateObj) return "Edad: ?";
+        
+        const today = new Date();
+        let endDate = null;
+        let isAlive = true;
+        
+        if (deathDate) {
+            const deathObj = parseDateToUTC(deathDate);
+            if (deathObj && !isNaN(deathObj.getTime())) {
+                endDate = deathObj;
+                isAlive = false;
+            }
+        }
+        
+        const referenceDate = endDate || today;
+        let age = referenceDate.getUTCFullYear() - birthDateObj.getUTCFullYear();
+        const monthDiff = referenceDate.getUTCMonth() - birthDateObj.getUTCMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && referenceDate.getUTCDate() < birthDateObj.getUTCDate())) {
+            age--;
+        }
+        if (age < 0) age = 0;
+        
+        if (!isAlive && endDate) {
+            return `⚰️ Falleció a los ${age} años`;
+        } else {
+            return `🎂 Edad actual: ${age} años`;
+        }
+    }
+
     function formatDateToDMY(dateValue) {
         if (!dateValue) return 'Desconocida';
         let d;
@@ -514,7 +600,7 @@
         return firebase.firestore.Timestamp.fromDate(date);
     }
 
-    // Render del panel derecho con nombre en negrita azul (hombre) o rosa (mujer)
+    // Render del panel derecho con nombre + edad en esquina superior derecha (float)
     function renderPersonDetailsInRightPanel(person, docId) {
         if (!person) {
             rightDetailsDiv.innerHTML = `<div class="empty-detail">Información no disponible.</div>`;
@@ -526,17 +612,20 @@
         const deathDateFormatted = person.deathDate ? formatDateToDMY(person.deathDate) : "—";
         const birthDateFormatted = person.birthDate ? formatDateToDMY(person.birthDate) : "Desconocida";
         
+        // Calcular edad (vivo o fallecido)
+        const ageString = calculateAgeString(person.birthDate, person.deathDate);
+        
         let genderText = "";
         let genderStyle = "";
         let nameColorStyle = "";
         if (person.gender === 'female') {
             genderText = "Mujer";
             genderStyle = "color: #D43F87; font-weight: 800;";
-            nameColorStyle = "color: #D43F87;";   // rosa intenso para el nombre
+            nameColorStyle = "color: #D43F87;";
         } else if (person.gender === 'male') {
             genderText = "Hombre";
             genderStyle = "color: #1E6FDF; font-weight: 800;";
-            nameColorStyle = "color: #1E6FDF;";   // azul intenso
+            nameColorStyle = "color: #1E6FDF;";
         } else {
             genderText = "Persona";
             genderStyle = "color: #2A5C4A; font-weight: 600;";
@@ -549,8 +638,12 @@
                 <button class="btn btn-edit" id="editBtn">Editar</button>
             </div>
             <div class="detail-text" id="printableArea">
-                <p><strong style="font-size:1.6rem; ${nameColorStyle}">${escapeHtml(fullName)}</strong><br>
-                <span style="background:#EFF5F2; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.85rem;">Nacido/a en ${birthYearDisplay} · <span style="${genderStyle}">${genderText}</span></span></p>
+                <!-- Cabecera con nombre + edad flotando a la derecha -->
+                <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;">
+                    <strong style="font-size:1.6rem; ${nameColorStyle}">${escapeHtml(fullName)}</strong>
+                    <span style="background:#EFF5F2; padding:0.3rem 1rem; border-radius: 40px; font-size:0.85rem; font-weight:600; color:#1C3F32; white-space: nowrap;">${escapeHtml(ageString)}</span>
+                </div>
+                <p><span style="background:#EFF5F2; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.85rem;">Nacido/a en ${birthYearDisplay} · <span style="${genderStyle}">${genderText}</span></span></p>
                 <p><span class="birth-date-bold">Fecha de nacimiento:</span> ${birthDateFormatted}<br>
                 <strong>Lugar de nacimiento:</strong> ${escapeHtml(birthPlace)}<br>
                 <strong>Fecha de fallecimiento:</strong> ${deathDateFormatted}</p>
@@ -723,7 +816,6 @@
         return finalGroups;
     }
 
-    // Render de tarjetas conservando colores de género (celeste/rosa)
     function renderGroupedCards(groupsArray) {
         if (!groupsArray.length) {
             groupsContainer.innerHTML = `<div class="empty-message" style="padding:1.5rem;">No se encontraron ancestros.</div>`;
@@ -819,20 +911,37 @@
         }
     }
 
+    // REINICIAR LISTADO: Selecciona el primer registro visible en el panel izquierdo
+    function resetToListFirst() {
+        const firstCard = document.querySelector('.card-module');
+        if (firstCard) {
+            firstCard.click();
+            // Scroll suave para que se vea el primer elemento (opcional)
+            firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            // Si no hay tarjetas, solo reseteamos selección
+            currentSelectedId = null;
+            resetRightPanelToWelcome();
+            applyCardSelection(null);
+        }
+    }
+
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
     }
 
+    // Eventos
     document.getElementById('modalCancel')?.addEventListener('click', () => editModal.style.display = 'none');
     document.getElementById('modalSave')?.addEventListener('click', savePersonChanges);
     window.addEventListener('click', (e) => { if (e.target === editModal) editModal.style.display = 'none'; });
-
     document.querySelector('.title-origen')?.addEventListener('click', () => {
         currentSelectedId = null;
         resetRightPanelToWelcome();
         applyCardSelection(null);
     });
+    const resetBtn = document.getElementById('resetListBtn');
+    if (resetBtn) resetBtn.addEventListener('click', resetToListFirst);
 
     loadAndGroupPersons();
 </script>
