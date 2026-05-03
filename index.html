@@ -100,6 +100,64 @@
             .brand-subtitle { font-size: 1.6rem; }
             .landing-right { flex: 1.2; }
         }
+
+        /* --- ESTILOS DEL MODAL FLOTANTE: TEXTO JUSTIFICADO, CENTRADO Y CON SALTOS DE LÍNEA --- */
+        .floating-credit-modal {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #FFFFFF;
+            border-left: 5px solid var(--accent, #C47D57);
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 14px 22px;
+            z-index: 10000;
+            max-width: 280px;
+            font-family: var(--font-main);
+            font-size: 0.88rem;
+            line-height: 1.45;
+            color: #1E2A2A;
+            background-color: #fefcf9;
+            transition: opacity 0.2s ease;
+            text-align: center;      /* centrado horizontal general */
+        }
+
+        /* Cada línea separada, mostrando el texto centrado y justificado (apariencia limpia) */
+        .floating-credit-modal .credit-line {
+            display: block;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Aplicamos justificación al texto de cada línea (se ve más armónico) */
+        .floating-credit-modal .credit-line {
+            text-align: justify;
+            text-align-last: center; /* Para que la última línea también quede centrada estéticamente */
+        }
+
+        /* Para mantener consistencia entre navegadores */
+        .floating-credit-modal {
+            text-align: justify;
+            text-align-last: center;
+        }
+
+        .floating-credit-modal strong {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        /* Ajuste responsive: móviles más pequeños */
+        @media (max-width: 640px) {
+            .floating-credit-modal {
+                top: 12px;
+                right: 12px;
+                max-width: 250px;
+                padding: 10px 16px;
+                font-size: 0.75rem;
+                border-left-width: 4px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -111,6 +169,15 @@
         </div>
     </div>
     <div class="landing-right" id="authPanel"></div>
+</div>
+
+<!-- MODAL FLOTANTE INFORMATIVO: estructura con líneas separadas, justificado y centrado -->
+<div id="infoCreditModal" class="floating-credit-modal">
+    <span class="credit-line"><strong>Diseño y Programación:</strong></span>
+    <span class="credit-line">Rómulo Fioravante</span>
+    <span class="credit-line"><strong>Versión:</strong></span>
+    <span class="credit-line">1.0.2026</span>
+    <span class="credit-line">Posadas-Misiones</span>
 </div>
 
 <script>
@@ -244,13 +311,23 @@
         document.getElementById('backToLoginBtn').addEventListener('click', () => { currentMode = 'login'; renderLoginView(); });
     }
 
+    // --- LÓGICA DEL MODAL FLOTANTE: desaparece automáticamente en 4 segundos ---
+    const modalElement = document.getElementById('infoCreditModal');
+    if (modalElement) {
+        setTimeout(() => {
+            if (modalElement && modalElement.remove) {
+                modalElement.remove();
+            } else if (modalElement && modalElement.style) {
+                modalElement.style.display = 'none';
+            }
+        }, 4000);
+    }
+
     // Redirección si ya hay sesión activa
     auth.onAuthStateChanged((user) => {
         if(user) {
-            // Si el usuario está autenticado y está en index, redirigir a app.html
             redirectToApp();
         } else {
-            // Mostrar la pantalla de login
             if(currentMode === 'login') renderLoginView();
             else renderRegisterView();
         }
