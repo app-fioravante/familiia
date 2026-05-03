@@ -20,7 +20,6 @@
             overflow: hidden;
         }
 
-        /* Contenedor principal de dos columnas */
         .app-container {
             display: flex;
             height: 100vh;
@@ -28,19 +27,19 @@
             background: #F5F7F5;
         }
 
-        /* COLUMNA IZQUIERDA: ahora en columna flex para poder empujar las tarjetas abajo */
         .left-panel {
             flex: 1.2;
             background: #FFFFFF;
             border-right: 5px solid #2A5C4A;
             padding: 3rem 2.5rem;
-            overflow-y: auto;
-            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+            /* Estructura flexible para que las tarjetas queden fijas abajo */
             display: flex;
             flex-direction: column;
+            overflow: hidden;  /* el scroll interno se maneja en .info-text */
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
+            height: 100%;
         }
 
-        /* TÍTULO e información: ocupan el espacio natural */
         .title-origen {
             font-family: 'Inter', sans-serif;
             font-size: 2.6rem;
@@ -51,15 +50,25 @@
             border-left: 5px solid #2A5C4A;
             padding-left: 1.2rem;
             line-height: 1.2;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .title-origen:hover {
+            opacity: 0.8;
         }
 
+        /* Contenedor del texto dinámico: scrollable y ocupa todo el espacio disponible */
         .info-text {
             font-family: 'Inter', sans-serif;
             color: #1E2E28;
             line-height: 1.65;
             font-size: 1.05rem;
             font-weight: 400;
-            flex-shrink: 0; /* evita que se comprima demasiado */
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 6px; /* espacio para el scrollbar */
+            scrollbar-width: thin;
         }
 
         .info-text p {
@@ -88,18 +97,21 @@
             border-top: 2px dashed #CBDCD4;
         }
 
-        /* --- CONTENEDOR DE TARJETAS: empujado hacia abajo con margin-top: auto --- */
+        /* MÓDULO DE TARJETAS: siempre visible, fijo en la parte inferior */
         .cards-modules {
             display: flex;
-            flex-wrap: nowrap;      /* fuerza una sola línea en desktop */
+            flex-wrap: nowrap;
             justify-content: space-between;
             gap: 1.5rem;
-            margin-top: auto;       /* clave: empuja las tarjetas a la parte inferior */
-            padding-top: 2rem;      /* separación respecto al contenido superior */
+            margin-top: 1.8rem;
+            padding-top: 1rem;
             width: 100%;
+            flex-shrink: 0;       /* evita que se encoja */
+            background: #FFFFFF;   /* fondo sólido para tapar cualquier scroll */
+            z-index: 2;
+            border-top: 1px solid #E2EBE7;
         }
 
-        /* Tarjetas más grandes, destacadas, sin iconos */
         .card-module {
             background: #FCFEFD;
             border-radius: 24px;
@@ -113,10 +125,10 @@
             color: #1C3F32;
             border: 1.5px solid #D0E0D8;
             transition: all 0.25s ease;
-            cursor: default;
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
             background: linear-gradient(135deg, #FFFFFF, #F6FAF8);
-            min-width: 0;          /* permite que se encojan si es necesario */
+            min-width: 0;
+            cursor: pointer;
         }
 
         .card-module:hover {
@@ -126,7 +138,41 @@
             background: #FFFFFF;
         }
 
-        /* Aseguramos que en desktop las tarjetas sean más grandes tipográficamente */
+        /* Estados visuales: seleccionada (borde oscuro) y no seleccionadas (gris) */
+        .card-module.selected-card {
+            border: 2px solid #132A21;
+            background: #FFFFFF;
+            background-image: none;
+            box-shadow: 0 14px 24px rgba(0, 0, 0, 0.12);
+            color: #1C3F32;
+            transform: translateY(-2px);
+        }
+
+        .card-module.selected-card:hover {
+            transform: translateY(-4px);
+            border-color: #0D261D;
+            box-shadow: 0 18px 28px rgba(0, 0, 0, 0.14);
+        }
+
+        .card-module.dimmed-card {
+            background: #E7EFEB;
+            border-color: #C2D2CA;
+            color: #7B9689;
+            box-shadow: none;
+            background-image: none;
+            opacity: 0.85;
+            filter: saturate(0.92);
+        }
+
+        .card-module.dimmed-card:hover {
+            transform: translateY(-3px);
+            background: #DFE9E4;
+            border-color: #B0C6BC;
+            opacity: 0.95;
+            filter: saturate(1);
+            color: #2C5A48;
+        }
+
         @media (min-width: 1000px) {
             .card-module {
                 font-size: 1.1rem;
@@ -134,7 +180,6 @@
             }
         }
 
-        /* En tablets: pueden seguir en línea, pero si no hay espacio se ajustan con wrap? No, preferimos mantener línea pero reducimos gap */
         @media (max-width: 999px) and (min-width: 701px) {
             .cards-modules {
                 gap: 1rem;
@@ -145,7 +190,6 @@
             }
         }
 
-        /* COLUMNA CENTRAL VACÍA */
         .center-panel {
             flex: 0.9;
             background: #F5F7F5;
@@ -177,24 +221,29 @@
             margin-bottom: 6px;
         }
 
-        /* Scroll personalizado */
-        .left-panel::-webkit-scrollbar {
+        /* Scroll suave para el texto */
+        .info-text::-webkit-scrollbar {
             width: 5px;
         }
-        .left-panel::-webkit-scrollbar-track {
+        .info-text::-webkit-scrollbar-track {
             background: #E2EBE7;
             border-radius: 10px;
         }
-        .left-panel::-webkit-scrollbar-thumb {
+        .info-text::-webkit-scrollbar-thumb {
             background: #2A5C4A;
             border-radius: 10px;
         }
 
-        /* Responsive: móviles */
+        /* En móvil: mantener tarjetas visibles y área de texto scrollable */
         @media (max-width: 780px) {
             .app-container {
                 flex-direction: column;
                 overflow-y: auto;
+                height: auto;
+            }
+            body {
+                overflow-y: auto;
+                height: auto;
             }
             .left-panel {
                 flex: auto;
@@ -203,28 +252,27 @@
                 padding: 1.8rem 1.5rem;
                 display: flex;
                 flex-direction: column;
-            }
-            .center-panel {
-                flex: auto;
-                min-height: 200px;
-                background: #F5F7F5;
+                overflow: hidden;   /* el scroll interno se delega al .info-text */
+                height: auto;
+                max-height: 70vh;
             }
             .title-origen {
                 font-size: 2rem;
                 padding-left: 1rem;
+                margin-bottom: 1.2rem;
             }
-            body {
+            .info-text {
+                flex: 1;
                 overflow-y: auto;
-                height: auto;
+                max-height: none;
             }
-            /* En móvil, las tarjetas deben poder estar en una línea si es posible, pero si son muy pequeñas las hacemos wrap? 
-               El diseño original pide "una única línea", incluso en móvil intentaremos mantener línea con scroll horizontal si es necesario */
             .cards-modules {
                 flex-wrap: nowrap;
                 overflow-x: auto;
-                padding-bottom: 0.5rem;
                 gap: 0.8rem;
-                margin-top: auto;
+                padding-bottom: 0.5rem;
+                margin-top: 1.2rem;
+                border-top: 1px solid #E2EBE7;
             }
             .card-module {
                 flex: 0 0 auto;
@@ -232,9 +280,12 @@
                 font-size: 0.85rem;
                 padding: 0.9rem 0.5rem;
             }
+            .center-panel {
+                min-height: 180px;
+                flex: 0 0 auto;
+            }
         }
 
-        /* Animación suave */
         .left-panel, .center-panel {
             animation: fadeSlideUp 0.45s ease-out;
         }
@@ -252,22 +303,19 @@
 </head>
 <body>
 <div class="app-container">
-    <!-- COLUMNA IZQUIERDA: contenido + tarjetas ancladas abajo -->
     <div class="left-panel">
         <h1 class="title-origen">Origen del Apellido</h1>
-        <div class="info-text">
+        <div class="info-text" id="dynamicContent">
             <p>
                 <strong>El apellido Fioravante es absolutamente cautivador.</strong><br>
                 Proviene del encantador nombre "Fiore", que se deriva del latín 
                 <em>flos, floris</em>, ¡lo que significa <strong>"flor de flor"</strong>!<br>
                 Un legado lleno de belleza y significado impresionante.
             </p>
-
             <div class="highlight-quote">
                 “Andrea da Barberino interpreta a Fioravante en el sentido de  
                 <strong>«deja que esta flor avance»</strong>”
             </div>
-
             <div class="primer-aparicion">
                 <p><strong>Primera aparición del apellido</strong></p>
                 <p>
@@ -277,17 +325,13 @@
                 </p>
             </div>
         </div>
-
-        <!-- CONTENEDOR DE TARJETAS: siempre en una línea, más grandes y en la parte inferior -->
         <div class="cards-modules">
-            <div class="card-module">Referencias Históricas</div>
-            <div class="card-module">Otros apellidos similares</div>
-            <div class="card-module">Heráldica</div>
-            <div class="card-module">Personajes ilustres</div>
+            <div class="card-module" data-action="historico">Referencias Históricas</div>
+            <div class="card-module" data-action="similares">Otros apellidos similares</div>
+            <div class="card-module" data-action="heraldica">Heráldica</div>
+            <div class="card-module" data-action="personajes">Personajes ilustres</div>
         </div>
     </div>
-
-    <!-- COLUMNA CENTRAL: vacía (reservada) -->
     <div class="center-panel">
         <div class="empty-placeholder">
             <span>✦</span>
@@ -295,5 +339,181 @@
         </div>
     </div>
 </div>
+
+<script>
+    const dynamicContainer = document.getElementById('dynamicContent');
+
+    // ----- CONTENIDOS COMPLETOS (sin cambios) -----
+    const textoOriginal = `
+        <p>
+            <strong>El apellido Fioravante es absolutamente cautivador.</strong><br>
+            Proviene del encantador nombre "Fiore", que se deriva del latín 
+            <em>flos, floris</em>, ¡lo que significa <strong>"flor de flor"</strong>!<br>
+            Un legado lleno de belleza y significado impresionante.
+        </p>
+        <div class="highlight-quote">
+            “Andrea da Barberino interpreta a Fioravante en el sentido de  
+            <strong>«deja que esta flor avance»</strong>”
+        </div>
+        <div class="primer-aparicion">
+            <p><strong>Primera aparición del apellido</strong></p>
+            <p>
+                El apellido Fioravante se encontró por primera vez en 
+                <strong>Pistoia (Toscana - Italia)</strong>, cuando un Fioravante era miembro 
+                del consejo de gobierno de la ciudad.
+            </p>
+        </div>
+    `;
+
+    const textoReferencias = `
+        <p>Han surgido una variedad de nombres distinguidos y notables de la hermosa e histórica región italiana de la Toscana, incluido el notable apellido Fioravante.</p>
+        <p>Durante la Edad Media, a medida que las poblaciones crecían y los viajes entre regiones se volvían más frecuentes, la gente de la Toscana, que originalmente se conocía solo por un solo nombre, descubrió que era necesario adoptar un segundo nombre para identificarse a sí mismos y a sus familias.</p>
+        <p>Este proceso de adopción de apellidos hereditarios fijos en Italia comenzó en los siglos X y XI, pero no se completó hasta la era moderna. El desarrollo de los apellidos hereditarios italianos siguió principios generales y se caracterizó por derivados del nombre de pila.</p>
+        <p>El patronímico, el apellido, que se deriva del nombre de pila del padre, era uno de los tipos de nombre más comunes que se encuentran en la región de la Toscana.</p>
+        <p>Este sistema de creación de nombres fue ampliamente utilizado porque se vinculó bien con el sistema feudal existente y durante la era cristiana, muchas personas nombraron a sus hijos en honor a los santos y las figuras bíblicas.</p>
+    `;
+
+    const textoPersonajes = `
+        <p><strong>Familia Fioravanti/e, de la aristocracia en Pistoia (Toscana)</strong></p>
+        <p>Fioravanti d’Accorso en 1267 era miembro del consejo de la ciudad de Florencia.<br>
+        Fioravanti Ranieri (hijo del anterior) en 1310 era alcalde de la Pistoia.<br>
+        Simone di Ranieri Fioravanti en 1319 era miembro de los mayores de la ciudad.<br>
+        Giovanni di Puccio di Ranieri Fioravanti entre 1305 y 1314 era un banquero activo en la corte del papa Clemente V en Aviñón (Francia).<br>
+        Andrea di Simone di Baldo Fioravanti el 17 de junio de 1354 fue elegido capitán de la Montaña Superior.<br>
+        Francesco di Rinieri Fioravanti en 1385 y 1389 fue gonfaloniero de la República Florentina.<br>
+        Neri di Rinieri Fioravanti (hijo del anterior) en 1428 fue gonfaloniero de la República Florentina.<br>
+        Fioravanti di Piero en 1510 fue capitán de caballería en Flandes (Países Bajos) y más tarde fue comisionado por el papa Alejandro VI al asedio de la ciudad de Faenza.<br>
+        Vincenzo di Cipriano, en 1576, fue uno de los primeros en ser nombrado caballero de San Esteban, poco después del establecimiento de esta orden militar; más tarde fue canciller de la orden.<br>
+        Fabio of Cipriano fue capitán de caballería en los Países Bajos.<br>
+        Alberto di Fioravanti en 1590 fue nombrado caballero de Malta, y comendador en 1610.<br>
+        Niccolao di Fioravanti en 1636 luchó como capitán en la guerra del emperador Fernando II contra el rey de Suecia, y en 1643 en Toscana en la guerra del Gran Duque contra los Barberini.<br>
+        Neri di Fioravanti (f. 1374), arquitecto italiano.<br>
+        Fieravante Fioravanti (1390-1430), arquitecto italiano, padre de Aristóteles.<br>
+        Aristóteles Fioravanti (1415-1486), arquitecto italiano, hijo de Fieravante.<br>
+        Leonardo Fioravanti (1518-1588), médico italiano de Boloña.<br>
+        Valentino Fioravanti (1764-1837), compositor italiano de óperas bufas, padre de Giuseppe.<br>
+        Giuseppe Fioravanti (1790-1850), cantante lírico bajo de ópera, italiano, hijo de Valentino.<br>
+        Vincenzo Fioravanti (1799-1877), compositor italiano de óperas bufas, hijo de Valentino.<br>
+        Valentino Fioravanti (bajo) (1827-1879), cantante italiano lírico bajo de ópera, nieto de Valentino.<br>
+        Luigi Fioravanti (1829-1887), cantante italiano lírico bajo de ópera, nieto de Valentino.<br>
+        Marcos Christino Fioravanti (1775-1862), cirujano italiano.<br>
+     `;
+
+    const textoHeraldica = `
+        <p>Las fuentes heráldicas toscanas registran dos formas principales del escudo de armas asociado con la familia Fioravanti. La forma más común y ampliamente atestiguada presenta una cruz de San Andrés a cuadros. También está documentada una segunda forma, que difiere en la disposición del campo. Sobreviven representaciones adicionales en contextos arquitectónicos de Toscana y reflejan una interpretación estilística local más que concesiones heráldicas distintas.</p>
+    `;
+
+    const textoSimilares = `
+        <p>El apellido Fioravante es una variante del nombre medieval italiano Fiore (flor) y comparte raíz con una amplia gama de apellidos derivados de este concepto o con sonoridades similares.</p>
+        <p><strong>Apellidos de la misma familia etimológica (Raíz Fiore)</strong><br>
+        Estos apellidos comparten el origen italiano derivado del latín flos, floris, que se usaba con un sentido de prosperidad o crecimiento.</p>
+        <p>Fioravanti: Es la variante más directa y común, muy frecuente en diversas regiones de Italia.<br>
+        Fiore: La forma base de la que derivan el resto de las variantes.<br>
+        Fiorini / Fiorino: Diminutivos comunes en el centro y norte de Italia.<br>
+        Fiorelli / Fiorello: Otra variante diminutiva popular.<br>
+        Fiorillo: Variante común en el sur de Italia, especialmente en Campania.<br>
+        Fiorucci: Apellido frecuente en regiones como Umbría.</p>
+        <p><strong>Apellidos con sonoridad o terminación similar</strong><br>
+        Existen otros apellidos que, aunque no siempre comparten el mismo origen "floral", suenan parecido debido a su estructura o terminación en italiano o español.</p>
+        <p>Fioramante: Una variante ortográfica muy cercana.<br>
+        Morgante: Comparte la estructura de tres sílabas con terminación fuerte.<br>
+        Mirante: Similar en ritmo y terminación.<br>
+        Bramante: Comparte la terminación "-ante".<br>
+        Ferrante: Otro apellido italiano común con una estructura fonética parecida.<br>
+        Bustamante: De origen español, pero con una cadencia final similar.<br>
+        Tramonte: Similar en sonoridad a la segunda mitad del apellido.</p>
+    `;
+
+    const contentMap = {
+        'historico': textoReferencias,
+        'similares': textoSimilares,
+        'heraldica': textoHeraldica,
+        'personajes': textoPersonajes
+    };
+
+    // ----- MANEJO DE ESTADO VISUAL DE TARJETAS (SELECCIÓN + GRIS) -----
+    function applyCardSelection(selectedAction) {
+        const allCards = document.querySelectorAll('.card-module');
+        allCards.forEach(card => {
+            card.classList.remove('selected-card', 'dimmed-card');
+        });
+        if (!selectedAction) return;
+
+        let targetCard = null;
+        allCards.forEach(card => {
+            if (card.getAttribute('data-action') === selectedAction) {
+                targetCard = card;
+            }
+        });
+
+        if (targetCard) {
+            targetCard.classList.add('selected-card');
+            allCards.forEach(card => {
+                if (card !== targetCard) {
+                    card.classList.add('dimmed-card');
+                }
+            });
+        }
+    }
+
+    function setContentAndSelect(action, htmlContent) {
+        if (dynamicContainer) dynamicContainer.innerHTML = htmlContent;
+        applyCardSelection(action);
+    }
+
+    function restoreOriginalContent() {
+        if (dynamicContainer) dynamicContainer.innerHTML = textoOriginal;
+        applyCardSelection(null);
+    }
+
+    // ----- EVENTOS -----
+    const cards = document.querySelectorAll('.card-module');
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const action = card.getAttribute('data-action');
+            if (action && contentMap[action]) {
+                setContentAndSelect(action, contentMap[action]);
+            } else {
+                // fallback inesperado
+                const msg = document.createElement('div');
+                msg.textContent = '🔍 Información en preparación · Pronto actualizaremos más datos.';
+                msg.style.position = 'fixed';
+                msg.style.bottom = '20px';
+                msg.style.left = '20px';
+                msg.style.backgroundColor = '#2A5C4A';
+                msg.style.color = 'white';
+                msg.style.padding = '8px 16px';
+                msg.style.borderRadius = '40px';
+                msg.style.fontSize = '0.8rem';
+                msg.style.fontFamily = 'Inter, sans-serif';
+                msg.style.zIndex = '9999';
+                msg.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 2000);
+            }
+        });
+    });
+
+    const titleElement = document.querySelector('.title-origen');
+    if (titleElement) {
+        titleElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            restoreOriginalContent();
+        });
+    }
+
+    const leftPanel = document.querySelector('.left-panel');
+    if (leftPanel) {
+        leftPanel.addEventListener('click', (e) => {
+            if (e.target === leftPanel) {
+                restoreOriginalContent();
+            }
+        });
+    }
+
+    // Estado inicial: sin selección, todas las tarjetas normales y siempre visibles
+    applyCardSelection(null);
+</script>
 </body>
 </html>
