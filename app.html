@@ -58,6 +58,22 @@
             .family-image { max-height: 45vh; }
         }
 
+        /* Estilos para el contenedor del iframe */
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            display: none;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         .bottom-panel {
             background-color: var(--primary);
             padding: 0 2rem;
@@ -395,6 +411,10 @@
         <div class="image-container">
             <img class="family-image" src="https://github.com/rfioravante73-ar/familiia/blob/main/fioravante.png?raw=true" alt="Archivo Genealógico Fioravante" onerror="this.onerror=null;this.src='https://placehold.co/400x300/2C423F/FFFFFF?text=Fioravante';">
         </div>
+        <!-- Nuevo contenedor para el iframe -->
+        <div id="iframeContainer" class="iframe-container">
+            <iframe id="webIframe" title="Contenido externo" src="about:blank"></iframe>
+        </div>
     </div>
 
     <!-- Panel inferior -->
@@ -490,6 +510,25 @@
     const saveEditBtn = document.getElementById('saveEditBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
 
+    // Elementos para el iframe
+    const imageContainer = document.querySelector('.image-container');
+    const iframeContainer = document.getElementById('iframeContainer');
+    const webIframe = document.getElementById('webIframe');
+
+    // Función para mostrar la imagen principal y ocultar el iframe
+    function showImage() {
+        imageContainer.style.display = 'flex'; // Asegurar que se muestre la imagen
+        iframeContainer.style.display = 'none';
+        webIframe.src = 'about:blank'; // Limpiar el iframe
+    }
+
+    // Función para mostrar el iframe con una URL específica
+    function showIframe(url) {
+        imageContainer.style.display = 'none';
+        iframeContainer.style.display = 'block';
+        webIframe.src = url;
+    }
+
     // Función para mostrar el modal con los datos actuales
     function openEditModal() {
         const user = auth.currentUser;
@@ -557,7 +596,7 @@
 
     // Evento al hacer clic en el área de bienvenida -> abrir modal
     welcomeArea.addEventListener('click', (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // Evita que el panel inferior regrese a inicio
         openEditModal();
     });
 
@@ -583,7 +622,7 @@
     let isMenuOpen = false;
 
     menuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // Evita que el panel inferior regrese a inicio
         isMenuOpen = !isMenuOpen;
         menuBtn.classList.toggle('menu-open', isMenuOpen);
         floatingMenu.classList.toggle('active', isMenuOpen);
@@ -597,22 +636,32 @@
         }
     });
 
-    // Acciones del menú (toast)
+    // Acciones del menú
     floatingMenu.querySelectorAll('li').forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             const text = item.innerText;
-            const toast = document.createElement('div');
-            toast.style.cssText = `
-                position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-                background: var(--primary); color: var(--accent); padding: 12px 28px;
-                border-radius: 50px; font-size: 0.85rem; z-index: 1000;
-                border: 1px solid var(--accent); font-family: 'Inter', sans-serif;
-                font-weight: 500; backdrop-filter: blur(8px); white-space: nowrap; pointer-events: none;
-            `;
-            toast.innerHTML = `📜 ${text} — Próximamente disponible`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+            
+            // Verificar si es la opción "Origen del Apellido"
+            if (text === 'Origen del Apellido') {
+                // Mostrar el iframe con la URL específica
+                showIframe('https://rfioravante73-ar.github.io/familiia/origen.html');
+            } else {
+                // Para las demás opciones, mostrar el mensaje temporal y volver a la imagen
+                showImage();
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+                    background: var(--primary); color: var(--accent); padding: 12px 28px;
+                    border-radius: 50px; font-size: 0.85rem; z-index: 1000;
+                    border: 1px solid var(--accent); font-family: 'Inter', sans-serif;
+                    font-weight: 500; backdrop-filter: blur(8px); white-space: nowrap; pointer-events: none;
+                `;
+                toast.innerHTML = `📜 ${text} — Próximamente disponible`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2500);
+            }
+            
             isMenuOpen = false;
             menuBtn.classList.remove('menu-open');
             floatingMenu.classList.remove('active');
@@ -629,8 +678,8 @@
     function closeAlertModal() { modalOverlay.classList.remove('active'); }
 
     exitBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que el panel inferior regrese a inicio
         e.preventDefault();
-        e.stopPropagation();
         showAlertModal();
     });
 
@@ -668,6 +717,17 @@
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modalOverlay.classList.contains('active')) closeAlertModal();
     });
+
+    // ----- NUEVO: Regresar a la pantalla principal al hacer clic en el panel inferior (si no es un elemento interactivo) -----
+    const bottomPanel = document.querySelector('.bottom-panel');
+    bottomPanel.addEventListener('click', (e) => {
+        // Solo ejecuta showImage si el clic fue directamente en el panel o en elementos no interactivos.
+        // Los elementos que ya tienen stopPropagation no llegarán aquí.
+        showImage();
+    });
+
+    // Aseguramos que la imagen sea visible al cargar (por si acaso)
+    showImage();
 </script>
 </body>
 </html>
