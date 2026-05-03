@@ -79,8 +79,8 @@
             opacity: 0.85;
         }
 
-        /* Botón reiniciar listado */
-        .btn-reset-list {
+        /* Botones del header */
+        .btn-reset-list, .btn-new-person {
             background: #F0F5F2;
             border: 1.5px solid #C2D2CA;
             color: #1C3F32;
@@ -93,10 +93,20 @@
             transition: all 0.2s ease;
             white-space: nowrap;
         }
-        .btn-reset-list:hover {
+        .btn-reset-list:hover, .btn-new-person:hover {
             background: #E2EBE7;
             transform: scale(0.97);
             border-color: #2A5C4A;
+        }
+        .btn-new-person {
+            background: #2A5C4A;
+            color: white;
+            border-color: #2A5C4A;
+        }
+        .btn-new-person:hover {
+            background: #1C3F32;
+            border-color: #1C3F32;
+            color: white;
         }
 
         .year-group {
@@ -366,7 +376,7 @@
         }
         
         @media print {
-            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list {
+            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person {
                 display: none !important;
             }
             .right-panel {
@@ -432,7 +442,7 @@
                 border-left-width: 4px;
             }
             
-            .btn-reset-list {
+            .btn-reset-list, .btn-new-person {
                 padding: 0.4rem 1rem;
                 font-size: 0.75rem;
                 white-space: nowrap;
@@ -566,7 +576,7 @@
                 font-size: 1.2rem;
             }
             
-            .btn-reset-list {
+            .btn-reset-list, .btn-new-person {
                 font-size: 0.7rem;
                 padding: 0.35rem 0.9rem;
             }
@@ -611,11 +621,14 @@
 <body>
 <div class="app-container">
     <div class="left-panel">
-        <!-- HEADER FIJO (STICKY) con título + botón reiniciar -->
+        <!-- HEADER FIJO (STICKY) con título + botón Nuevo + botón reiniciar -->
         <div class="sticky-header">
             <div class="title-row">
                 <h1 class="title-origen">Árbol Genealógico</h1>
-                <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button class="btn-new-person" id="newPersonBtn">＋ Nuevo</button>
+                    <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
+                </div>
             </div>
         </div>
         <div id="groupsContainer" class="groups-list">Cargando ancestros...</div>
@@ -630,10 +643,10 @@
     </div>
 </div>
 
-<!-- Modal de edición -->
+<!-- Modal de edición / creación -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3>Editar ancestro</h3>
+        <h3 id="modalTitle">Editar ancestro</h3>
         <div class="form-group">
             <label>Nombre</label>
             <input type="text" id="editFirstName" placeholder="Nombre">
@@ -653,6 +666,10 @@
         <div class="form-group">
             <label>Fecha de fallecimiento</label>
             <input type="date" id="editDeathDate">
+        </div>
+        <div class="form-group">
+            <label>Lugar de fallecimiento</label>
+            <input type="text" id="editDeathPlace" placeholder="Ciudad, País">
         </div>
         <div class="form-group">
             <label>Género</label>
@@ -811,7 +828,7 @@
         return firebase.firestore.Timestamp.fromDate(date);
     }
 
-    // Render del panel derecho con nombre + edad en esquina superior derecha (float)
+    // Render del panel derecho con TODOS los campos (igual que el modal)
     function renderPersonDetailsInRightPanel(person, docId) {
         if (!person) {
             rightDetailsDiv.innerHTML = `<div class="empty-detail">Información no disponible.</div>`;
@@ -822,6 +839,7 @@
         const birthPlace = person.birthPlace ? person.birthPlace : "No especificado";
         const deathDateFormatted = person.deathDate ? formatDateToDMY(person.deathDate) : "—";
         const birthDateFormatted = person.birthDate ? formatDateToDMY(person.birthDate) : "Desconocida";
+        const deathPlace = person.deathPlace ? person.deathPlace : "No especificado";
         
         // Calcular edad (vivo o fallecido)
         const ageString = calculateAgeString(person.birthDate, person.deathDate);
@@ -838,7 +856,7 @@
             genderStyle = "color: #1E6FDF; font-weight: 800;";
             nameColorStyle = "color: #1E6FDF;";
         } else {
-            genderText = "Persona";
+            genderText = "Sin especificar";
             genderStyle = "color: #2A5C4A; font-weight: 600;";
             nameColorStyle = "color: #1C3F32;";
         }
@@ -857,7 +875,8 @@
                 <p><span style="background:#EFF5F2; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.85rem;">Nacido/a en ${birthYearDisplay} · <span style="${genderStyle}">${genderText}</span></span></p>
                 <p><span class="birth-date-bold">Fecha de nacimiento:</span> ${birthDateFormatted}<br>
                 <strong>Lugar de nacimiento:</strong> ${escapeHtml(birthPlace)}<br>
-                <strong>Fecha de fallecimiento:</strong> ${deathDateFormatted}</p>
+                <strong>Fecha de fallecimiento:</strong> ${deathDateFormatted}<br>
+                <strong>Lugar de fallecimiento:</strong> ${escapeHtml(deathPlace)}</p>
         `;
         if (person.biography && person.biography.trim() !== "") {
             bioHtml += `<div class="detail-highlight"><strong>Reseña biográfica:</strong><br>${escapeHtml(person.biography)}</div>`;
@@ -889,6 +908,7 @@
     }
 
     function openEditModal(docId, person) {
+        document.getElementById('modalTitle').textContent = 'Editar ancestro';
         currentSelectedId = docId;
         currentPersonData = { ...person };
         document.getElementById('editFirstName').value = person.firstName || '';
@@ -922,6 +942,7 @@
             }
         }
         document.getElementById('editDeathDate').value = deathDateStr;
+        document.getElementById('editDeathPlace').value = person.deathPlace || '';
         document.getElementById('editGender').value = person.gender || '';
         document.getElementById('editBiography').value = person.biography || '';
         
@@ -934,12 +955,32 @@
         editModal.style.display = 'flex';
     }
 
+    function openCreateModal() {
+        document.getElementById('modalTitle').textContent = 'Nuevo ancestro';
+        currentSelectedId = null;
+        currentPersonData = null;
+        // Limpiar todos los campos
+        document.getElementById('editFirstName').value = '';
+        document.getElementById('editLastName').value = '';
+        document.getElementById('editBirthDate').value = '';
+        document.getElementById('editBirthPlace').value = '';
+        document.getElementById('editDeathDate').value = '';
+        document.getElementById('editDeathPlace').value = '';
+        document.getElementById('editGender').value = '';
+        document.getElementById('editBiography').value = '';
+        document.getElementById('editPhoto1').value = '';
+        document.getElementById('editPhoto2').value = '';
+        document.getElementById('editPhoto3').value = '';
+        document.getElementById('editPhoto4').value = '';
+        editModal.style.display = 'flex';
+    }
+
     async function savePersonChanges() {
-        if (!currentSelectedId) return;
         const updatedData = {
             firstName: document.getElementById('editFirstName').value,
             lastName: document.getElementById('editLastName').value,
             birthPlace: document.getElementById('editBirthPlace').value,
+            deathPlace: document.getElementById('editDeathPlace').value,
             gender: document.getElementById('editGender').value,
             biography: document.getElementById('editBiography').value,
         };
@@ -968,16 +1009,37 @@
         updatedData.photos = photoUrls;
         
         try {
-            await db.collection("persons").doc(currentSelectedId).update(updatedData);
-            await loadAndGroupPersons();
-            editModal.style.display = 'none';
-            const updatedPerson = allPersons.find(p => p.id === currentSelectedId)?.person;
-            if (updatedPerson) {
-                renderPersonDetailsInRightPanel(updatedPerson, currentSelectedId);
-                applyCardSelection(currentSelectedId);
+            if (currentSelectedId) {
+                // Actualizar registro existente
+                await db.collection("persons").doc(currentSelectedId).update(updatedData);
+                editModal.style.display = 'none';
+                await loadAndGroupPersons();
+                const updatedPerson = allPersons.find(p => p.id === currentSelectedId)?.person;
+                if (updatedPerson) {
+                    renderPersonDetailsInRightPanel(updatedPerson, currentSelectedId);
+                    applyCardSelection(currentSelectedId);
+                }
+            } else {
+                // Crear nuevo registro
+                const docRef = await db.collection("persons").add(updatedData);
+                editModal.style.display = 'none';
+                await loadAndGroupPersons();
+                // Seleccionar automáticamente el nuevo ancestro
+                const newId = docRef.id;
+                const newCard = document.querySelector(`.card-module[data-id="${newId}"]`);
+                if (newCard) {
+                    newCard.click();
+                } else {
+                    currentSelectedId = newId;
+                    const newPerson = allPersons.find(p => p.id === newId)?.person;
+                    if (newPerson) {
+                        renderPersonDetailsInRightPanel(newPerson, newId);
+                        applyCardSelection(newId);
+                    }
+                }
             }
         } catch (error) {
-            console.error("Error al actualizar:", error);
+            console.error("Error al guardar:", error);
             alert("Error al guardar: " + error.message);
         }
     }
@@ -1107,6 +1169,7 @@
                         birthYear: data.birthYear ?? extractYear(data.birthDate),
                         birthPlace: data.birthPlace || "",
                         deathDate: data.deathDate || null,
+                        deathPlace: data.deathPlace || "",
                         biography: data.biography || "",
                         gender: data.gender || "",
                         photos: data.photos || []
@@ -1127,10 +1190,8 @@
         const firstCard = document.querySelector('.card-module');
         if (firstCard) {
             firstCard.click();
-            // Scroll suave para que se vea el primer elemento (opcional)
             firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
-            // Si no hay tarjetas, solo reseteamos selección
             currentSelectedId = null;
             resetRightPanelToWelcome();
             applyCardSelection(null);
@@ -1153,6 +1214,9 @@
     });
     const resetBtn = document.getElementById('resetListBtn');
     if (resetBtn) resetBtn.addEventListener('click', resetToListFirst);
+
+    const newBtn = document.getElementById('newPersonBtn');
+    if (newBtn) newBtn.addEventListener('click', openCreateModal);
 
     loadAndGroupPersons();
 </script>
