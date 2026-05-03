@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Genealogía Fioravante - Mapas de Ciudades</title>
-    <!-- Google Fonts: Inter + Dancing Script (desde index.html) -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Inter:opsz,wght@14..32,300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <title>Mapas de Ciudades</title>
+    <!-- Tipografía exclusiva: Inter (Google Fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Leaflet CSS y JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Firebase SDK (versión estable) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
@@ -19,16 +19,17 @@
             box-sizing: border-box;
         }
 
-        /* Paleta de colores TOMADA DE INDEX.HTML */
+        /* DEFINICIÓN DE COLORES (manteniendo la paleta original solo para textos y bordes) */
         :root {
-            --primary: #2C423F;      /* verde oscuro elegante */
-            --accent: #C47D57;       /* terracota / cálido */
-            --text-light: #F7F4EF;
-            --bg-soft: #FAF8F5;      /* fondo claro tipo pergamino */
+            --primary: #2C423F;      /* verde oscuro – se usará principalmente en textos */
+            --accent: #C47D57;       /* terracota – para bordes de modal y detalles */
+            --text-dark: #1E2A2A;
+            --text-soft: #4a5b58;
+            --bg-white: #FFFFFF;
             --border-light: #E5E0D8;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
             --font-main: 'Inter', sans-serif;
-            --font-fancy: 'Dancing Script', cursive;
-            --shadow-md: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
         }
 
         body {
@@ -36,7 +37,7 @@
             height: 100vh;
             width: 100vw;
             overflow: hidden;
-            background-color: var(--bg-soft);
+            background-color: var(--bg-white);
         }
 
         .app-container {
@@ -45,34 +46,31 @@
             height: 100%;
         }
 
-        /* ========= PANEL IZQUIERDO (HEREDADOS DE INDEX) ========= */
+        /* ========= PANEL IZQUIERDO (FONDO BLANCO, TEXTO CON COLOR ACTUAL) ========= */
         .sidebar {
             width: 340px;
-            background-color: var(--primary);
-            color: var(--text-light);
-            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: var(--bg-white);
+            color: var(--primary);
+            border-right: 1px solid var(--border-light);
             display: flex;
             flex-direction: column;
             padding: 24px 0 20px 0;
             overflow-y: auto;
             z-index: 10;
-            backdrop-filter: blur(0px);
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-sm);
         }
 
         .sidebar h1 {
-            font-family: var(--font-fancy);
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--text-light);
+            font-family: var(--font-main);
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: var(--primary);
             padding: 0 24px 12px 24px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid var(--accent);
             margin-bottom: 20px;
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #D4D0C8 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: none;
+            -webkit-text-fill-color: var(--primary);
         }
 
         .search-box {
@@ -85,23 +83,22 @@
             font-size: 0.9rem;
             font-family: var(--font-main);
             font-weight: 500;
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border: 1.5px solid var(--border-light);
             border-radius: 60px;
-            background-color: rgba(255, 255, 255, 0.08);
-            color: white;
+            background-color: var(--bg-white);
+            color: var(--text-dark);
             outline: none;
             transition: all 0.2s ease;
         }
 
         .filter-input::placeholder {
-            color: rgba(255, 255, 255, 0.65);
+            color: #b7b3ae;
             font-weight: 400;
         }
 
         .filter-input:focus {
             border-color: var(--accent);
-            background-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 0 3px rgba(196, 125, 87, 0.25);
+            box-shadow: 0 0 0 3px rgba(196, 125, 87, 0.15);
         }
 
         .city-list {
@@ -111,72 +108,72 @@
         }
 
         .city-item {
-            background: rgba(255, 255, 255, 0.08);
+            background: #F9F7F4;
             margin-bottom: 10px;
             padding: 12px 18px;
             border-radius: 40px;
             cursor: pointer;
             transition: all 0.2s;
-            font-weight: 500;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            color: var(--primary);
+            border: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(2px);
         }
 
         .city-item:hover {
-            background: var(--accent);
+            background: #FDF8F4;
             border-color: var(--accent);
             transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-sm);
         }
 
         .city-name {
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.2px;
+            color: var(--primary);
         }
 
         .city-count {
-            background: rgba(0, 0, 0, 0.35);
+            background: rgba(44, 66, 63, 0.08);
             padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.7rem;
             font-weight: 700;
-            color: var(--text-light);
-            backdrop-filter: blur(4px);
+            color: var(--accent);
         }
 
-        /* ========= ÁREA DEL MAPA ========= */
+        /* ========= ÁREA DEL MAPA (FONDO BLANCO) ========= */
         .map-area {
             flex: 1;
             position: relative;
-            background: #e9e4db;
+            background: #fefefe;
         }
 
         #map {
             width: 100%;
             height: 100%;
             z-index: 1;
+            background: #f5f3ef;
         }
 
-        /* LOADING con estilo elegante */
+        /* LOADING con estilo neutro */
         .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(44, 66, 63, 0.9);
-            backdrop-filter: blur(6px);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 200;
-            color: white;
-            font-weight: 500;
+            color: var(--primary);
+            font-weight: 600;
             flex-direction: column;
             gap: 16px;
             font-family: var(--font-main);
@@ -185,7 +182,7 @@
         .spinner {
             width: 48px;
             height: 48px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
+            border: 4px solid rgba(44, 66, 63, 0.15);
             border-top: 4px solid var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -195,7 +192,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ========= PANEL LATERAL DERECHO (FIJO / SLIDE-IN) ========= */
+        /* ========= PANEL LATERAL DERECHO (MODAL) – FONDO BLANCO, BORDE CON COLOR ACTUAL ========= */
         .ancestor-panel {
             position: absolute;
             top: 0;
@@ -203,15 +200,15 @@
             width: 380px;
             max-width: 90vw;
             height: 100%;
-            background: var(--primary);
-            color: var(--text-light);
-            box-shadow: -8px 0 28px rgba(0, 0, 0, 0.4);
+            background: var(--bg-white);
+            color: var(--text-dark);
+            box-shadow: -8px 0 28px rgba(0, 0, 0, 0.12);
             z-index: 300;
             transform: translateX(100%);
             transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             display: flex;
             flex-direction: column;
-            border-left: 4px solid var(--accent);
+            border-left: 5px solid var(--accent);  /* BORDE CON COLOR ACTUAL (acento terracota) */
             font-family: var(--font-main);
         }
 
@@ -220,31 +217,31 @@
         }
 
         .panel-header {
-            background: rgba(0, 0, 0, 0.25);
+            background: #FEFAF6;
             padding: 22px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid var(--border-light);
         }
 
         .panel-header h2 {
-            font-family: var(--font-fancy);
-            font-size: 1.7rem;
-            font-weight: 600;
+            font-family: var(--font-main);
+            font-size: 1.5rem;
+            font-weight: 800;
             margin: 0;
             word-break: break-word;
-            color: white;
+            color: var(--primary);
             letter-spacing: -0.3px;
         }
 
         .panel-close-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: var(--text-light);
-            font-size: 1.8rem;
-            width: 40px;
-            height: 40px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--primary);
+            font-size: 1.5rem;
+            width: 36px;
+            height: 36px;
             border-radius: 40px;
             cursor: pointer;
             display: flex;
@@ -256,7 +253,7 @@
 
         .panel-close-btn:hover {
             background: var(--accent);
-            transform: scale(1.02);
+            border-color: var(--accent);
             color: white;
         }
 
@@ -264,48 +261,47 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px 20px;
-            background: rgba(0, 0, 0, 0.15);
+            background: #FFFFFF;
         }
 
         .person-row {
-            background: rgba(255, 255, 255, 0.1);
+            background: #F9F8F6;
             margin-bottom: 12px;
             padding: 14px 18px;
             border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--border-light);
             display: flex;
             align-items: baseline;
             justify-content: space-between;
             transition: all 0.2s;
-            backdrop-filter: blur(2px);
         }
 
         .person-row:hover {
-            background: var(--accent);
+            background: #FEF5EE;
             border-color: var(--accent);
-            transform: translateX(-4px);
+            transform: translateX(-2px);
         }
 
         .person-name {
             font-weight: 700;
-            font-size: 1rem;
-            color: white;
+            font-size: 0.95rem;
+            color: var(--primary);
             letter-spacing: -0.2px;
         }
 
         .person-year {
             font-weight: 500;
-            color: #FFE0B5;
-            font-size: 0.85rem;
-            background: rgba(0,0,0,0.3);
+            color: var(--accent);
+            font-size: 0.8rem;
+            background: rgba(196, 125, 87, 0.12);
             padding: 2px 12px;
             border-radius: 30px;
         }
 
         .panel-footer {
             padding: 16px 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--border-light);
+            background: #FEFAF6;
             text-align: right;
         }
 
@@ -314,8 +310,8 @@
             border: 1.5px solid var(--accent);
             padding: 8px 22px;
             border-radius: 60px;
-            font-weight: 600;
-            color: var(--text-light);
+            font-weight: 700;
+            color: var(--accent);
             cursor: pointer;
             transition: 0.2s;
             font-family: var(--font-main);
@@ -330,48 +326,19 @@
 
         .panel-empty {
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-soft);
             padding: 40px 20px;
-            font-style: italic;
+            font-style: normal;
             font-weight: 400;
         }
 
-        /* MODAL FLOTANTE CRÉDITOS (IDÉNTICO AL INDEX) */
-        .floating-credit-modal {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #FFFFFF;
-            border-left: 5px solid var(--accent);
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
-            padding: 12px 20px;
-            z-index: 1000;
-            max-width: 260px;
-            font-family: var(--font-main);
-            font-size: 0.8rem;
-            line-height: 1.45;
-            color: #1E2A2A;
-            background-color: #fefcf9;
-            transition: opacity 0.2s;
-            text-align: center;
-            backdrop-filter: blur(2px);
-        }
-        .floating-credit-modal .credit-line {
-            display: block;
-            text-align: center;
-        }
-        .floating-credit-modal strong {
-            font-weight: 800;
-            color: var(--primary);
-        }
-
+        /* Ajustes responsive */
         @media (max-width: 768px) {
             .sidebar {
                 width: 280px;
             }
             .sidebar h1 {
-                font-size: 1.7rem;
+                font-size: 1.5rem;
                 padding: 0 16px 10px 16px;
             }
             .city-item {
@@ -388,14 +355,14 @@
 </head>
 <body>
 <div class="app-container">
-    <!-- Panel izquierdo: lista de ciudades + buscador -->
+    <!-- Panel izquierdo: lista de ciudades + buscador (fondo blanco, texto con color actual) -->
     <aside class="sidebar">
-        <h1>Ciudades Natales</h1>
+        <h1>🌍 Mapas</h1>
         <div class="search-box">
-            <input type="text" id="citySearchInput" class="filter-input" placeholder="🔍 Buscar ciudad...">
+            <input type="text" id="citySearchInput" class="filter-input" placeholder="🔍 Filtrar ciudad...">
         </div>
         <div id="cityListContainer" class="city-list">
-            <div style="padding: 30px; text-align: center; color: rgba(255,255,255,0.7);">⏳ Cargando ciudades...</div>
+            <div style="padding: 30px; text-align: center; color: var(--primary); font-weight: 500;">⏳ Cargando ciudades...</div>
         </div>
     </aside>
 
@@ -407,10 +374,10 @@
             <div>Geolocalizando & construyendo mapa familiar...</div>
         </div>
 
-        <!-- PANEL LATERAL INFORMATIVO (fijo al hacer click en ciudad) -->
+        <!-- PANEL LATERAL INFORMATIVO (modal) – fondo blanco, borde con color actual -->
         <div id="ancestorPanel" class="ancestor-panel">
             <div class="panel-header">
-                <h2 id="panelCityTitle">🌿 Ancestros</h2>
+                <h2 id="panelCityTitle">📜 Ancestros</h2>
                 <button class="panel-close-btn" id="closePanelBtn">&times;</button>
             </div>
             <div class="panel-body" id="panelBodyContent">
@@ -423,17 +390,9 @@
     </main>
 </div>
 
-<!-- Modal flotante de créditos inspirado en index.html (desaparece en 5s) -->
-<div id="infoCreditModal" class="floating-credit-modal">
-    <span class="credit-line"><strong>Diseño y Programación:</strong></span>
-    <span class="credit-line">Rómulo Fioravante</span>
-    <span class="credit-line"><strong>Versión:</strong> 1.0.2026 · Mapa Familiar</span>
-    <span class="credit-line">Posadas-Misiones</span>
-</div>
-
 <script>
     // --------------------------------------------------------------
-    // CONFIGURACIÓN FIREBASE (misma credencial que index.html)
+    // CONFIGURACIÓN FIREBASE (misma credencial)
     // --------------------------------------------------------------
     const firebaseConfig = {
         apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
@@ -490,15 +449,15 @@
         });
     }
 
-    // Renderiza la lista de ciudades en el sidebar
+    // Renderiza la lista de ciudades en el sidebar (fondo blanco, texto primary)
     function renderCityList(filterText = '') {
         if (!allCities.length) {
-            cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">🌍 No hay ciudades con datos genealógicos aún.</div>';
+            cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color: #2C423F; font-weight:500;">🌍 No hay ciudades con datos genealógicos aún.</div>';
             return;
         }
         let filtered = allCities.filter(city => cityMatches(city.name, filterText));
         if (filtered.length === 0) {
-            cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">🔍 Ninguna ciudad coincide con tu búsqueda.</div>';
+            cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color: #2C423F; font-weight:500;">🔍 Ninguna ciudad coincide con tu búsqueda.</div>';
             return;
         }
         filtered.sort((a, b) => a.name.localeCompare(b.name));
@@ -506,7 +465,7 @@
         filtered.forEach(city => {
             html += `
                 <div class="city-item" data-id="${escapeHtml(city.id)}">
-                    <span class="city-name">${escapeHtml(city.name)}</span>
+                    <span class="city-name">📍 ${escapeHtml(city.name)}</span>
                     <span class="city-count">${city.count} ${city.count === 1 ? 'persona' : 'personas'}</span>
                 </div>
             `;
@@ -524,21 +483,19 @@
                 if (city.lat && city.lng && map) {
                     map.setView([city.lat, city.lng], 12);
                 }
-                // Abrir panel lateral con información DETALLADA (fijo)
+                // Abrir panel lateral con información detallada
                 openAncestorPanel(city);
             });
         });
     }
 
-    // Función para ABRIR panel con la lista de ancestros (fijo hasta que se cierre manualmente)
+    // Función para ABRIR panel con la lista de ancestros (modal lateral)
     function openAncestorPanel(city) {
-        // Actualizar título del panel
         panelCityTitle.textContent = `${city.name}  •  ${city.count} ${city.count === 1 ? 'ancestro' : 'ancestros'}`;
         
         if (!city.persons || city.persons.length === 0) {
             panelBodyContent.innerHTML = '<div class="panel-empty">📜 No hay registros de nacimiento detallados para esta ciudad.</div>';
         } else {
-            // Ordenar por nombre o año
             const sorted = [...city.persons].sort((a, b) => {
                 if (a.fullName && b.fullName) return a.fullName.localeCompare(b.fullName);
                 return 0;
@@ -556,11 +513,9 @@
             });
             panelBodyContent.innerHTML = rowsHtml;
         }
-        // Asegurar que el panel se muestre (clase active)
         ancestorPanel.classList.add('active');
     }
 
-    // Cerrar panel lateral completamente
     function closeAncestorPanel() {
         ancestorPanel.classList.remove('active');
     }
@@ -588,8 +543,8 @@
             if (city.lat && city.lng) {
                 const popupHtml = `
                     <b style="font-family: 'Inter'; color: #2C423F;">📍 ${escapeHtml(city.name)}</b><br>
-                    <span style="font-size:0.85rem;">👥 ${city.count} habitante(s) registrado(s)</span><br>
-                    <i style="font-size:0.75rem;">Haz clic en la lista para detalles</i>
+                    <span style="font-size:0.85rem; color:#4a5b58;">👥 ${city.count} habitante(s) registrado(s)</span><br>
+                    <i style="font-size:0.75rem; color:#C47D57;">Haz clic en la lista para detalles</i>
                 `;
                 const marker = L.marker([city.lat, city.lng], {
                     riseOnHover: true
@@ -635,20 +590,19 @@
         try {
             const snapshot = await db.collection("persons").get();
             if (snapshot.empty) {
-                cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">📭 No hay personas en el árbol genealógico aún.</div>';
+                cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color: #2C423F;">📭 No hay personas en el árbol genealógico aún.</div>';
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
                 return;
             }
 
-            const cityMap = new Map(); // key: nombre normalizado, value: objeto acumulador
+            const cityMap = new Map();
 
             snapshot.forEach(doc => {
                 const data = doc.data();
                 let birthPlace = data.birthPlace ? data.birthPlace.trim() : null;
-                if (!birthPlace) return; // ignorar personas sin lugar de nacimiento
+                if (!birthPlace) return;
 
                 const normKey = normalizeString(birthPlace);
-                // Construir nombre completo
                 let fullName = data.fullName || '';
                 if (!fullName && (data.firstName || data.lastName)) {
                     fullName = [data.firstName, data.lastName].filter(Boolean).join(' ');
@@ -688,15 +642,12 @@
             });
 
             if (cityMap.size === 0) {
-                cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.8);">🌎 No se encontraron ciudades asociadas (campo birthPlace vacío).</div>';
+                cityListContainer.innerHTML = '<div style="padding:20px; text-align:center; color: #2C423F;">🌎 No se encontraron ciudades asociadas (campo birthPlace vacío).</div>';
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
                 return;
             }
 
-            // Mostrar loading overlay con progreso
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'flex';
-            }
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
             const totalCities = cityMap.size;
             let processed = 0;
             const citiesArray = [];
@@ -717,8 +668,7 @@
                         persons: cityInfo.persons
                     });
                 } else {
-                    // Si no se geocode, igual mostramos ciudad pero sin marcador? O la omitimos del mapa pero en lista?
-                    // Para mantener lista completa, la agregamos SIN coordenadas (para que aparezca en sidebar pero no en mapa)
+                    // Ciudad sin coordenadas pero igual visible en lista
                     citiesArray.push({
                         id: normKey,
                         name: cityInfo.rawName,
@@ -728,7 +678,6 @@
                         persons: cityInfo.persons
                     });
                 }
-                // Pequeña pausa para respetar límites de Nominatim
                 await new Promise(r => setTimeout(r, 180));
             }
 
@@ -742,29 +691,27 @@
                 }
             }
 
-            // Renderizar lista y actualizar mapa
             renderCityList('');
             if (mapInitialized && map) {
                 updateMarkers();
-                // Zoom a las ciudades con coordenadas válidas
                 const validCities = allCities.filter(c => c.lat && c.lng);
                 if (validCities.length) {
                     const bounds = L.latLngBounds(validCities.map(c => [c.lat, c.lng]));
                     if (bounds.isValid()) map.fitBounds(bounds.pad(0.1));
                 } else if (map) {
-                    map.setView([-27.3666, -55.8969], 5); // vista aproximada a Misiones/Argentina
+                    map.setView([-27.3666, -55.8969], 5);
                 }
             }
         } catch (error) {
             console.error("Error crítico al cargar datos:", error);
-            cityListContainer.innerHTML = `<div style="padding:20px; color:#ffaa88;">⚠️ Error conectando con la base: ${error.message}</div>`;
+            cityListContainer.innerHTML = `<div style="padding:20px; color:var(--accent);">⚠️ Error conectando con la base: ${error.message}</div>`;
             if (loadingOverlay) loadingOverlay.style.display = 'none';
         }
     }
 
-    // Inicializar mapa Leaflet
+    // Inicializar mapa Leaflet (estilo sobrio y claro)
     function initMap() {
-        map = L.map('map').setView([-27.3666, -55.8969], 5); // centro aproximado Argentina
+        map = L.map('map').setView([-27.3666, -55.8969], 5);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CartoDB',
             subdomains: 'abcd',
@@ -788,19 +735,7 @@
         if (mapInitialized) updateMarkers();
     });
 
-    // MODAL FLOTANTE: desaparece luego de 5 segundos (como en index)
-    const creditModal = document.getElementById('infoCreditModal');
-    if (creditModal) {
-        setTimeout(() => {
-            if (creditModal && creditModal.remove) {
-                creditModal.remove();
-            } else if (creditModal && creditModal.style) {
-                creditModal.style.display = 'none';
-            }
-        }, 5000);
-    }
-
-    // EJECUCIÓN PRINCIPAL: carga y luego mapa
+    // EJECUCIÓN PRINCIPAL
     (async () => {
         await loadAndGeocodeCities();
         initMap();
