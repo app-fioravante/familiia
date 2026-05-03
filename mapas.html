@@ -60,17 +60,49 @@
             box-shadow: var(--shadow-sm);
         }
 
+        /* Contenedor flexible para título y botón */
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px 12px 24px;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 20px;
+        }
+
         .sidebar h1 {
             font-family: var(--font-main);
             font-size: 1.9rem;
             font-weight: 800;
             color: var(--primary);
-            padding: 0 24px 12px 24px;
-            border-bottom: 2px solid var(--accent);
-            margin-bottom: 20px;
             letter-spacing: -0.5px;
+            margin: 0;
             background: none;
             -webkit-text-fill-color: var(--primary);
+        }
+
+        .reset-map-btn {
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .reset-map-btn:hover {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: var(--shadow-sm);
         }
 
         .search-box {
@@ -337,9 +369,15 @@
             .sidebar {
                 width: 280px;
             }
+            .title-container {
+                padding: 0 16px 10px 16px;
+            }
             .sidebar h1 {
                 font-size: 1.5rem;
-                padding: 0 16px 10px 16px;
+            }
+            .reset-map-btn {
+                font-size: 0.7rem;
+                padding: 4px 10px;
             }
             .city-item {
                 padding: 8px 14px;
@@ -357,7 +395,10 @@
 <div class="app-container">
     <!-- Panel izquierdo: lista de ciudades + buscador (fondo blanco, texto con color actual) -->
     <aside class="sidebar">
-        <h1>🌍 Mapas</h1>
+        <div class="title-container">
+            <h1>🌍 Mapas</h1>
+            <button id="resetMapBtn" class="reset-map-btn" title="Restablecer vista del mapa y limpiar filtro">⟳ Reiniciar</button>
+        </div>
         <div class="search-box">
             <input type="text" id="citySearchInput" class="filter-input" placeholder="🔍 Filtrar ciudad...">
         </div>
@@ -420,6 +461,7 @@
     const panelBodyContent = document.getElementById('panelBodyContent');
     const closePanelBtn = document.getElementById('closePanelBtn');
     const closePanelFooterBtn = document.getElementById('closePanelFooterBtn');
+    const resetMapBtn = document.getElementById('resetMapBtn');
 
     // Helper: Normalización (sin tildes, minúsculas)
     function normalizeString(str) {
@@ -529,6 +571,40 @@
             closeAncestorPanel();
         }
     });
+
+    // Función para ajustar el mapa a todas las ciudades con coordenadas (vista completa)
+    function resetMapView() {
+        if (!map || !allCities.length) return;
+        const citiesWithCoords = allCities.filter(c => c.lat && c.lng);
+        if (citiesWithCoords.length > 0) {
+            const bounds = L.latLngBounds(citiesWithCoords.map(c => [c.lat, c.lng]));
+            if (bounds.isValid()) {
+                map.fitBounds(bounds.pad(0.1));
+            } else {
+                // Si no es válido, vista por defecto
+                map.setView([-27.3666, -55.8969], 5);
+            }
+        } else {
+            // Si no hay ciudades con coordenadas, ir a vista por defecto
+            map.setView([-27.3666, -55.8969], 5);
+        }
+    }
+
+    // Reiniciar: limpiar filtro, restaurar lista completa y ajustar mapa completo
+    function resetFullView() {
+        // Limpiar input de búsqueda
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        // Volver a renderizar lista sin filtro
+        renderCityList('');
+        // Actualizar marcadores sin filtro
+        if (mapInitialized) {
+            updateMarkers();
+        }
+        // Ajustar mapa a toda la extensión
+        resetMapView();
+    }
 
     // Actualizar marcadores en el mapa (usando filtro de búsqueda)
     function updateMarkers() {
@@ -734,6 +810,13 @@
         renderCityList(searchInput.value);
         if (mapInitialized) updateMarkers();
     });
+
+    // Evento del botón Reiniciar
+    if (resetMapBtn) {
+        resetMapBtn.addEventListener('click', () => {
+            resetFullView();
+        });
+    }
 
     // EJECUCIÓN PRINCIPAL
     (async () => {
