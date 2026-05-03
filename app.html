@@ -41,20 +41,18 @@
             overflow: hidden;
         }
 
-        /* Área principal flexible: ahora en columna para scroll vertical correcto */
         .main-empty {
             flex: 1;
             display: flex;
-            flex-direction: column;      /* Permite apilar elementos y scroll vertical */
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow-y: auto;
-            min-height: 0;               /* Esencial para que flex respete el overflow en móviles */
+            min-height: 0;
             padding: 16px;
             width: 100%;
         }
 
-        /* Contenedor imagen centrada (se mantiene igual pero dentro de columna) */
         .image-container {
             max-width: 95%;
             width: auto;
@@ -65,7 +63,7 @@
             backdrop-filter: blur(8px);
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
             transition: all 0.2s ease;
-            margin: auto;               /* Centrado vertical/horizontal dentro del flex column */
+            margin: auto;
             flex-shrink: 0;
         }
 
@@ -93,17 +91,16 @@
             opacity: 0.75;
         }
 
-        /* Iframe responsivo - ahora con flex para ocupar todo el espacio disponible */
         .iframe-container {
             width: 100%;
-            flex: 1;                    /* Ocupa todo el espacio restante en columna */
+            flex: 1;
             display: none;
             background: white;
             border-radius: 24px;
             overflow: hidden;
             position: relative;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            min-height: 0;              /* Evita desbordes en flex */
+            min-height: 0;
         }
 
         .iframe-container iframe {
@@ -112,7 +109,7 @@
             border: none;
         }
 
-        /* Panel inferior fijo (siempre visible) */
+        /* Panel inferior con nuevo orden: menú (lupa) a la izquierda, luego bienvenida, luego título + btn salir */
         .bottom-panel {
             background-color: var(--primary);
             padding: 0 1rem;
@@ -120,14 +117,13 @@
             height: auto;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 0.75rem;
             box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.12);
             flex-shrink: 0;
             width: 100%;
         }
 
-        /* Botón menú creativo */
+        /* MENÚ (LUPA) - siempre en la esquina izquierda */
         .menu-wrapper {
             position: relative;
             width: 56px;
@@ -165,12 +161,8 @@
         }
 
         @keyframes rotateLight {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .lupa-icon {
@@ -200,17 +192,18 @@
             border-radius: 4px;
         }
 
-        /* Área de bienvenida */
+        /* Área de bienvenida (después del menú) */
         .welcome-area {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 0;
+            gap: 8px;
+            flex: 0 0 auto;
+            max-width: 60%;
             cursor: pointer;
             padding: 6px 10px;
             border-radius: 60px;
             transition: background 0.2s;
+            background: rgba(0,0,0,0.1);
         }
 
         .welcome-area:active {
@@ -256,7 +249,7 @@
             font-weight: normal;
         }
 
-        /* Título fijo derecha */
+        /* Título a la derecha (con margin-left: auto para empujar el contenido a la derecha) */
         .genealogy-title-right {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
@@ -265,15 +258,16 @@
             text-align: right;
             letter-spacing: 0.2px;
             white-space: normal;
-            flex-shrink: 1;
+            flex-shrink: 0;
             background: rgba(0, 0, 0, 0.2);
             padding: 6px 12px;
             border-radius: 40px;
             backdrop-filter: blur(2px);
             line-height: 1.2;
+            margin-left: auto;   /* empuja título y botón hacia la derecha */
         }
 
-        /* Botón salir */
+        /* Botón salir intacto */
         .btn-exit {
             background: var(--alert-red);
             border: none;
@@ -295,7 +289,7 @@
             background: var(--alert-red-dark);
         }
 
-        /* Menú flotante responsivo */
+        /* Menú flotante */
         .floating-menu {
             position: fixed;
             bottom: 90px;
@@ -341,7 +335,7 @@
             padding-left: 30px;
         }
 
-        /* Modales responsivos */
+        /* Modales */
         .alert-modal-overlay,
         .edit-name-modal-overlay {
             position: fixed;
@@ -438,7 +432,6 @@
             font-size: 0.9rem;
         }
 
-        /* Toast personalizado */
         .custom-toast {
             position: fixed;
             bottom: 100px;
@@ -460,43 +453,40 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* 🔹 SOLUCIÓN MÓVIL: altura dinámica + corrección panel inferior 🔹 */
+        /* Responsive */
         @media (max-width: 640px) {
             .app-container {
-                height: 100dvh;         /* Altura real del viewport en móviles (sin bars) */
+                height: 100dvh;
             }
-
             .bottom-panel {
                 padding: 0 0.8rem;
                 gap: 0.5rem;
                 min-height: 70px;
             }
-
             .menu-wrapper {
                 width: 48px;
                 height: 48px;
             }
-
             .menu-creative {
                 width: 44px;
                 height: 44px;
             }
-
             .menu-light-aura {
                 width: 52px;
                 height: 52px;
             }
-
             .welcome-avatar {
                 width: 38px;
                 height: 38px;
                 font-size: 1.1rem;
             }
-
             .welcome-greeting {
                 font-size: 0.75rem;
             }
-
+            .welcome-area {
+                max-width: 70%;
+                padding: 4px 8px;
+            }
             .genealogy-title-right {
                 font-size: 0.6rem;
                 padding: 4px 8px;
@@ -504,12 +494,10 @@
                 line-height: 1.2;
                 max-width: 110px;
             }
-
             .btn-exit {
                 padding: 6px 14px;
                 font-size: 0.75rem;
             }
-
             .floating-menu {
                 left: 10px;
                 right: 10px;
@@ -517,21 +505,17 @@
                 max-width: none;
                 width: auto;
             }
-
             .floating-menu li {
                 padding: 12px 20px;
                 font-size: 0.9rem;
             }
-
             .image-container {
                 padding: 14px;
                 border-radius: 24px;
             }
-
             .family-image {
                 max-height: 45vh;
             }
-
             .custom-toast {
                 font-size: 0.75rem;
                 padding: 8px 16px;
@@ -542,29 +526,24 @@
         @media (max-width: 480px) {
             .welcome-area {
                 gap: 6px;
-                padding: 4px 8px;
+                max-width: 75%;
             }
-
             .welcome-avatar {
                 width: 34px;
                 height: 34px;
                 font-size: 1rem;
             }
-
             .genealogy-title-right {
-                display: none; /* oculto en pantallas muy pequeñas para ganar espacio */
+                display: none;
             }
-
             .bottom-panel {
                 justify-content: space-between;
             }
-
             .btn-exit {
                 padding: 6px 12px;
             }
         }
 
-        /* Escritorio: sin cambios, conserva 100vh y diseño original */
         @media (min-width: 1024px) {
             .floating-menu {
                 left: 20px;
@@ -572,14 +551,15 @@
                 bottom: 100px;
                 min-width: 260px;
             }
-
             .genealogy-title-right {
                 display: block;
                 white-space: nowrap;
             }
-
             .bottom-panel {
                 padding: 0 2rem;
+            }
+            .welcome-area {
+                max-width: 50%;
             }
         }
     </style>
@@ -596,6 +576,7 @@
     </div>
 
     <div class="bottom-panel">
+        <!-- 1) Botón menú (LUPA) siempre en la esquina izquierda -->
         <div class="menu-wrapper">
             <div class="menu-light-aura"></div>
             <div class="menu-creative" id="creativeMenuBtn">
@@ -606,6 +587,7 @@
             </div>
         </div>
 
+        <!-- 2) Área de bienvenida (justo a la derecha del menú) -->
         <div class="welcome-area" id="welcomeArea">
             <div class="welcome-avatar" id="welcomeAvatar">👤</div>
             <div class="welcome-text">
@@ -613,10 +595,12 @@
             </div>
         </div>
 
+        <!-- 3) Título a la derecha (con margin-left:auto) -->
         <div class="genealogy-title-right">
             Archivo Genealógico <strong>Fioravante</strong> · Argentina
         </div>
 
+        <!-- 4) Botón salir intacto -->
         <button class="btn-exit" id="exitButton">Salir</button>
     </div>
 </div>
@@ -634,7 +618,6 @@
     </ul>
 </div>
 
-<!-- Modal de salida -->
 <div id="alertModal" class="alert-modal-overlay">
     <div class="alert-modal">
         <div class="alert-icon">⚠️</div>
@@ -647,7 +630,6 @@
     </div>
 </div>
 
-<!-- Modal para editar nombre -->
 <div id="editNameModal" class="edit-name-modal-overlay">
     <div class="edit-name-modal">
         <h3>Editar nombre completo</h3>
@@ -667,7 +649,6 @@
 </div>
 
 <script>
-    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
         authDomain: "familia-genealogia.firebaseapp.com",
@@ -679,7 +660,6 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Elementos DOM
     const welcomeArea = document.getElementById('welcomeArea');
     const welcomeAvatar = document.getElementById('welcomeAvatar');
     const welcomeGreeting = document.getElementById('welcomeGreeting');
@@ -688,12 +668,10 @@
     const editLastName = document.getElementById('editLastName');
     const saveEditBtn = document.getElementById('saveEditBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
-
     const imageContainer = document.querySelector('.image-container');
     const iframeContainer = document.getElementById('iframeContainer');
     const webIframe = document.getElementById('webIframe');
 
-    // Funciones de UI
     function showImage() {
         if (imageContainer) imageContainer.style.display = 'flex';
         if (iframeContainer) iframeContainer.style.display = 'none';
@@ -702,7 +680,7 @@
 
     function showIframe(url) {
         if (imageContainer) imageContainer.style.display = 'none';
-        if (iframeContainer) iframeContainer.style.display = 'flex';  // ahora es flex para que flex:1 funcione
+        if (iframeContainer) iframeContainer.style.display = 'flex';
         if (webIframe) webIframe.src = url;
     }
 
@@ -710,13 +688,11 @@
         const toast = document.createElement('div');
         toast.className = 'custom-toast';
         toast.style.background = isError ? '#b91c1c' : 'var(--primary)';
-        toast.style.color = '#fff';
         toast.innerHTML = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2300);
     }
 
-    // Modal de edición
     function openEditModal() {
         const user = auth.currentUser;
         if (!user) return;
@@ -747,7 +723,6 @@
             closeEditModal();
             showToast(`✅ Nombre actualizado: ${fullName}`);
         } catch (error) {
-            console.error(error);
             showToast("Error al actualizar nombre", true);
         }
     }
@@ -775,7 +750,6 @@
         if (e.target === editModal) closeEditModal();
     });
 
-    // Auth
     auth.onAuthStateChanged((user) => {
         if (!user) {
             window.location.href = "index.html";
@@ -784,7 +758,6 @@
         actualizarBienvenida(user);
     });
 
-    // Menú flotante
     const menuBtn = document.getElementById('creativeMenuBtn');
     const floatingMenu = document.getElementById('floatingMenu');
     let isMenuOpen = false;
@@ -792,38 +765,33 @@
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         isMenuOpen = !isMenuOpen;
-        menuBtn.classList.toggle('menu-open', isMenuOpen);
         floatingMenu.classList.toggle('active', isMenuOpen);
     });
 
     document.addEventListener('click', (e) => {
         if (isMenuOpen && !menuBtn.contains(e.target) && !floatingMenu.contains(e.target)) {
             isMenuOpen = false;
-            menuBtn.classList.remove('menu-open');
             floatingMenu.classList.remove('active');
         }
     });
 
-    // Acciones del menú
     floatingMenu.querySelectorAll('li').forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             const text = item.innerText;
-            
-            if (text === 'Origen del Apellido') {
+            if (text === 'Árbol completo') {
+                showIframe('https://rfioravante73-ar.github.io/familiia/arbol.html');
+            } else if (text === 'Origen del Apellido') {
                 showIframe('https://rfioravante73-ar.github.io/familiia/origen.html');
             } else {
                 showImage();
                 showToast(`📜 ${text} — Próximamente disponible`);
             }
-            
             isMenuOpen = false;
-            menuBtn.classList.remove('menu-open');
             floatingMenu.classList.remove('active');
         });
     });
 
-    // Modal de salida (rojo)
     const alertModal = document.getElementById('alertModal');
     const cancelModalBtn = document.getElementById('modalCancelBtn');
     const confirmModalBtn = document.getElementById('modalConfirmBtn');
@@ -834,7 +802,6 @@
 
     exitBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        e.preventDefault();
         showAlertModal();
     });
 
@@ -862,7 +829,6 @@
         if (e.target === alertModal) closeAlertModal();
     });
 
-    // Regresar a imagen al hacer clic en panel inferior (excepto elementos con stopPropagation)
     const bottomPanel = document.querySelector('.bottom-panel');
     bottomPanel.addEventListener('click', (e) => {
         if (!e.target.closest('.welcome-area') && !e.target.closest('.menu-wrapper') && !e.target.closest('.btn-exit')) {
