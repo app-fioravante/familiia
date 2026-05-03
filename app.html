@@ -19,7 +19,45 @@
         }
         body, html { height: 100%; width: 100%; background: var(--bg-soft); font-family: var(--font-main); overflow: hidden; }
         .app-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-        .main-empty { flex: 1; }
+        .main-empty { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        
+        /* Contenedor de la imagen centrado */
+        .image-container {
+            max-width: 90%;
+            max-height: 70%;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+        .family-image {
+            max-width: 100%;
+            max-height: 55vh;
+            width: auto;
+            height: auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(196, 125, 87, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .family-image:hover {
+            transform: scale(1.01);
+        }
+        .image-caption {
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+        @media (max-width: 768px) {
+            .image-container { max-width: 95%; padding: 12px; }
+            .family-image { max-height: 45vh; }
+        }
+
         .bottom-panel {
             background-color: var(--primary);
             padding: 0 2rem;
@@ -203,7 +241,12 @@
 </head>
 <body>
 <div class="app-container">
-    <div class="main-empty"></div>
+    <!-- Contenedor principal con la imagen centrada -->
+    <div class="main-empty">
+        <div class="image-container">
+            <img class="family-image" src="https://github.com/rfioravante73-ar/familiia/blob/main/fioravante.png?raw=true" alt="Archivo Genealógico Fioravante" onerror="this.onerror=null;this.src='https://placehold.co/400x300/2C423F/FFFFFF?text=Fioravante';">
+        </div>
+    </div>
     <div class="bottom-panel">
         <div class="menu-wrapper">
             <div class="menu-light-aura"></div>
