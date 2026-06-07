@@ -224,6 +224,7 @@
             cursor: pointer;
             text-decoration: none;
             transition: color 0.2s;
+            display: inline-block;
         }
         .ancestor-name:hover {
             color: #2A5C4A;
@@ -510,12 +511,12 @@
             const ageInfo = getAgeStatus(person);
             const statusText = ageInfo.text;
             const statusClass = ageInfo.class;
-            // 🔗 MODIFICACIÓN: se pasa el ID del ancestro como parámetro en la URL para que arbol.html pueda abrir el registro correspondiente
-            const treeLink = `arbol.html?selectedId=${encodeURIComponent(item.id)}`;
+            // 🔄 CAMBIO: ahora se usa un span con evento para abrir dentro del iframe principal
+            const treeUrl = `arbol.html?selectedId=${encodeURIComponent(item.id)}`;
             html += `
                 <div class="ancestor-item">
                     <div class="ancestor-info">
-                        <a href="${treeLink}" target="_blank" class="ancestor-name">${escapeHtml(fullName)}</a>
+                        <span class="ancestor-name" data-url="${treeUrl}">${escapeHtml(fullName)}</span>
                         <div class="ancestor-detail">${escapeHtml(statusText)}</div>
                     </div>
                     <div class="status-badge ${statusClass}">${ageInfo.state === 'vivo' ? 'Vivo' : (ageInfo.state === 'fallecido' ? 'Fallecido' : '—')}</div>
@@ -525,6 +526,21 @@
         
         html += `</div>`;
         rightDetailsDiv.innerHTML = html;
+        
+        // Asignar evento a cada nombre de ancestro para abrir dentro de la app principal
+        document.querySelectorAll('.ancestor-name').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const url = elem.getAttribute('data-url');
+                if (url && window.parent && typeof window.parent.showIframe === 'function') {
+                    // Llamar a la función global de la ventana padre (app.html) para mostrar el iframe
+                    window.parent.showIframe(url);
+                } else {
+                    // Fallback: abrir en nueva pestaña si no está embebido
+                    window.open(url, '_blank');
+                }
+            });
+        });
         
         const saveBtn = document.getElementById('saveCityImageBtn');
         const imageInput = document.getElementById('cityImageUrl');
