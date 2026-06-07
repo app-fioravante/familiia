@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
+        /* ========== ESTILOS ORIGINALES (sin cambios) ========== */
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +33,6 @@
             background: #F5F7F5;
         }
 
-        /* PANEL IZQUIERDO */
         .left-panel {
             flex: 0.85;
             background: #FFFFFF;
@@ -44,7 +44,6 @@
             height: 100%;
         }
 
-        /* CONTENEDOR STICKY PARA TÍTULO + BOTONES + BÚSQUEDA */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -80,7 +79,6 @@
             opacity: 0.85;
         }
 
-        /* Botones del header */
         .btn-reset-list, .btn-new-person {
             background: #F0F5F2;
             border: 1.5px solid #C2D2CA;
@@ -110,7 +108,6 @@
             color: white;
         }
 
-        /* Barra de búsqueda mejorada */
         .search-container {
             display: flex;
             align-items: center;
@@ -244,7 +241,6 @@
             margin-top: 0.3rem;
         }
 
-        /* PANEL DERECHO */
         .right-panel {
             flex: 1.5;
             background: #F5F7F5;
@@ -267,7 +263,6 @@
             border: 1px solid #E2EBE7;
         }
 
-        /* Estilo para el mensaje vacío: centrado, tipografía destacada y moderna */
         .empty-detail {
             display: flex;
             flex-direction: column;
@@ -294,9 +289,6 @@
             letter-spacing: -0.02em;
             line-height: 1.2;
         }
-        .empty-detail br {
-            display: none;
-        }
         .empty-detail .sub-message {
             font-size: 1.2rem;
             font-weight: 400;
@@ -307,23 +299,13 @@
             padding-top: 1.2rem;
             display: inline-block;
         }
-        /* Ajuste para mantener el texto legible en móviles */
         @media (max-width: 768px) {
-            .empty-detail strong {
-                font-size: 2rem;
-            }
-            .empty-detail .sub-message {
-                font-size: 1rem;
-                max-width: 95%;
-            }
+            .empty-detail strong { font-size: 2rem; }
+            .empty-detail .sub-message { font-size: 1rem; max-width: 95%; }
         }
         @media (max-width: 480px) {
-            .empty-detail strong {
-                font-size: 1.6rem;
-            }
-            .empty-detail .sub-message {
-                font-size: 0.9rem;
-            }
+            .empty-detail strong { font-size: 1.6rem; }
+            .empty-detail .sub-message { font-size: 0.9rem; }
         }
 
         .detail-text {
@@ -348,7 +330,6 @@
             margin: 1rem 0;
         }
 
-        /* Galería de fotos */
         .photos-container {
             display: flex;
             flex-wrap: wrap;
@@ -366,9 +347,7 @@
             background: #F9F9F9;
             transition: transform 0.2s;
         }
-        .photo-item:hover {
-            transform: scale(1.02);
-        }
+        .photo-item:hover { transform: scale(1.02); }
         .photo-item img {
             width: 100%;
             height: 150px;
@@ -387,7 +366,6 @@
             text-align: center;
         }
         
-        /* Botones de acción */
         .action-buttons {
             display: flex;
             gap: 1rem;
@@ -421,7 +399,6 @@
             background: #DFE9E4;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -443,13 +420,8 @@
             max-height: 85vh;
             overflow-y: auto;
         }
-        .modal-content h3 {
-            margin-bottom: 1.2rem;
-            color: #1C3F32;
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
+        .modal-content h3 { margin-bottom: 1.2rem; color: #1C3F32; }
+        .form-group { margin-bottom: 1rem; }
         .form-group label {
             display: block;
             font-weight: 600;
@@ -476,226 +448,56 @@
             border-top: 1px solid #E2EBE7;
             padding-top: 1rem;
         }
-        .photos-section h4 {
-            margin-bottom: 0.8rem;
-            color: #246148;
-        }
+        .photos-section h4 { margin-bottom: 0.8rem; color: #246148; }
         
         @media print {
-            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person, .search-container {
-                display: none !important;
-            }
-            .right-panel {
-                flex: 1;
-                padding: 0;
-                margin: 0;
-            }
-            .details-container {
-                box-shadow: none;
-                border: none;
-                padding: 0;
-            }
-            .photo-item {
-                break-inside: avoid;
-            }
+            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person, .search-container { display: none !important; }
+            .right-panel { flex: 1; padding: 0; margin: 0; }
+            .details-container { box-shadow: none; border: none; padding: 0; }
+            .photo-item { break-inside: avoid; }
         }
         
-        /* ========== RESPONSIVE: MÓVILES Y TABLETS (≤ 768px) ========== */
         @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-                height: auto;
-            }
-            
-            .app-container {
-                flex-direction: column;
-                height: auto;
-                min-height: 100vh;
-            }
-            
-            .left-panel {
-                flex: none;
-                width: 100%;
-                border-right: none;
-                border-bottom: 5px solid #2A5C4A;
-                padding: 0 0.9rem 1.2rem 0.9rem;
-                max-height: 60vh;
-                overflow-y: auto;
-            }
-            
-            .right-panel {
-                flex: 1;
-                width: 100%;
-                padding: 1.2rem 1rem 1.5rem 1rem;
-                overflow-y: auto;
-            }
-            
-            .sticky-header {
-                padding: 0.9rem 0 0.6rem 0;
-                margin-bottom: 0.6rem;
-            }
-            
-            .title-row {
-                gap: 0.7rem;
-                margin-bottom: 0.8rem;
-            }
-            
-            .title-origen {
-                font-size: 1.4rem;
-                padding-left: 0.8rem;
-                border-left-width: 4px;
-            }
-            
-            .btn-reset-list, .btn-new-person {
-                padding: 0.4rem 1rem;
-                font-size: 0.75rem;
-                white-space: nowrap;
-            }
-
-            .search-container {
-                gap: 0.5rem;
-            }
-            .search-input {
-                padding: 0.6rem 0.8rem 0.6rem 2.4rem;
-                font-size: 0.85rem;
-                background-size: 1rem;
-            }
-            .btn-clear-search {
-                width: 34px;
-                height: 34px;
-            }
-            
-            .year-group {
-                margin-bottom: 1.5rem;
-            }
-            
-            .group-title {
-                font-size: 1.2rem;
-                padding: 0.2rem 1rem;
-                margin-bottom: 0.8rem;
-            }
-            
-            .group-cards {
-                gap: 0.7rem;
-            }
-            
-            .card-module {
-                padding: 0.7rem 0.9rem;
-                min-height: 70px;
-                border-radius: 18px;
-            }
-            
-            .birth-year-badge {
-                font-size: 0.75rem;
-                top: 6px;
-                left: 10px;
-                padding: 0.15rem 0.6rem;
-            }
-            
-            .full-name-card {
-                font-size: 0.85rem;
-                margin-top: 0.2rem;
-            }
-            
-            .details-container {
-                padding: 1.2rem 1.2rem;
-                border-radius: 28px;
-                gap: 0.9rem;
-            }
-            
-            .detail-text {
-                font-size: 0.95rem;
-            }
-            
-            .detail-highlight {
-                padding: 1rem 1.2rem;
-                margin: 0.8rem 0;
-            }
-            
-            .action-buttons {
-                gap: 0.8rem;
-                justify-content: flex-end;
-                margin-bottom: 0.8rem;
-            }
-            
-            .btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-            }
-            
-            .photos-container {
-                gap: 0.8rem;
-                justify-content: center;
-                margin-top: 1rem;
-            }
-            
-            .photo-item {
-                width: 105px;
-            }
-            
-            .photo-item img {
-                height: 105px;
-            }
-            
-            .photo-placeholder {
-                height: 105px;
-                font-size: 0.7rem;
-            }
-            
-            .modal-content {
-                width: 92%;
-                max-width: 92%;
-                padding: 1.5rem;
-                border-radius: 28px;
-                max-height: 90vh;
-            }
-            
-            .empty-detail {
-                min-height: 250px;
-            }
+            body { overflow-y: auto; height: auto; }
+            .app-container { flex-direction: column; height: auto; min-height: 100vh; }
+            .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; padding: 0 0.9rem 1.2rem 0.9rem; max-height: 60vh; overflow-y: auto; }
+            .right-panel { flex: 1; width: 100%; padding: 1.2rem 1rem 1.5rem 1rem; overflow-y: auto; }
+            .sticky-header { padding: 0.9rem 0 0.6rem 0; margin-bottom: 0.6rem; }
+            .title-row { gap: 0.7rem; margin-bottom: 0.8rem; }
+            .title-origen { font-size: 1.4rem; padding-left: 0.8rem; border-left-width: 4px; }
+            .btn-reset-list, .btn-new-person { padding: 0.4rem 1rem; font-size: 0.75rem; }
+            .search-container { gap: 0.5rem; }
+            .search-input { padding: 0.6rem 0.8rem 0.6rem 2.4rem; font-size: 0.85rem; background-size: 1rem; }
+            .btn-clear-search { width: 34px; height: 34px; }
+            .year-group { margin-bottom: 1.5rem; }
+            .group-title { font-size: 1.2rem; padding: 0.2rem 1rem; margin-bottom: 0.8rem; }
+            .group-cards { gap: 0.7rem; }
+            .card-module { padding: 0.7rem 0.9rem; min-height: 70px; border-radius: 18px; }
+            .birth-year-badge { font-size: 0.75rem; top: 6px; left: 10px; padding: 0.15rem 0.6rem; }
+            .full-name-card { font-size: 0.85rem; margin-top: 0.2rem; }
+            .details-container { padding: 1.2rem 1.2rem; border-radius: 28px; gap: 0.9rem; }
+            .detail-text { font-size: 0.95rem; }
+            .detail-highlight { padding: 1rem 1.2rem; margin: 0.8rem 0; }
+            .action-buttons { gap: 0.8rem; justify-content: flex-end; margin-bottom: 0.8rem; }
+            .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+            .photos-container { gap: 0.8rem; justify-content: center; margin-top: 1rem; }
+            .photo-item { width: 105px; }
+            .photo-item img { height: 105px; }
+            .photo-placeholder { height: 105px; font-size: 0.7rem; }
+            .modal-content { width: 92%; max-width: 92%; padding: 1.5rem; border-radius: 28px; max-height: 90vh; }
+            .empty-detail { min-height: 250px; }
         }
-        
         @media (max-width: 480px) {
-            .title-origen {
-                font-size: 1.2rem;
-            }
-            
-            .btn-reset-list, .btn-new-person {
-                font-size: 0.7rem;
-                padding: 0.35rem 0.9rem;
-            }
-            
-            .card-module {
-                padding: 0.6rem 0.7rem;
-            }
-            
-            .birth-year-badge {
-                font-size: 0.7rem;
-                top: 5px;
-                left: 8px;
-            }
-            
-            .full-name-card {
-                font-size: 0.8rem;
-            }
-            
-            .details-container {
-                padding: 1rem;
-            }
-            
-            .detail-text {
-                font-size: 0.9rem;
-            }
-            
-            .photo-item {
-                width: 85px;
-            }
-            
-            .photo-item img {
-                height: 85px;
-            }
+            .title-origen { font-size: 1.2rem; }
+            .btn-reset-list, .btn-new-person { font-size: 0.7rem; padding: 0.35rem 0.9rem; }
+            .card-module { padding: 0.6rem 0.7rem; }
+            .birth-year-badge { font-size: 0.7rem; top: 5px; left: 8px; }
+            .full-name-card { font-size: 0.8rem; }
+            .details-container { padding: 1rem; }
+            .detail-text { font-size: 0.9rem; }
+            .photo-item { width: 85px; }
+            .photo-item img { height: 85px; }
         }
-        
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(8px);}
             to { opacity: 1; transform: translateY(0);}
@@ -713,7 +515,6 @@
                     <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
                 </div>
             </div>
-            <!-- BÚSQUEDA AVANZADA -->
             <div class="search-container">
                 <div class="search-input-wrapper">
                     <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, lugar, biografía, edad, año...">
@@ -725,7 +526,6 @@
     </div>
     <div class="right-panel">
         <div id="rightDetails" class="details-container">
-            <!-- Este contenido se reemplazará dinámicamente, pero el estilo vacío será el actualizado -->
             <div class="empty-detail">
                 <strong>Legado familiar</strong>
                 <span class="sub-message">Selecciona un ancestro para ver sus datos.</span>
@@ -734,7 +534,6 @@
     </div>
 </div>
 
-<!-- Modal edición / creación -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Editar ancestro</h3>
@@ -774,7 +573,6 @@
             <label>Biografía</label>
             <textarea id="editBiography" rows="4" placeholder="Escribe aquí su historia..."></textarea>
         </div>
-
         <div class="photos-section">
             <h4>Fotos (hasta 4 imágenes, pega URL directa)</h4>
             <div class="form-group">
@@ -794,7 +592,6 @@
                 <input type="url" id="editPhoto4" placeholder="https://ejemplo.com/foto4.jpg">
             </div>
         </div>
-
         <div class="modal-buttons">
             <button class="btn btn-print" id="modalCancel">Cancelar</button>
             <button class="btn btn-edit" id="modalSave">Guardar cambios</button>
@@ -1240,6 +1037,23 @@
         syncSelectionAfterRender();
     }
 
+    // ========== NUEVA FUNCIÓN: seleccionar ancestro por ID (usado al cargar con parámetro URL) ==========
+    function selectPersonById(id) {
+        const found = allPersons.find(p => p.id === id);
+        if (found) {
+            onPersonCardClick(found.person, id);
+            // Opcional: hacer scroll hasta la tarjeta seleccionada
+            const targetCard = document.querySelector(`.card-module[data-id="${id}"]`);
+            if (targetCard) {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return true;
+        } else {
+            console.warn(`No se encontró ancestro con ID: ${id}`);
+            return false;
+        }
+    }
+
     async function loadAndGroupPersons() {
         try {
             groupsContainer.innerHTML = "Cargando...";
@@ -1271,20 +1085,31 @@
             });
             allPersons = personsArray;
             refreshFilteredView();
+
+            // ========== LEER PARÁMETRO DE LA URL Y SELECCIONAR ANCESTRO ==========
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedId = urlParams.get('selectedId');
+            if (selectedId) {
+                // Esperar un breve momento a que las tarjetas estén renderizadas
+                setTimeout(() => {
+                    const success = selectPersonById(selectedId);
+                    if (!success) {
+                        console.log("ID no encontrado, mostrando mensaje de error en consola");
+                    }
+                    // Limpiar el parámetro de la URL para evitar reselección al recargar (opcional)
+                    // window.history.replaceState({}, document.title, window.location.pathname);
+                }, 300);
+            }
         } catch (error) {
             console.error(error);
             groupsContainer.innerHTML = `Error: ${error.message}`;
         }
     }
 
-    // NUEVO: Reiniciar listado: limpia búsqueda, muestra todos los ancestros y limpia la selección (panel derecho vuelve a mensaje de bienvenida)
     function resetToListFirst() {
-        // Limpiar filtro de búsqueda
         currentSearchTerm = "";
         if (searchInput) searchInput.value = "";
-        // Refrescar la vista sin filtro (muestra todos los ancestros)
         refreshFilteredView();
-        // Asegurar que no haya ninguna tarjeta seleccionada y el panel derecho muestre el mensaje de bienvenida
         currentSelectedId = null;
         resetRightPanelToWelcome();
         applyCardSelection(null);
