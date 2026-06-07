@@ -44,7 +44,7 @@
             height: 100%;
         }
 
-        /* CONTENEDOR STICKY PARA TÍTULO + BOTÓN */
+        /* CONTENEDOR STICKY PARA TÍTULO + BOTONES + BÚSQUEDA */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -60,6 +60,7 @@
             align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
+            margin-bottom: 1rem;
         }
         .title-origen {
             font-family: 'Inter', sans-serif;
@@ -107,6 +108,57 @@
             background: #1C3F32;
             border-color: #1C3F32;
             color: white;
+        }
+
+        /* Barra de búsqueda mejorada */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 0.4rem;
+            margin-bottom: 0.2rem;
+            width: 100%;
+        }
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.6rem;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid #D0E0D8;
+            border-radius: 60px;
+            background: #FFFFFF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237B9689" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>') no-repeat 12px center;
+            background-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #2A5C4A;
+            box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1);
+        }
+        .btn-clear-search {
+            background: #F0F5F2;
+            border: 1.5px solid #C2D2CA;
+            border-radius: 60px;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #2A5C4A;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .btn-clear-search:hover {
+            background: #E2EBE7;
+            border-color: #2A5C4A;
+            transform: scale(0.96);
         }
 
         .year-group {
@@ -215,6 +267,65 @@
             border: 1px solid #E2EBE7;
         }
 
+        /* Estilo para el mensaje vacío: centrado, tipografía destacada y moderna */
+        .empty-detail {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            min-height: 300px;
+            color: #2A5C4A;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin: 0;
+            padding: 1rem;
+        }
+        .empty-detail strong {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        .empty-detail br {
+            display: none;
+        }
+        .empty-detail .sub-message {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #5C7A6A;
+            max-width: 80%;
+            margin-top: 0.5rem;
+            border-top: 2px solid #E2EBE7;
+            padding-top: 1.2rem;
+            display: inline-block;
+        }
+        /* Ajuste para mantener el texto legible en móviles */
+        @media (max-width: 768px) {
+            .empty-detail strong {
+                font-size: 2rem;
+            }
+            .empty-detail .sub-message {
+                font-size: 1rem;
+                max-width: 95%;
+            }
+        }
+        @media (max-width: 480px) {
+            .empty-detail strong {
+                font-size: 1.6rem;
+            }
+            .empty-detail .sub-message {
+                font-size: 0.9rem;
+            }
+        }
+
         .detail-text {
             font-family: 'Inter', sans-serif;
             color: #1E2E28;
@@ -235,11 +346,6 @@
             padding: 1.2rem 1.5rem;
             border-radius: 24px;
             margin: 1rem 0;
-        }
-        .empty-detail {
-            text-align: center;
-            padding: 2rem;
-            color: #4A6A5C;
         }
 
         /* Galería de fotos */
@@ -376,7 +482,7 @@
         }
         
         @media print {
-            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person {
+            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person, .search-container {
                 display: none !important;
             }
             .right-panel {
@@ -407,7 +513,6 @@
                 min-height: 100vh;
             }
             
-            /* Panel izquierdo (lista) ocupa todo el ancho, sin borde lateral */
             .left-panel {
                 flex: none;
                 width: 100%;
@@ -418,7 +523,6 @@
                 overflow-y: auto;
             }
             
-            /* Panel derecho (detalles) resto de la pantalla */
             .right-panel {
                 flex: 1;
                 width: 100%;
@@ -426,7 +530,6 @@
                 overflow-y: auto;
             }
             
-            /* Ajustes del header sticky en móvil */
             .sticky-header {
                 padding: 0.9rem 0 0.6rem 0;
                 margin-bottom: 0.6rem;
@@ -434,6 +537,7 @@
             
             .title-row {
                 gap: 0.7rem;
+                margin-bottom: 0.8rem;
             }
             
             .title-origen {
@@ -447,8 +551,20 @@
                 font-size: 0.75rem;
                 white-space: nowrap;
             }
+
+            .search-container {
+                gap: 0.5rem;
+            }
+            .search-input {
+                padding: 0.6rem 0.8rem 0.6rem 2.4rem;
+                font-size: 0.85rem;
+                background-size: 1rem;
+            }
+            .btn-clear-search {
+                width: 34px;
+                height: 34px;
+            }
             
-            /* Grupos de años */
             .year-group {
                 margin-bottom: 1.5rem;
             }
@@ -481,7 +597,6 @@
                 margin-top: 0.2rem;
             }
             
-            /* Detalles derecha */
             .details-container {
                 padding: 1.2rem 1.2rem;
                 border-radius: 28px;
@@ -492,16 +607,11 @@
                 font-size: 0.95rem;
             }
             
-            .detail-text strong:first-of-type {
-                font-size: 1.2rem;
-            }
-            
             .detail-highlight {
                 padding: 1rem 1.2rem;
                 margin: 0.8rem 0;
             }
             
-            /* Botones acción más táctiles */
             .action-buttons {
                 gap: 0.8rem;
                 justify-content: flex-end;
@@ -513,7 +623,6 @@
                 font-size: 0.85rem;
             }
             
-            /* Galería fotos en móvil */
             .photos-container {
                 gap: 0.8rem;
                 justify-content: center;
@@ -533,7 +642,6 @@
                 font-size: 0.7rem;
             }
             
-            /* Modal responsive */
             .modal-content {
                 width: 92%;
                 max-width: 92%;
@@ -542,35 +650,11 @@
                 max-height: 90vh;
             }
             
-            .modal-content h3 {
-                font-size: 1.3rem;
-                margin-bottom: 1rem;
-            }
-            
-            .form-group input, 
-            .form-group textarea, 
-            .form-group select {
-                padding: 0.7rem;
-                font-size: 0.9rem;
-            }
-            
-            .photos-section h4 {
-                font-size: 1rem;
-            }
-            
-            .modal-buttons {
-                gap: 0.8rem;
-                margin-top: 1.2rem;
-            }
-            
-            /* Mensaje vacío más compacto */
             .empty-detail {
-                padding: 1.5rem;
-                font-size: 0.95rem;
+                min-height: 250px;
             }
         }
         
-        /* Ajuste fino para pantallas muy pequeñas (≤ 480px) */
         @media (max-width: 480px) {
             .title-origen {
                 font-size: 1.2rem;
@@ -621,7 +705,6 @@
 <body>
 <div class="app-container">
     <div class="left-panel">
-        <!-- HEADER FIJO (STICKY) con título + botón Nuevo + botón reiniciar -->
         <div class="sticky-header">
             <div class="title-row">
                 <h1 class="title-origen">Árbol Genealógico</h1>
@@ -630,20 +713,28 @@
                     <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
                 </div>
             </div>
+            <!-- BÚSQUEDA AVANZADA -->
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, lugar, biografía, edad, año...">
+                </div>
+                <button id="clearSearchBtn" class="btn-clear-search" title="Limpiar búsqueda">✖</button>
+            </div>
         </div>
         <div id="groupsContainer" class="groups-list">Cargando ancestros...</div>
     </div>
     <div class="right-panel">
         <div id="rightDetails" class="details-container">
+            <!-- Este contenido se reemplazará dinámicamente, pero el estilo vacío será el actualizado -->
             <div class="empty-detail">
-                <strong>Explora tu legado</strong><br><br>
-                Selecciona un ancestro de la izquierda para ver su biografía, fechas y lugar de origen.
+                <strong>Legado familiar</strong>
+                <span class="sub-message">Selecciona un ancestro para ver sus datos.</span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal de edición / creación -->
+<!-- Modal edición / creación -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Editar ancestro</h3>
@@ -726,10 +817,13 @@
     let allPersons = [];
     let currentSelectedId = null;
     let currentPersonData = null;
+    let currentSearchTerm = "";
 
     const groupsContainer = document.getElementById('groupsContainer');
     const rightDetailsDiv = document.getElementById('rightDetails');
     const editModal = document.getElementById('editModal');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
 
     const YEAR_RANGES = [
         { label: "1740 — 1800", min: 1740, max: 1800 },
@@ -752,7 +846,6 @@
         return null;
     }
 
-    // Función para convertir Timestamp/string a objeto Date UTC
     function parseDateToUTC(dateValue) {
         if (!dateValue) return null;
         let d;
@@ -769,36 +862,83 @@
         return isNaN(d.getTime()) ? null : d;
     }
 
-    // Calcular edad: si existe deathDate -> edad al morir, si no -> edad actual (basado en hoy)
-    function calculateAgeString(birthDate, deathDate) {
+    function calculateAgeNumber(birthDate, deathDate) {
         const birthDateObj = parseDateToUTC(birthDate);
-        if (!birthDateObj) return "Edad: ?";
-        
+        if (!birthDateObj) return null;
         const today = new Date();
         let endDate = null;
-        let isAlive = true;
-        
         if (deathDate) {
             const deathObj = parseDateToUTC(deathDate);
-            if (deathObj && !isNaN(deathObj.getTime())) {
-                endDate = deathObj;
-                isAlive = false;
-            }
+            if (deathObj && !isNaN(deathObj.getTime())) endDate = deathObj;
         }
-        
         const referenceDate = endDate || today;
         let age = referenceDate.getUTCFullYear() - birthDateObj.getUTCFullYear();
         const monthDiff = referenceDate.getUTCMonth() - birthDateObj.getUTCMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && referenceDate.getUTCDate() < birthDateObj.getUTCDate())) {
-            age--;
-        }
-        if (age < 0) age = 0;
-        
-        if (!isAlive && endDate) {
-            return `⚰️ Falleció a los ${age} años`;
+        if (monthDiff < 0 || (monthDiff === 0 && referenceDate.getUTCDate() < birthDateObj.getUTCDate())) age--;
+        return age >= 0 ? age : 0;
+    }
+
+    function getDeathYear(person) {
+        if (!person.deathDate) return null;
+        const d = parseDateToUTC(person.deathDate);
+        return d ? d.getUTCFullYear() : null;
+    }
+
+    function matchesSearchTerm(person, term) {
+        if (!term) return true;
+        const lowerTerm = term.toLowerCase();
+        const fullName = `${person.firstName || ""} ${person.lastName || ""}`.trim().toLowerCase();
+        if (fullName.includes(lowerTerm)) return true;
+        if ((person.firstName || "").toLowerCase().includes(lowerTerm)) return true;
+        if ((person.lastName || "").toLowerCase().includes(lowerTerm)) return true;
+        if ((person.birthPlace || "").toLowerCase().includes(lowerTerm)) return true;
+        if ((person.deathPlace || "").toLowerCase().includes(lowerTerm)) return true;
+        if ((person.biography || "").toLowerCase().includes(lowerTerm)) return true;
+        if (person.gender === 'male' && ("hombre".includes(lowerTerm) || "hombre" === lowerTerm)) return true;
+        if (person.gender === 'female' && ("mujer".includes(lowerTerm) || "mujer" === lowerTerm)) return true;
+        const birthYear = person.birthYear ?? extractYear(person.birthDate);
+        if (birthYear && birthYear.toString().includes(lowerTerm)) return true;
+        const deathYear = getDeathYear(person);
+        if (deathYear && deathYear.toString().includes(lowerTerm)) return true;
+        const ageNum = calculateAgeNumber(person.birthDate, person.deathDate);
+        if (ageNum !== null && ageNum.toString().includes(lowerTerm)) return true;
+        const ageString = calculateAgeStringForSearch(person);
+        if (ageString.toLowerCase().includes(lowerTerm)) return true;
+        const birthDateStr = person.birthDate ? formatDateToDMYSimple(person.birthDate) : "";
+        if (birthDateStr.toLowerCase().includes(lowerTerm)) return true;
+        const deathDateStr = person.deathDate ? formatDateToDMYSimple(person.deathDate) : "";
+        if (deathDateStr.toLowerCase().includes(lowerTerm)) return true;
+        return false;
+    }
+
+    function calculateAgeStringForSearch(person) {
+        const ageNum = calculateAgeNumber(person.birthDate, person.deathDate);
+        if (ageNum === null) return "";
+        if (person.deathDate && parseDateToUTC(person.deathDate)) {
+            return `falleció a los ${ageNum} años`;
         } else {
-            return `🎂 Edad actual: ${age} años`;
+            return `edad actual ${ageNum} años`;
         }
+    }
+
+    function formatDateToDMYSimple(dateValue) {
+        if (!dateValue) return '';
+        let d;
+        if (typeof dateValue === 'object' && dateValue !== null && 'seconds' in dateValue) {
+            d = new Date(dateValue.seconds * 1000);
+        } else if (typeof dateValue === 'string') {
+            d = new Date(dateValue);
+            if (isNaN(d.getTime())) return dateValue;
+        } else if (typeof dateValue === 'number') {
+            d = new Date(dateValue);
+        } else {
+            return String(dateValue);
+        }
+        if (isNaN(d.getTime())) return '';
+        const day = d.getUTCDate().toString().padStart(2, '0');
+        const month = (d.getUTCMonth() + 1).toString().padStart(2, '0');
+        const year = d.getUTCFullYear();
+        return `${day}/${month}/${year}`;
     }
 
     function formatDateToDMY(dateValue) {
@@ -828,10 +968,9 @@
         return firebase.firestore.Timestamp.fromDate(date);
     }
 
-    // Render del panel derecho con TODOS los campos (igual que el modal)
     function renderPersonDetailsInRightPanel(person, docId) {
         if (!person) {
-            rightDetailsDiv.innerHTML = `<div class="empty-detail">Información no disponible.</div>`;
+            rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>Legado familiar</strong><span class="sub-message">Selecciona un ancestro para ver sus datos.</span></div>`;
             return;
         }
         const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim() || "Ancestro sin nombre";
@@ -840,13 +979,9 @@
         const deathDateFormatted = person.deathDate ? formatDateToDMY(person.deathDate) : "—";
         const birthDateFormatted = person.birthDate ? formatDateToDMY(person.birthDate) : "Desconocida";
         const deathPlace = person.deathPlace ? person.deathPlace : "No especificado";
+        const ageString = calculateAgeStringForSearch(person);
         
-        // Calcular edad (vivo o fallecido)
-        const ageString = calculateAgeString(person.birthDate, person.deathDate);
-        
-        let genderText = "";
-        let genderStyle = "";
-        let nameColorStyle = "";
+        let genderText = "", genderStyle = "", nameColorStyle = "";
         if (person.gender === 'female') {
             genderText = "Mujer";
             genderStyle = "color: #D43F87; font-weight: 800;";
@@ -867,7 +1002,6 @@
                 <button class="btn btn-edit" id="editBtn">Editar</button>
             </div>
             <div class="detail-text" id="printableArea">
-                <!-- Cabecera con nombre + edad flotando a la derecha -->
                 <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;">
                     <strong style="font-size:1.6rem; ${nameColorStyle}">${escapeHtml(fullName)}</strong>
                     <span style="background:#EFF5F2; padding:0.3rem 1rem; border-radius: 40px; font-size:0.85rem; font-weight:600; color:#1C3F32; white-space: nowrap;">${escapeHtml(ageString)}</span>
@@ -889,11 +1023,7 @@
             bioHtml += `<div class="photos-container">`;
             photos.forEach(photoUrl => {
                 if (photoUrl && photoUrl.trim() !== "") {
-                    bioHtml += `
-                        <div class="photo-item">
-                            <img src="${escapeHtml(photoUrl)}" alt="Familiar" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23EFF5F2%22%2F%3E%3Ctext%20x%3D%2275%22%20y%3D%2275%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%237B9689%22%20font-size%3D%2212%22%3EImagen no disponible%3C%2Ftext%3E%3C%2Fsvg%3E';">
-                        </div>
-                    `;
+                    bioHtml += `<div class="photo-item"><img src="${escapeHtml(photoUrl)}" alt="Familiar" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23EFF5F2%22%2F%3E%3Ctext%20x%3D%2275%22%20y%3D%2275%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%237B9689%22%20font-size%3D%2212%22%3EImagen no disponible%3C%2Ftext%3E%3C%2Fsvg%3E';"></div>`;
                 }
             });
             bioHtml += `</div>`;
@@ -913,7 +1043,6 @@
         currentPersonData = { ...person };
         document.getElementById('editFirstName').value = person.firstName || '';
         document.getElementById('editLastName').value = person.lastName || '';
-        
         let birthDateStr = '';
         if (person.birthDate) {
             let d;
@@ -928,7 +1057,6 @@
         }
         document.getElementById('editBirthDate').value = birthDateStr;
         document.getElementById('editBirthPlace').value = person.birthPlace || '';
-        
         let deathDateStr = '';
         if (person.deathDate) {
             let d2;
@@ -945,13 +1073,11 @@
         document.getElementById('editDeathPlace').value = person.deathPlace || '';
         document.getElementById('editGender').value = person.gender || '';
         document.getElementById('editBiography').value = person.biography || '';
-        
         const photos = person.photos || [];
         document.getElementById('editPhoto1').value = photos[0] || '';
         document.getElementById('editPhoto2').value = photos[1] || '';
         document.getElementById('editPhoto3').value = photos[2] || '';
         document.getElementById('editPhoto4').value = photos[3] || '';
-        
         editModal.style.display = 'flex';
     }
 
@@ -959,7 +1085,6 @@
         document.getElementById('modalTitle').textContent = 'Nuevo ancestro';
         currentSelectedId = null;
         currentPersonData = null;
-        // Limpiar todos los campos
         document.getElementById('editFirstName').value = '';
         document.getElementById('editLastName').value = '';
         document.getElementById('editBirthDate').value = '';
@@ -994,54 +1119,28 @@
             updatedData.birthYear = null;
         }
         const deathDateInput = document.getElementById('editDeathDate').value;
-        if (deathDateInput) {
-            updatedData.deathDate = dateInputToTimestamp(deathDateInput);
-        } else {
-            updatedData.deathDate = null;
-        }
-        
-        const photoUrls = [
-            document.getElementById('editPhoto1').value.trim(),
-            document.getElementById('editPhoto2').value.trim(),
-            document.getElementById('editPhoto3').value.trim(),
-            document.getElementById('editPhoto4').value.trim()
-        ].filter(url => url !== "");
+        if (deathDateInput) updatedData.deathDate = dateInputToTimestamp(deathDateInput);
+        else updatedData.deathDate = null;
+        const photoUrls = [document.getElementById('editPhoto1').value.trim(), document.getElementById('editPhoto2').value.trim(), document.getElementById('editPhoto3').value.trim(), document.getElementById('editPhoto4').value.trim()].filter(url => url !== "");
         updatedData.photos = photoUrls;
-        
         try {
             if (currentSelectedId) {
-                // Actualizar registro existente
                 await db.collection("persons").doc(currentSelectedId).update(updatedData);
                 editModal.style.display = 'none';
                 await loadAndGroupPersons();
                 const updatedPerson = allPersons.find(p => p.id === currentSelectedId)?.person;
-                if (updatedPerson) {
-                    renderPersonDetailsInRightPanel(updatedPerson, currentSelectedId);
-                    applyCardSelection(currentSelectedId);
-                }
+                if (updatedPerson) renderPersonDetailsInRightPanel(updatedPerson, currentSelectedId);
+                applyCardSelection(currentSelectedId);
             } else {
-                // Crear nuevo registro
                 const docRef = await db.collection("persons").add(updatedData);
                 editModal.style.display = 'none';
                 await loadAndGroupPersons();
-                // Seleccionar automáticamente el nuevo ancestro
                 const newId = docRef.id;
                 const newCard = document.querySelector(`.card-module[data-id="${newId}"]`);
-                if (newCard) {
-                    newCard.click();
-                } else {
-                    currentSelectedId = newId;
-                    const newPerson = allPersons.find(p => p.id === newId)?.person;
-                    if (newPerson) {
-                        renderPersonDetailsInRightPanel(newPerson, newId);
-                        applyCardSelection(newId);
-                    }
-                }
+                if (newCard) newCard.click();
+                else { currentSelectedId = newId; const np = allPersons.find(p => p.id === newId)?.person; if(np) renderPersonDetailsInRightPanel(np, newId); applyCardSelection(newId); }
             }
-        } catch (error) {
-            console.error("Error al guardar:", error);
-            alert("Error al guardar: " + error.message);
-        }
+        } catch (error) { alert("Error al guardar: " + error.message); }
     }
 
     function applyCardSelection(selectedDocId) {
@@ -1049,12 +1148,7 @@
         allCards.forEach(card => card.classList.remove('selected-card', 'dimmed-card'));
         if (!selectedDocId) return;
         const targetCard = document.querySelector(`.card-module[data-id="${selectedDocId}"]`);
-        if (targetCard) {
-            targetCard.classList.add('selected-card');
-            allCards.forEach(card => {
-                if (card !== targetCard) card.classList.add('dimmed-card');
-            });
-        }
+        if (targetCard) { targetCard.classList.add('selected-card'); allCards.forEach(card => { if (card !== targetCard) card.classList.add('dimmed-card'); }); }
     }
 
     function onPersonCardClick(person, docId) {
@@ -1071,18 +1165,10 @@
             let year = person.birthYear ?? extractYear(person.birthDate);
             let assigned = false;
             if (year !== null && typeof year === 'number') {
-                for (let group of groups) {
-                    if (year >= group.min && year <= group.max) {
-                        group.items.push(item);
-                        assigned = true;
-                        break;
-                    }
-                }
+                for (let group of groups) { if (year >= group.min && year <= group.max) { group.items.push(item); assigned = true; break; } }
                 if (!assigned && year < 1740) extraGroup.items.push(item);
                 else if (!assigned && year > 3000) groups[groups.length-1].items.push(item);
-            } else {
-                extraGroup.items.push(item);
-            }
+            } else extraGroup.items.push(item);
         }
         const finalGroups = groups.filter(g => g.items.length > 0);
         if (extraGroup.items.length) finalGroups.push(extraGroup);
@@ -1090,8 +1176,8 @@
     }
 
     function renderGroupedCards(groupsArray) {
-        if (!groupsArray.length) {
-            groupsContainer.innerHTML = `<div class="empty-message" style="padding:1.5rem;">No se encontraron ancestros.</div>`;
+        if (!groupsArray.length || groupsArray.every(g => g.items.length === 0)) {
+            groupsContainer.innerHTML = `<div class="empty-message" style="padding:1.5rem; text-align:center; color:#4A6A5C;">🔍 No se encontraron ancestros que coincidan con la búsqueda.</div>`;
             return;
         }
         let globalHtml = '';
@@ -1103,25 +1189,13 @@
                 const person = item.person;
                 const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim() || "Anónimo";
                 const year = person.birthYear ?? extractYear(person.birthDate) ?? "?";
-                
                 let genderClass = '';
                 if (person.gender === 'male') genderClass = 'card-male';
                 else if (person.gender === 'female') genderClass = 'card-female';
                 else genderClass = 'card-default';
-                
-                cardsHtml += `
-                    <div class="card-module ${genderClass}" data-id="${item.id}">
-                        <div class="birth-year-badge">${escapeHtml(String(year))}</div>
-                        <div class="full-name-card">${escapeHtml(fullName)}</div>
-                    </div>
-                `;
+                cardsHtml += `<div class="card-module ${genderClass}" data-id="${item.id}"><div class="birth-year-badge">${escapeHtml(String(year))}</div><div class="full-name-card">${escapeHtml(fullName)}</div></div>`;
             }
-            globalHtml += `
-                <div class="year-group">
-                    <div class="group-title">${escapeHtml(group.label)}</div>
-                    <div class="group-cards">${cardsHtml}</div>
-                </div>
-            `;
+            globalHtml += `<div class="year-group"><div class="group-title">${escapeHtml(group.label)}</div><div class="group-cards">${cardsHtml}</div></div>`;
         }
         groupsContainer.innerHTML = globalHtml;
         document.querySelectorAll('.card-module').forEach(card => {
@@ -1129,23 +1203,41 @@
             const found = allPersons.find(p => p.id === docId);
             if (found) card.addEventListener('click', (e) => { e.stopPropagation(); onPersonCardClick(found.person, docId); });
         });
+    }
+
+    function syncSelectionAfterRender() {
         if (currentSelectedId) {
-            const selected = allPersons.find(p => p.id === currentSelectedId);
-            if (selected) {
-                renderPersonDetailsInRightPanel(selected.person, currentSelectedId);
+            const cardExists = document.querySelector(`.card-module[data-id="${currentSelectedId}"]`);
+            if (cardExists) {
+                const personObj = allPersons.find(p => p.id === currentSelectedId)?.person;
+                if (personObj) renderPersonDetailsInRightPanel(personObj, currentSelectedId);
                 applyCardSelection(currentSelectedId);
             } else {
+                currentSelectedId = null;
                 resetRightPanelToWelcome();
                 applyCardSelection(null);
-                currentSelectedId = null;
             }
         } else {
             resetRightPanelToWelcome();
+            applyCardSelection(null);
         }
     }
 
     function resetRightPanelToWelcome() {
-        rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>Legado familiar</strong><br><br>Selecciona un ancestro para ver sus datos.</div>`;
+        rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>Legado familiar</strong><span class="sub-message">Selecciona un ancestro para ver sus datos.</span></div>`;
+    }
+
+    function getFilteredPersons() {
+        if (!currentSearchTerm.trim()) return [...allPersons];
+        const term = currentSearchTerm.trim().toLowerCase();
+        return allPersons.filter(item => matchesSearchTerm(item.person, term));
+    }
+
+    function refreshFilteredView() {
+        const filtered = getFilteredPersons();
+        const grouped = groupPersonsByYearRange(filtered);
+        renderGroupedCards(grouped);
+        syncSelectionAfterRender();
     }
 
     async function loadAndGroupPersons() {
@@ -1153,8 +1245,9 @@
             groupsContainer.innerHTML = "Cargando...";
             const snapshot = await db.collection("persons").get();
             if (snapshot.empty) {
-                groupsContainer.innerHTML = "No hay registros.";
                 allPersons = [];
+                groupsContainer.innerHTML = "No hay registros.";
+                resetRightPanelToWelcome();
                 return;
             }
             const personsArray = [];
@@ -1177,25 +1270,24 @@
                 });
             });
             allPersons = personsArray;
-            const grouped = groupPersonsByYearRange(allPersons);
-            renderGroupedCards(grouped);
+            refreshFilteredView();
         } catch (error) {
             console.error(error);
             groupsContainer.innerHTML = `Error: ${error.message}`;
         }
     }
 
-    // REINICIAR LISTADO: Selecciona el primer registro visible en el panel izquierdo
+    // NUEVO: Reiniciar listado: limpia búsqueda, muestra todos los ancestros y limpia la selección (panel derecho vuelve a mensaje de bienvenida)
     function resetToListFirst() {
-        const firstCard = document.querySelector('.card-module');
-        if (firstCard) {
-            firstCard.click();
-            firstCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-            currentSelectedId = null;
-            resetRightPanelToWelcome();
-            applyCardSelection(null);
-        }
+        // Limpiar filtro de búsqueda
+        currentSearchTerm = "";
+        if (searchInput) searchInput.value = "";
+        // Refrescar la vista sin filtro (muestra todos los ancestros)
+        refreshFilteredView();
+        // Asegurar que no haya ninguna tarjeta seleccionada y el panel derecho muestre el mensaje de bienvenida
+        currentSelectedId = null;
+        resetRightPanelToWelcome();
+        applyCardSelection(null);
     }
 
     function escapeHtml(str) {
@@ -1207,16 +1299,19 @@
     document.getElementById('modalCancel')?.addEventListener('click', () => editModal.style.display = 'none');
     document.getElementById('modalSave')?.addEventListener('click', savePersonChanges);
     window.addEventListener('click', (e) => { if (e.target === editModal) editModal.style.display = 'none'; });
-    document.querySelector('.title-origen')?.addEventListener('click', () => {
-        currentSelectedId = null;
-        resetRightPanelToWelcome();
-        applyCardSelection(null);
+    document.querySelector('.title-origen')?.addEventListener('click', () => { currentSelectedId = null; resetRightPanelToWelcome(); applyCardSelection(null); });
+    document.getElementById('resetListBtn')?.addEventListener('click', resetToListFirst);
+    document.getElementById('newPersonBtn')?.addEventListener('click', openCreateModal);
+    
+    searchInput?.addEventListener('input', (e) => {
+        currentSearchTerm = e.target.value;
+        refreshFilteredView();
     });
-    const resetBtn = document.getElementById('resetListBtn');
-    if (resetBtn) resetBtn.addEventListener('click', resetToListFirst);
-
-    const newBtn = document.getElementById('newPersonBtn');
-    if (newBtn) newBtn.addEventListener('click', openCreateModal);
+    clearSearchBtn?.addEventListener('click', () => {
+        currentSearchTerm = "";
+        if (searchInput) searchInput.value = "";
+        refreshFilteredView();
+    });
 
     loadAndGroupPersons();
 </script>
