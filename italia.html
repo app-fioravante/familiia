@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Familia en Italia | Ciudades de residencia y fallecimiento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+        /* ========== ESTILOS IDÉNTICOS AL ÁRBOL ORIGINAL ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #F5F7F5;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background: #F5F7F5;
+        }
+
+        .left-panel {
+            flex: 0.85;
+            background: #FFFFFF;
+            border-right: 5px solid #2A5C4A;
+            padding: 0 1rem 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: #FFFFFF;
+            z-index: 15;
+            padding: 1.2rem 0 0.8rem 0;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #E2EBE7;
+        }
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .title-origen {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1C3F32;
+            letter-spacing: -0.3px;
+            border-left: 5px solid #2A5C4A;
+            padding-left: 1rem;
+            line-height: 1.2;
+            margin: 0;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .title-origen:hover {
+            opacity: 0.85;
+        }
+
+        .btn-refresh {
+            background: #F0F5F2;
+            border: 1.5px solid #C2D2CA;
+            color: #1C3F32;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .btn-refresh:hover {
+            background: #E2EBE7;
+            transform: scale(0.97);
+            border-color: #2A5C4A;
+        }
+
+        .city-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            margin-top: 0.5rem;
+        }
+        .city-card {
+            background: #FCFEFD;
+            border: 1.5px solid #D0E0D8;
+            border-radius: 20px;
+            padding: 0.9rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .city-card:hover {
+            background: #EFF5F2;
+            transform: translateX(4px);
+            border-color: #2A5C4A;
+        }
+        .city-card.selected-city {
+            background: #2A5C4A20;
+            border: 2px solid #2A5C4A;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .city-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1C3F32;
+        }
+        .city-count {
+            background: #EFF5F2;
+            border-radius: 60px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2A5C4A;
+        }
+
+        .right-panel {
+            flex: 1.5;
+            background: #F5F7F5;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 2.2rem 2rem 2.2rem;
+            overflow-y: auto;
+        }
+
+        .details-container {
+            background: #FFFFFF;
+            border-radius: 36px;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
+            padding: 2rem 2.2rem;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            border: 1px solid #E2EBE7;
+        }
+
+        .empty-detail {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            min-height: 300px;
+            color: #2A5C4A;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+        }
+        .empty-detail strong {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        .city-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #E2EBE7;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .city-header h2 {
+            color: #1C3F32;
+            font-size: 1.8rem;
+        }
+        .ancestors-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .ancestor-item {
+            background: #FCFEFD;
+            border: 1px solid #D0E0D8;
+            border-radius: 24px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: all 0.2s;
+        }
+        .ancestor-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .ancestor-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #1C3F32;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-block;
+        }
+        .ancestor-name:hover {
+            color: #2A5C4A;
+            text-decoration: underline;
+        }
+        .ancestor-detail {
+            font-size: 0.85rem;
+            color: #4A6A5C;
+        }
+        .status-badge {
+            background: #EFF5F2;
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-alive { color: #1E6F3F; }
+        .status-deceased { color: #B1624B; }
+
+        .city-media {
+            background: #F9FBF9;
+            border-radius: 28px;
+            padding: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        .city-media h4 {
+            color: #1C3F32;
+            margin-bottom: 0.8rem;
+        }
+        .image-input-group {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .image-input-group input {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border: 1.5px solid #D0E0D8;
+            border-radius: 60px;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-sm {
+            background: #2A5C4A;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .city-img-preview {
+            margin-top: 0.8rem;
+            max-width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+        .city-img-preview img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+        .map-link {
+            margin-top: 0.8rem;
+            display: inline-block;
+            font-size: 0.85rem;
+            color: #2A5C4A;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            body { overflow-y: auto; height: auto; }
+            .app-container { flex-direction: column; height: auto; }
+            .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; max-height: 50vh; }
+            .right-panel { flex: 1; padding: 1rem; }
+            .details-container { padding: 1.2rem; }
+            .city-header h2 { font-size: 1.4rem; }
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .ancestors-list, .city-card { animation: fadeSlideUp 0.2s ease; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="left-panel">
+        <div class="sticky-header">
+            <div class="title-row">
+                <h1 class="title-origen">Familia en Italia</h1>
+                <button class="btn-refresh" id="refreshCitiesBtn">⟳ Actualizar</button>
+            </div>
+            <p style="font-size:0.85rem; color:#5C7A6A; margin-top: 0.2rem;">
+                🇮🇹 Vivos: ciudad de nacimiento (residencia actual)<br>
+                🇮🇹 Fallecidos: ciudad de fallecimiento
+            </p>
+        </div>
+        <div id="citiesContainer" class="city-list">Cargando...</div>
+    </div>
+    <div class="right-panel">
+        <div id="rightDetails" class="details-container">
+            <div class="empty-detail">
+                <strong>🌆 Ancestros por ciudad</strong>
+                <span>Seleccioná una ciudad para ver sus historias.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== CONFIGURACIÓN FIREBASE ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+        authDomain: "familia-genealogia.firebaseapp.com",
+        projectId: "familia-genealogia",
+        storageBucket: "familia-genealogia.firebasestorage.app",
+        messagingSenderId: "923693678578",
+        appId: "1:923693678578:web:bfed5d66d564d00847356b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ==================== VARIABLES GLOBALES ====================
+    let allPersons = [];      // { id, person, cityKey }
+    let currentCity = null;
+
+    const citiesContainer = document.getElementById('citiesContainer');
+    const rightDetailsDiv = document.getElementById('rightDetails');
+    const refreshBtn = document.getElementById('refreshCitiesBtn');
+
+    // ==================== FUNCIONES AUXILIARES ====================
+    function parseDateToUTC(dateValue) {
+        if (!dateValue) return null;
+        let d;
+        if (typeof dateValue === 'object' && dateValue !== null && 'seconds' in dateValue) {
+            d = new Date(dateValue.seconds * 1000);
+        } else if (typeof dateValue === 'string') {
+            d = new Date(dateValue);
+            if (isNaN(d.getTime())) return null;
+        } else if (typeof dateValue === 'number') {
+            d = new Date(dateValue);
+        } else {
+            return null;
+        }
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function calculateAgeNumber(birthDate, deathDate) {
+        const birthDateObj = parseDateToUTC(birthDate);
+        if (!birthDateObj) return null;
+        const today = new Date();
+        let endDate = null;
+        if (deathDate) {
+            const deathObj = parseDateToUTC(deathDate);
+            if (deathObj && !isNaN(deathObj.getTime())) endDate = deathObj;
+        }
+        const referenceDate = endDate || today;
+        let age = referenceDate.getUTCFullYear() - birthDateObj.getUTCFullYear();
+        const monthDiff = referenceDate.getUTCMonth() - birthDateObj.getUTCMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && referenceDate.getUTCDate() < birthDateObj.getUTCDate())) age--;
+        return age >= 0 ? age : 0;
+    }
+
+    function getAgeStatus(person) {
+        const age = calculateAgeNumber(person.birthDate, person.deathDate);
+        if (age === null) return { text: "Edad desconocida", class: "", state: "desconocido" };
+        const hasDeath = person.deathDate && parseDateToUTC(person.deathDate);
+        if (hasDeath) {
+            return { text: `Falleció a los ${age} años`, class: "status-deceased", state: "fallecido" };
+        } else {
+            return { text: `Vivo, ${age} años`, class: "status-alive", state: "vivo" };
+        }
+    }
+
+    // Verifica si el lugar contiene "Italia" o "Italy" (sin importar mayúsculas)
+    function isInItalia(place) {
+        if (!place) return false;
+        const p = place.toLowerCase();
+        return p.includes("italia") || p.includes("italy");
+    }
+
+    // Limpia el nombre de ciudad (toma primera parte antes de coma, elimina prefijos)
+    function cleanCityName(rawPlace) {
+        if (!rawPlace) return null;
+        let city = rawPlace.split(',')[0].trim();
+        // Eliminar prefijos comunes (se mantienen los generales que también aplican para organizar nombres de lugares)
+        city = city.replace(/^(Provincia de|Provincia di|Comune di|Città di|Regione di|Partido de|Ciudad de|Ciudad Autónoma de|Departamento de|Municipio de|Estado de)\s*/i, '');
+        return city || null;
+    }
+
+    // Determina la ciudad clave según estado y filtra solo Italia
+    function getCityForPerson(person) {
+        const hasDeath = person.deathDate && parseDateToUTC(person.deathDate);
+        if (hasDeath) {
+            // Fallecido: debe tener deathPlace con Italia
+            if (person.deathPlace && isInItalia(person.deathPlace)) {
+                return cleanCityName(person.deathPlace);
+            }
+        } else {
+            // Vivo: debe tener birthPlace con Italia
+            if (person.birthPlace && isInItalia(person.birthPlace)) {
+                return cleanCityName(person.birthPlace);
+            }
+        }
+        return null;
+    }
+
+    // Obtener ciudades únicas con conteo
+    function getCitiesFromPersons(personsArray) {
+        const cityMap = new Map();
+        for (let item of personsArray) {
+            const city = item.cityKey;
+            if (city) {
+                cityMap.set(city, (cityMap.get(city) || 0) + 1);
+            }
+        }
+        return Array.from(cityMap.entries()).map(([name, count]) => ({ name, count })).sort((a,b) => a.name.localeCompare(b.name));
+    }
+
+    function getAncestorsByCity(cityName) {
+        return allPersons.filter(item => item.cityKey === cityName);
+    }
+
+    // ==================== RENDER PANEL IZQUIERDO ====================
+    function renderCities(cities) {
+        if (!cities.length) {
+            citiesContainer.innerHTML = `<div style="padding:1rem; text-align:center; color:#6B8A6A;">No hay ciudades en Italia. Asegurate de que los ancestros tengan lugar de nacimiento (vivos) o fallecimiento (difuntos) con la palabra "Italia" o "Italy".</div>`;
+            return;
+        }
+        let html = '';
+        for (let city of cities) {
+            const selectedClass = (currentCity === city.name) ? 'selected-city' : '';
+            html += `
+                <div class="city-card ${selectedClass}" data-city="${escapeHtml(city.name)}">
+                    <span class="city-name">${escapeHtml(city.name)}</span>
+                    <span class="city-count">${city.count} ancestro${city.count !== 1 ? 's' : ''}</span>
+                </div>
+            `;
+        }
+        citiesContainer.innerHTML = html;
+        document.querySelectorAll('.city-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const cityName = card.getAttribute('data-city');
+                if (cityName) selectCity(cityName);
+            });
+        });
+    }
+
+    // ==================== RENDER PANEL DERECHO ====================
+    function renderCityDetails(cityName) {
+        const ancestors = getAncestorsByCity(cityName);
+        if (!ancestors.length) {
+            rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🏙️ ${escapeHtml(cityName)}</strong><span>No hay ancestros vinculados a esta ciudad.</span></div>`;
+            return;
+        }
+
+        const savedImage = localStorage.getItem(`city_img_${cityName}`) || '';
+        let html = `
+            <div class="city-header">
+                <h2>${escapeHtml(cityName)}</h2>
+                <span class="city-count" style="background:#2A5C4A20;">${ancestors.length} personas</span>
+            </div>
+            
+            <div class="city-media">
+                <h4>📷 Fotos de la ciudad / Mapas</h4>
+                <div class="image-input-group">
+                    <input type="text" id="cityImageUrl" placeholder="Pegá URL de una imagen (foto, mapa, etc.)" value="${escapeHtml(savedImage)}">
+                    <button class="btn-sm" id="saveCityImageBtn">Mostrar / Guardar</button>
+                </div>
+                <div id="cityImagePreview" class="city-img-preview">
+                    ${savedImage ? `<img src="${escapeHtml(savedImage)}" alt="Imagen de ${escapeHtml(cityName)}" onerror="this.onerror=null;this.parentElement.innerHTML='<span style=\'color:#B1624B;\'>❌ No se pudo cargar la imagen.</span>';">` : ''}
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName + ', Italia')}" target="_blank" class="map-link">🗺️ Ver en Google Maps (abre externo)</a>
+            </div>
+            
+            <h3 style="margin-top:0.5rem;">🌳 Ancestros vinculados</h3>
+            <div class="ancestors-list">
+        `;
+        
+        for (let item of ancestors) {
+            const person = item.person;
+            const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim() || "Anónimo";
+            const ageInfo = getAgeStatus(person);
+            const statusText = ageInfo.text;
+            const statusClass = ageInfo.class;
+            // Link al árbol principal
+            const treeUrl = `arbol.html?selectedId=${encodeURIComponent(item.id)}`;
+            html += `
+                <div class="ancestor-item">
+                    <div class="ancestor-info">
+                        <span class="ancestor-name" data-url="${treeUrl}">${escapeHtml(fullName)}</span>
+                        <div class="ancestor-detail">${escapeHtml(statusText)}</div>
+                    </div>
+                    <div class="status-badge ${statusClass}">${ageInfo.state === 'vivo' ? 'Vivo' : (ageInfo.state === 'fallecido' ? 'Fallecido' : '—')}</div>
+                </div>
+            `;
+        }
+        
+        html += `</div>`;
+        rightDetailsDiv.innerHTML = html;
+        
+        // Asignar evento a cada nombre de ancestro para abrir dentro de la app principal
+        document.querySelectorAll('.ancestor-name').forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const url = elem.getAttribute('data-url');
+                if (url && window.parent && typeof window.parent.showIframe === 'function') {
+                    // Llamar a la función global de la ventana padre
+                    window.parent.showIframe(url);
+                } else {
+                    // Fallback: abrir en nueva pestaña si no está embebido
+                    window.open(url, '_blank');
+                }
+            });
+        });
+        
+        const saveBtn = document.getElementById('saveCityImageBtn');
+        const imageInput = document.getElementById('cityImageUrl');
+        const previewDiv = document.getElementById('cityImagePreview');
+        
+        if (saveBtn && imageInput) {
+            saveBtn.addEventListener('click', () => {
+                const newUrl = imageInput.value.trim();
+                if (newUrl) {
+                    localStorage.setItem(`city_img_${cityName}`, newUrl);
+                    previewDiv.innerHTML = `<img src="${escapeHtml(newUrl)}" alt="Imagen de ${escapeHtml(cityName)}" onerror="this.onerror=null;this.parentElement.innerHTML='<span style=\'color:#B1624B;\'>❌ Error al cargar la imagen</span>';">`;
+                } else {
+                    localStorage.removeItem(`city_img_${cityName}`);
+                    previewDiv.innerHTML = '';
+                }
+            });
+        }
+    }
+    
+    function selectCity(cityName) {
+        currentCity = cityName;
+        renderCities(getCitiesFromPersons(allPersons));
+        renderCityDetails(cityName);
+    }
+    
+    // ==================== CARGA DESDE FIRESTORE (con filtro Italia) ====================
+    async function loadPersonsAndCities() {
+        try {
+            citiesContainer.innerHTML = "Cargando ancestros en Italia...";
+            const snapshot = await db.collection("persons").get();
+            if (snapshot.empty) {
+                allPersons = [];
+                citiesContainer.innerHTML = "No hay registros en el árbol.";
+                rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌾 Sin datos aún</strong><span>Agregá ancestros desde el árbol genealógico.</span></div>`;
+                return;
+            }
+            
+            const personsArray = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const person = {
+                    firstName: data.firstName || "",
+                    lastName: data.lastName || "",
+                    birthDate: data.birthDate || null,
+                    birthYear: data.birthYear,
+                    birthPlace: data.birthPlace || "",
+                    deathDate: data.deathDate || null,
+                    deathPlace: data.deathPlace || "",
+                    biography: data.biography || "",
+                    gender: data.gender || "",
+                    photos: data.photos || []
+                };
+                
+                const cityKey = getCityForPerson(person);
+                if (cityKey) {
+                    personsArray.push({
+                        id: doc.id,
+                        person: person,
+                        cityKey: cityKey
+                    });
+                }
+            });
+            
+            allPersons = personsArray;
+            const cities = getCitiesFromPersons(allPersons);
+            renderCities(cities);
+            if (currentCity && cities.some(c => c.name === currentCity)) {
+                selectCity(currentCity);
+            } else {
+                rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias.</span></div>`;
+                currentCity = null;
+            }
+        } catch (error) {
+            console.error(error);
+            citiesContainer.innerHTML = `Error al cargar: ${error.message}`;
+        }
+    }
+    
+    function refreshAll() {
+        currentCity = null;
+        loadPersonsAndCities();
+    }
+    
+    // ==================== EVENTOS ====================
+    refreshBtn.addEventListener('click', refreshAll);
+    document.querySelector('.title-origen')?.addEventListener('click', () => {
+        currentCity = null;
+        renderCities(getCitiesFromPersons(allPersons));
+        rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias.</span></div>`;
+    });
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&':'&', '<':'<', '>':'>' }[m] || m));
+    }
+    
+    loadPersonsAndCities();
+</script>
+</body>
+</html>
