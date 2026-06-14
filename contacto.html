@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #F5F7F5;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* Contenedor central con efecto glass y borde verde oscuro */
+        .contact-container {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid #2A5C4A;
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            max-width: 950px;
+            width: 100%;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Disposición en malla/columnas para escritorio */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 3.5rem;
+            align-items: start;
+        }
+
+        /* Columna Izquierda (Texto informativo) */
+        .contact-info {
+            text-align: left;
+        }
+
+        .info-title {
+            color: #1C3F32;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-description {
+            color: #2A5C4A;
+            font-weight: 400;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Columna Derecha (Formulario) */
+        .contact-form-wrapper {
+            text-align: left;
+        }
+
+        .main-text {
+            color: #1C3F32;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            color: #1C3F32;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .form-group input, 
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #D0E0D8;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.9);
+            outline: none;
+            transition: all 0.2s ease;
+            color: #10261E;
+        }
+
+        /* Estilo específico para corregir apariencia del select en algunos navegadores */
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232A5C4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2rem;
+            padding-right: 2.5rem;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2A5C4A;
+            box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1);
+        }
+
+        .btn-submit {
+            background: #2A5C4A;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .btn-submit:hover {
+            background: #1C3F32;
+            transform: scale(0.99);
+        }
+
+        /* Responsive para tablets y móviles */
+        @media (max-width: 768px) {
+            .contact-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .contact-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .info-title {
+                font-size: 1.6rem;
+            }
+
+            .main-text {
+                font-size: 1.15rem;
+                border-top: 1px solid #D0E0D8;
+                padding-top: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contact-container">
+        <div class="contact-layout">
+            
+            <div class="contact-info">
+                <h1 class="info-title">Contacto</h1>
+                <p class="info-description">
+                    Podes enviar tus sugerencias, biografia, fotos, anecdotas, etc que no se encuentran registradas en esta aplicación de genalogía.
+                </p>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <p class="main-text">
+                    Aplicación web de Genealogía Fioravante.
+                </p>
+
+                <form action="https://formsubmit.co/setiposadas@gmail.com" method="POST" class="contact-form">
+                    <input type="hidden" name="_subject" value="Nuevo mensaje desde la App Genealogía">
+
+                    <div class="form-group">
+                        <label for="nombre">Tu nombre y apellido completo:</label>
+                        <input type="text" id="nombre" name="Nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ciudad">Ciudad:</label>
+                        <input type="text" id="ciudad" name="Ciudad" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pais">País:</label>
+                        <select id="pais" name="Pais" required>
+                            <option value="" disabled selected>Selecciona tu país</option>
+                            
+                            <optgroup label="América del Sur">
+                                <option value="Argentina">Argentina</option>
+                                <option value="Bolivia">Bolivia</option>
+                                <option value="Brasil">Brasil</option>
+                                <option value="Chile">Chile</option>
+                                <option value="Colombia">Colombia</option>
+                                <option value="Ecuador">Ecuador</option>
+                                <option value="Paraguay">Paraguay</option>
+                                <option value="Perú">Perú</option>
+                                <option value="Uruguay">Uruguay</option>
+                                <option value="Venezuela">Venezuela</option>
+                            </optgroup>
+
+                            <optgroup label="América Central y Caribe">
+                                <option value="Costa Rica">Costa Rica</option>
+                                <option value="Cuba">Cuba</option>
+                                <option value="Guatemala">Guatemala</option>
+                                <option value="Panamá">Panamá</option>
+                                <option value="Puerto Rico">Puerto Rico</option>
+                                <option value="República Dominicana">República Dominicana</option>
+                            </optgroup>
+
+                            <optgroup label="América del Norte">
+                                <option value="Canadá">Canadá</option>
+                                <option value="Estados Unidos">Estados Unidos</option>
+                                <option value="México">México</option>
+                            </optgroup>
+
+                            <optgroup label="Europa">
+                                <option value="Alemania">Alemania</option>
+                                <option value="España">España</option>
+                                <option value="Francia">Francia</option>
+                                <option value="Italia">Italia</option>
+                                <option value="Países Bajos">Países Bajos</option>
+                                <option value="Portugal">Portugal</option>
+                                <option value="Reino Unido">Reino Unido</option>
+                                <option value="Suiza">Suiza</option>
+                            </optgroup>
+
+                            <optgroup label="Asia">
+                                <option value="China">China</option>
+                                <option value="Corea del Sur">Corea del Sur</option>
+                                <option value="Emiratos Árabes Unidos">Emiratos Árabes Unidos</option>
+                                <option value="India">India</option>
+                                <option value="Israel">Israel</option>
+                                <option value="Japón">Japón</option>
+                            </optgroup>
+
+                            <optgroup label="África">
+                                <option value="Egipto">Egipto</option>
+                                <option value="Marruecos">Marruecos</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Sudáfrica">Sudáfrica</option>
+                            </optgroup>
+
+                            <optgroup label="Oceanía">
+                                <option value="Australia">Australia</option>
+                                <option value="Nueva Zelanda">Nueva Zelanda</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="Email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="asunto">Asunto del Mensaje:</label>
+                        <input type="text" id="asunto" name="Asunto" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje:</label>
+                        <textarea id="mensaje" name="Mensaje" rows="4" required placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Enviar tu mensaje</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const cityToCountryMap = {
+            // Argentina
+            'posadas': 'Argentina', 'buenos aires': 'Argentina', 'cordoba': 'Argentina', 'rosario': 'Argentina', 'mendoza': 'Argentina', 'obera': 'Argentina', 'eldorado': 'Argentina',
+            // Brasil
+            'sao paulo': 'Brasil', 'são paulo': 'Brasil', 'rio de janeiro': 'Brasil', 'brasilia': 'Brasil', 'curitiba': 'Brasil',
+            // Uruguay
+            'montevideo': 'Uruguay', 'punta del este': 'Uruguay',
+            // Paraguay
+            'asuncion': 'Paraguay', 'asunción': 'Paraguay', 'encarnacion': 'Paraguay', 'encarnación': 'Paraguay',
+            // Chile
+            'santiago': 'Chile', 'valparaiso': 'Chile', 'viña del mar': 'Chile',
+            // España
+            'madrid': 'España', 'barcelona': 'España', 'valencia': 'España', 'sevilla': 'España',
+            // Italia
+            'roma': 'Italia', 'milan': 'Italia', 'milán': 'Italia', 'florencia': 'Italia', 'venecia': 'Italia',
+            // Estados Unidos
+            'miami': 'Estados Unidos', 'new york': 'Estados Unidos', 'nueva york': 'Estados Unidos', 'los angeles': 'Estados Unidos', 'washington': 'Estados Unidos',
+            // México
+            'mexico df': 'México', 'ciudad de mexico': 'México', 'cdmx': 'México', 'guadalajara': 'México',
+            // Colombia
+            'bogota': 'Colombia', 'bogotá': 'Colombia', 'medellin': 'Colombia', 'cali': 'Colombia',
+            // Perú
+            'lima': 'Perú', 'cusco': 'Perú',
+            // Otros principales del mundo
+            'paris': 'Francia', 'parís': 'Francia', 'londres': 'Reino Unido', 'london': 'Reino Unido', 'berlin': 'Alemania', 'berlín': 'Alemania', 'lisboa': 'Portugal',
+            'tokio': 'Japón', 'tokyo': 'Japón', 'pekin': 'China', 'beijing': 'China', 'sidney': 'Australia', 'sydney': 'Australia'
+        };
+
+        const ciudadInput = document.getElementById('ciudad');
+        const paisSelect = document.getElementById('pais');
+
+        ciudadInput.addEventListener('input', function() {
+            // Convertimos a minúsculas y limpiamos espacios extra
+            const valorCiudad = this.value.toLowerCase().trim();
+            
+            if (cityToCountryMap[valorCiudad]) {
+                paisSelect.value = cityToCountryMap[valorCiudad];
+            }
+        });
+    </script>
+</body>
+</html>
