@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Recuerdos de la familia Fioravante</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #F5F7F5; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.5; height: 100vh; width: 100vw; overflow: hidden; }
+        .app-container { display: flex; height: 100vh; width: 100%; background: #F5F7F5; }
+        
+        /* Contenedor Izquierdo (Mismo estilo que árbol) */
+        .left-panel { flex: 0.85; background: #FFFFFF; border-right: 5px solid #2A5C4A; padding: 0 1rem 1.5rem 1.2rem; display: flex; flex-direction: column; overflow-y: auto; height: 100%; }
+        .sticky-header { position: sticky; top: 0; background: #FFFFFF; z-index: 15; padding: 1.2rem 0 0.8rem 0; margin-bottom: 0.8rem; border-bottom: 1px solid #E2EBE7; }
+        .title-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .title-origen { font-family: 'Inter', sans-serif; font-size: 1.6rem; font-weight: 700; color: #1C3F32; letter-spacing: -0.3px; border-left: 5px solid #2A5C4A; padding-left: 1rem; line-height: 1.2; margin: 0; cursor: pointer; transition: opacity 0.2s; flex-shrink: 0; }
+        .title-origen:hover { opacity: 0.85; }
+        .btn-reset-list, .btn-new-person { background: #F0F5F2; border: 1.5px solid #C2D2CA; color: #1C3F32; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+        .btn-reset-list:hover, .btn-new-person:hover { background: #E2EBE7; transform: scale(0.97); border-color: #2A5C4A; }
+        .btn-new-person { background: #2A5C4A; color: white; border-color: #2A5C4A; }
+        .btn-new-person:hover { background: #1C3F32; border-color: #1C3F32; color: white; }
+        .auth-status { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; background: #EFF5F2; padding: 0.3rem 1rem; border-radius: 40px; }
+        .login-link { color: #2A5C4A; font-weight: 700; text-decoration: none; cursor: pointer; }
+        .login-link:hover { text-decoration: underline; }
+        .search-container { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.4rem; margin-bottom: 0.2rem; width: 100%; }
+        .search-input-wrapper { flex: 1; position: relative; }
+        .search-input { width: 100%; padding: 0.7rem 1rem 0.7rem 2.6rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; border: 1.5px solid #D0E0D8; border-radius: 60px; background: #FFFFFF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237B9689" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>') no-repeat 12px center; background-size: 1.1rem; transition: all 0.2s ease; }
+        .search-input:focus { outline: none; border-color: #2A5C4A; box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1); }
+        .btn-clear-search { background: #F0F5F2; border: 1.5px solid #C2D2CA; border-radius: 60px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 600; cursor: pointer; color: #2A5C4A; transition: all 0.2s; flex-shrink: 0; }
+        .btn-clear-search:hover { background: #E2EBE7; border-color: #2A5C4A; transform: scale(0.96); }
+        
+        .year-group { margin-bottom: 2rem; animation: fadeSlideUp 0.3s ease; }
+        .group-title { font-size: 1.2rem; font-weight: 800; color: #10261E; background: #EFF5F2; display: inline-block; padding: 0.3rem 1.1rem; border-radius: 60px; margin-bottom: 1rem; letter-spacing: -0.3px; border-left: 4px solid #2A5C4A; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .group-cards { display: flex; flex-direction: column; gap: 0.85rem; }
+        .card-module { position: relative; border-radius: 20px; padding: 0.9rem 1rem 0.9rem 1rem; text-align: center; font-weight: 600; font-size: 0.9rem; color: #1C3F32; border: 1.5px solid #D0E0D8; transition: all 0.2s ease; cursor: pointer; min-height: 85px; display: flex; align-items: center; justify-content: center; }
+        .card-module.card-male { background: #C7E9FF; border-color: #9AC9E8; }
+        .card-module.card-female { background: #FFD6E8; border-color: #F6C1DA; }
+        .card-module.card-default { background: #FCFEFD; border-color: #D0E0D8; }
+        .card-module.selected-card { border: 3px solid #132A21; box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12); transform: scale(1.01); }
+        .card-module.dimmed-card { opacity: 0.5; filter: grayscale(0.3); }
+        .birth-year-badge { position: absolute; top: 8px; left: 12px; font-size: 0.85rem; font-weight: 800; background: rgba(42, 92, 74, 0.2); padding: 0.1rem 0.6rem; border-radius: 40px; color: #174432; }
+        .full-name-card { font-weight: 700; font-size: 0.95rem; color: #10261E; margin-top: 0.3rem; }
+
+        /* Contenedor Derecho (Especial para la Galería de Fotos) */
+        .right-panel { flex: 1.5; background: #F5F7F5; display: flex; flex-direction: column; padding: 2rem; overflow-y: auto; }
+        .gallery-container { background: #FFFFFF; border-radius: 36px; box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06); padding: 2rem; height: 100%; overflow-y: auto; display: flex; flex-direction: column; border: 1px solid #E2EBE7; }
+        
+        .gallery-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #E2EBE7; padding-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+        .gallery-title { font-size: 1.5rem; font-weight: 700; color: #1C3F32; }
+        
+        /* Cuadrícula de fotos */
+        .memory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; width: 100%; }
+        .memory-item { background: #FCFEFD; border: 1px solid #E2EBE7; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; display: flex; flex-direction: column; position: relative; }
+        .memory-item:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(42, 92, 74, 0.12); border-color: #2A5C4A; }
+        
+        .image-wrapper { width: 100%; height: 200px; overflow: hidden; background: #EFF5F2; position: relative; }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .memory-item:hover .image-wrapper img { transform: scale(1.06); }
+        
+        .memory-info { padding: 1rem; background: #FFFFFF; display: flex; flex-direction: column; gap: 0.25rem; border-top: 1px solid #F0F5F2; }
+        .memory-owner { font-size: 0.95rem; font-weight: 700; color: #10261E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .memory-desc { font-size: 0.8rem; color: #5C7A6A; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-style: italic; }
+
+        /* Estado Inicial / Vacío */
+        .empty-detail { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; min-height: 300px; color: #2A5C4A; }
+        .empty-detail strong { font-size: 2.4rem; font-weight: 700; background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%); background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 1rem; letter-spacing: -0.02em; }
+        .empty-detail .sub-message { font-size: 1.1rem; font-weight: 400; color: #5C7A6A; max-width: 80%; border-top: 2px solid #E2EBE7; padding-top: 1.2rem; }
+
+        /* Modales */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+        .modal-content { background: white; border-radius: 32px; padding: 2rem; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 1.2rem; color: #1C3F32; font-size: 1.4rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; color: #1C3F32; font-size: 0.9rem; }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 0.8rem; border: 1px solid #D0E0D8; border-radius: 20px; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+        .btn { font-family: 'Inter', sans-serif; font-weight: 600; padding: 0.6rem 1.4rem; border-radius: 40px; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .btn-cancel { background: #EFF5F2; color: #1C3F32; border: 1px solid #C2D2CA; }
+        .btn-save { background: #2A5C4A; color: white; }
+        .btn-save:hover { background: #1C3F32; }
+
+        /* Visor de imágenes integrado (Lightbox) */
+        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(16, 38, 30, 0.95); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.3s ease; }
+        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox-content { max-width: 90%; max-height: 80vh; border-radius: 16px; box-shadow: 0 24px 48px rgba(0,0,0,0.4); transform: scale(0.95); transition: transform 0.3s ease; object-fit: contain; }
+        .lightbox.active .lightbox-content { transform: scale(1); }
+        .lightbox-caption { color: #FFFFFF; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; text-align: center; max-width: 80%; background: rgba(0,0,0,0.5); padding: 0.5rem 1.5rem; border-radius: 40px; }
+        .lightbox-close { position: absolute; top: 20px; right: 24px; color: white; font-size: 2.5rem; font-weight: 300; cursor: pointer; transition: transform 0.2s; user-select: none; }
+        .lightbox-close:hover { transform: scale(1.1); }
+
+        /* Animaciones y Responsivo */
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+        @media (max-width: 768px) {
+            body { overflow-y: auto; height: auto; }
+            .app-container { flex-direction: column; height: auto; min-height: 100vh; }
+            .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; max-height: 50vh; }
+            .right-panel { flex: 1; width: 100%; padding: 1rem; }
+            .memory-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+            .image-wrapper { height: 140px; }
+            .gallery-container { padding: 1.2rem; border-radius: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="left-panel">
+        <div class="sticky-header">
+            <div class="title-row">
+                <h1 class="title-origen" id="appTitle">Recuerdos Fioravante</h1>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <div id="authStatusContainer" class="auth-status"></div>
+                    <button class="btn-new-person" id="newPhotoBtn" style="display: none;">＋ Foto</button>
+                    <button class="btn-reset-list" id="resetListBtn">⟳ Todos</button>
+                </div>
+            </div>
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por ancestro, año o reseña...">
+                </div>
+                <button id="clearSearchBtn" class="btn-clear-search">✖</button>
+            </div>
+        </div>
+        <div id="groupsContainer" class="groups-list">Cargando ancestros...</div>
+    </div>
+
+    <div class="right-panel">
+        <div id="galleryContainer" class="gallery-container">
+            <div class="empty-detail">
+                <strong>Álbum de Recuerdos</strong>
+                <span class="sub-message">Selecciona un miembro familiar del panel izquierdo para filtrar sus fotos, o explora la galería completa.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="photoModal" class="modal">
+    <div class="modal-content">
+        <h3>Añadir foto al álbum</h3>
+        <div class="form-group">
+            <label>Seleccionar Familiar / Legado</label>
+            <select id="modalPersonSelect" style="width:100%; padding:0.8rem; border:1px solid #D0E0D8; border-radius:20px; font-size:0.95rem;"></select>
+        </div>
+        <div class="form-group">
+            <label>URL Directa de la Imagen</label>
+            <input type="url" id="photoUrlInput" placeholder="https://ejemplo.com/imagen.jpg" required>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn btn-cancel" id="modalCancel">Cancelar</button>
+            <button class="btn btn-save" id="modalSave">Guardar en Galería</button>
+        </div>
+    </div>
+</div>
+
+<div id="lightbox" class="lightbox">
+    <span class="lightbox-close" id="lightboxClose">&times;</span>
+    <img class="lightbox-content" id="lightboxImg" src="" alt="Vista ampliada">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+    // Configuración idéntica a tu base de datos de Firebase Firestore
+    const firebaseConfig = {
+        apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+        authDomain: "familia-genealogia.firebaseapp.com",
+        projectId: "familia-genealogia",
+        storageBucket: "familia-genealogia.firebasestorage.app",
+        messagingSenderId: "923693678578",
+        appId: "1:923693678578:web:bfed5d66d564d00847356b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let allPersons = [];
+    let currentSelectedId = null; // Filtro por ancestro activo
+    let currentSearchTerm = "";
+    let isEditingAllowed = false;
+
+    const groupsContainer = document.getElementById('groupsContainer');
+    const galleryContainer = document.getElementById('galleryContainer');
+    const photoModal = document.getElementById('photoModal');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const newPhotoBtn = document.getElementById('newPhotoBtn');
+    const authStatusContainer = document.getElementById('authStatusContainer');
+    const modalPersonSelect = document.getElementById('modalPersonSelect');
+
+    const YEAR_RANGES = [
+        { label: "1740 — 1800", min: 1740, max: 1800 },
+        { label: "1801 — 1900", min: 1801, max: 1900 },
+        { label: "1901 — 2000", min: 1901, max: 2000 },
+        { label: "2001 — Actualidad", min: 2001, max: 3000 }
+    ];
+
+    function extractYear(birthDate) {
+        if (!birthDate) return null;
+        if (typeof birthDate === 'object' && 'seconds' in birthDate) return new Date(birthDate.seconds * 1000).getUTCFullYear();
+        if (typeof birthDate === 'string') { const match = birthDate.match(/\d{4}/); if (match) return parseInt(match[0], 10); }
+        if (typeof birthDate === 'number') return birthDate;
+        return null;
+    }
+
+    // Renderiza la cuadrícula de fotos basada en el filtro seleccionado o búsqueda global
+    function renderGalleryGrid() {
+        // Obtener todos los ancestros que cumplen la búsqueda actual
+        const filteredPersons = allPersons.filter(item => {
+            if (!currentSearchTerm.trim()) return true;
+            const term = currentSearchTerm.toLowerCase();
+            const fullName = `${item.person.firstName} ${item.person.lastName}`.toLowerCase();
+            const bio = (item.person.biography || "").toLowerCase();
+            const year = String(item.person.birthYear || "");
+            return fullName.includes(term) || bio.includes(term) || year.includes(term);
+        });
+
+        // Reunir todas las fotos válidas estructuradas
+        let photosToRender = [];
+        filteredPersons.forEach(item => {
+            // Si hay un ancestro seleccionado en la izquierda, ignorar las fotos de los demás
+            if (currentSelectedId && item.id !== currentSelectedId) return;
+
+            const fullName = `${item.person.firstName} ${item.person.lastName}`.trim() || "Ancestro";
+            const photos = item.person.photos || [];
+            
+            photos.forEach(url => {
+                if (url && url.trim() !== "") {
+                    photosToRender.push({
+                        docId: item.id,
+                        ownerName: fullName,
+                        url: url.trim(),
+                        biography: item.person.biography || "Legado de la familia Fioravante."
+                    });
+                }
+            });
+        });
+
+        if (photosToRender.length === 0) {
+            galleryContainer.innerHTML = `
+                <div class="empty-detail">
+                    <strong>Sin imágenes disponibles</strong>
+                    <span class="sub-message">No se encontraron fotografías registradas para este criterio de búsqueda. ${isEditingAllowed ? '¡Puedes añadir nuevas desde el botón superior!' : ''}</span>
+                </div>`;
+            return;
+        }
+
+        let titleText = currentSelectedId ? `Fotos de: ${photosToRender[0].ownerName}` : "Galería Fotográfica Familiar";
+        let gridHtml = `
+            <div class="gallery-header">
+                <h2 class="gallery-title">${escapeHtml(titleText)}</h2>
+                <span style="font-size:0.85rem; background:#EFF5F2; padding:0.3rem 1rem; border-radius:20px; font-weight:600; color:#2A5C4A;">${photosToRender.length} imágenes encontradas</span>
+            </div>
+            <div class="memory-grid">
+        `;
+
+        photosToRender.forEach(photo => {
+            gridHtml += `
+                <div class="memory-item" onclick="openLightbox('${escapeJs(photo.url)}', '${escapeJs(photo.ownerName)}')">
+                    <div class="image-wrapper">
+                        <img src="${escapeHtml(photo.url)}" alt="Recuerdo" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%25\' height=\'100%25\' fill=\'%23EFF5F2\'%3E%3Ctext x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%237B9689\' font-size=\'14\'%3EImagen no disponible%3C/text%3E%3C/svg%3E';">
+                    </div>
+                    <div class="memory-info">
+                        <span class="memory-owner">${escapeHtml(photo.ownerName)}</span>
+                        <span class="memory-desc">${escapeHtml(photo.biography)}</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        gridHtml += `</div>`;
+        galleryContainer.innerHTML = gridHtml;
+    }
+
+    // Control del Visor de Imágenes (Lightbox) incorporado
+    window.openLightbox = function(url, name) {
+        const lightbox = document.getElementById('lightbox');
+        document.getElementById('lightboxImg').src = url;
+        document.getElementById('lightboxCaption').textContent = name;
+        lightbox.classList.add('active');
+    };
+
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('active');
+    }
+
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    document.getElementById('lightbox').addEventListener('click', (e) => { if(e.target.id === 'lightbox') closeLightbox(); });
+
+    // Lógica del Contenedor Izquierdo (Mismo algoritmo del árbol original)
+    function groupPersonsByYearRange(personsArray) {
+        const groups = YEAR_RANGES.map(r => ({ ...r, items: [] }));
+        let extraGroup = { label: "Anteriores a 1740 o sin fecha", min: -Infinity, max: 1739, items: [] };
+        
+        for (let item of personsArray) {
+            let year = item.person.birthYear ?? extractYear(item.person.birthDate);
+            let assigned = false;
+            if (year !== null && typeof year === 'number') {
+                for (let group of groups) { if (year >= group.min && year <= group.max) { group.items.push(item); assigned = true; break; } }
+                if (!assigned && year < 1740) extraGroup.items.push(item);
+                else if (!assigned && year > 3000) groups[groups.length-1].items.push(item);
+            } else extraGroup.items.push(item);
+        }
+        const finalGroups = groups.filter(g => g.items.length > 0);
+        if (extraGroup.items.length) finalGroups.push(extraGroup);
+        return finalGroups;
+    }
+
+    function renderLeftPanelCards(groupsArray) {
+        if (!groupsArray.length || groupsArray.every(g => g.items.length === 0)) {
+            groupsContainer.innerHTML = `<div style="padding:1.5rem; text-align:center; color:#4A6A5C; font-size:0.9rem;">🔍 Sin resultados.</div>`;
+            return;
+        }
+        let globalHtml = '';
+        for (let group of groupsArray) {
+            if (!group.items.length) continue;
+            group.items.sort((a,b) => (a.person.birthYear ?? 9999) - (b.person.birthYear ?? 9999));
+            let cardsHtml = '';
+            for (let item of group.items) {
+                const fullName = `${item.person.firstName} ${item.person.lastName}`.trim() || "Anónimo";
+                const year = item.person.birthYear ?? "?";
+                let genderClass = item.person.gender === 'male' ? 'card-male' : (item.person.gender === 'female' ? 'card-female' : 'card-default');
+                
+                cardsHtml += `<div class="card-module ${genderClass}" data-id="${item.id}"><div class="birth-year-badge">${year}</div><div class="full-name-card">${escapeHtml(fullName)}</div></div>`;
+            }
+            globalHtml += `<div class="year-group"><div class="group-title">${escapeHtml(group.label)}</div><div class="group-cards">${cardsHtml}</div></div>`;
+        }
+        groupsContainer.innerHTML = globalHtml;
+
+        // Asignar clics a tarjetas de la izquierda
+        document.querySelectorAll('.card-module').forEach(card => {
+            card.addEventListener('click', () => {
+                const docId = card.getAttribute('data-id');
+                if (currentSelectedId === docId) {
+                    currentSelectedId = null; // Quita filtro
+                    card.classList.remove('selected-card');
+                    document.querySelectorAll('.card-module').forEach(c => c.classList.remove('dimmed-card'));
+                } else {
+                    currentSelectedId = docId;
+                    document.querySelectorAll('.card-module').forEach(c => {
+                        c.classList.remove('selected-card');
+                        c.classList.add('dimmed-card');
+                    });
+                    card.classList.remove('dimmed-card');
+                    card.classList.add('selected-card');
+                }
+                renderGalleryGrid();
+            });
+        });
+    }
+
+    // Carga de datos de la base de datos distribuida en Firestore
+    async function loadData() {
+        try {
+            groupsContainer.innerHTML = "Cargando...";
+            const snapshot = await db.collection("persons").get();
+            if (snapshot.empty) {
+                groupsContainer.innerHTML = "No hay registros.";
+                return;
+            }
+            allPersons = [];
+            modalPersonSelect.innerHTML = "";
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const personObj = {
+                    id: doc.id,
+                    person: {
+                        firstName: data.firstName || "",
+                        lastName: data.lastName || "",
+                        birthDate: data.birthDate || null,
+                        birthYear: data.birthYear ?? extractYear(data.birthDate),
+                        biography: data.biography || "",
+                        gender: data.gender || "",
+                        photos: data.photos || []
+                    }
+                };
+                allPersons.push(personObj);
+
+                // Llenar selector del modal para registrar fotos
+                const option = document.createElement('option');
+                option.value = doc.id;
+                option.textContent = `${personObj.person.firstName} ${personObj.person.lastName}`.trim();
+                modalPersonSelect.appendChild(option);
+            });
+
+            // Refrescar vistas componentes
+            const grouped = groupPersonsByYearRange(allPersons);
+            renderLeftPanelCards(grouped);
+            renderGalleryGrid();
+        } catch (error) {
+            groupsContainer.innerHTML = `Error: ${error.message}`;
+        }
+    }
+
+    // Guardar enlaces/URLs de fotos nuevas en el array correspondiente del ancestro
+    async function savePhotoToFirebase() {
+        // Validación extra de seguridad por si se evade la UI
+        if (!isEditingAllowed) {
+            alert("No tienes permisos para añadir fotografías. Inicia sesión.");
+            photoModal.style.display = 'none';
+            return;
+        }
+
+        const targetId = modalPersonSelect.value;
+        const newUrl = document.getElementById('photoUrlInput').value.trim();
+        
+        if (!targetId || !newUrl) { alert("Completa todos los campos"); return; }
+        
+        const selectedPerson = allPersons.find(p => p.id === targetId);
+        if (!selectedPerson) return;
+
+        let updatedPhotos = [...(selectedPerson.person.photos || [])];
+        if (updatedPhotos.length >= 4) {
+            alert("Este ancestro ya alcanzó el límite máximo de 4 fotografías asignadas.");
+            return;
+        }
+        updatedPhotos.push(newUrl);
+
+        try {
+            await db.collection("persons").doc(targetId).update({ photos: updatedPhotos });
+            photoModal.style.display = 'none';
+            document.getElementById('photoUrlInput').value = "";
+            await loadData();
+        } catch (e) {
+            alert("Error al añadir foto: " + e.message);
+        }
+    }
+
+    // Control de Permisos y Sesión (Modo Escritura vs Solo Lectura)
+    auth.onAuthStateChanged((user) => {
+        isEditingAllowed = !!user;
+        if (user) {
+            authStatusContainer.innerHTML = `<span>📸 Álbum de ${user.email.split('@')[0]}</span>`;
+            newPhotoBtn.style.display = 'inline-flex';
+        } else {
+            authStatusContainer.innerHTML = `<span>🔍 Galería Pública</span> <a class="login-link" id="loginLink">Acceder</a>`;
+            newPhotoBtn.style.display = 'none';
+            const loginLink = document.getElementById('loginLink');
+            if (loginLink) loginLink.addEventListener('click', () => { window.location.href = 'index.html'; });
+        }
+        loadData();
+    });
+
+    // Control de Eventos de Interfaz
+    newPhotoBtn.addEventListener('click', () => { 
+        if (!isEditingAllowed) {
+            alert("Debes iniciar sesión para añadir fotos.");
+            return;
+        }
+        photoModal.style.display = 'flex'; 
+    });
+    
+    document.getElementById('modalCancel').addEventListener('click', () => { photoModal.style.display = 'none'; });
+    document.getElementById('modalSave').addEventListener('click', savePhotoToFirebase);
+    document.getElementById('resetListBtn').addEventListener('click', () => {
+        currentSelectedId = null;
+        currentSearchTerm = "";
+        searchInput.value = "";
+        document.querySelectorAll('.card-module').forEach(c => c.classList.remove('selected-card', 'dimmed-card'));
+        renderGalleryGrid();
+    });
+    
+    document.getElementById('appTitle').addEventListener('click', () => document.getElementById('resetListBtn').click());
+
+    searchInput.addEventListener('input', (e) => { currentSearchTerm = e.target.value; renderGalleryGrid(); });
+    clearSearchBtn.addEventListener('click', () => { currentSearchTerm = ""; searchInput.value = ""; renderGalleryGrid(); });
+
+    function escapeHtml(str) { return !str ? '' : str.replace(/[&<>"]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[m] || m)); }
+    function escapeJs(str) { return !str ? '' : str.replace(/'/g, "\\'"); }
+</script>
+</body>
+</html>
