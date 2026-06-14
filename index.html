@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
+        /* (igual que antes, sin cambios) */
         :root {
             --primary: #2C423F;
             --accent: #C47D57;
@@ -91,6 +93,12 @@
             margin-top: 12px;
         }
         .btn-outline:hover { background: rgba(44,66,63,0.05); border-color: var(--accent); color: var(--accent); }
+        .btn-invited {
+            background: transparent;
+            border: 1.5px solid var(--accent);
+            color: var(--accent);
+        }
+        .btn-invited:hover { background: rgba(196,125,87,0.08); border-color: var(--primary); color: var(--primary); }
         .error-message { background: var(--error-bg); border-left: 4px solid var(--error-border); padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #C62828; margin-bottom: 16px; }
         .success-message { background: var(--success-bg); border-left: 4px solid #4CAF50; padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #1E4620; margin-bottom: 16px; }
         @media (max-width: 768px) {
@@ -100,8 +108,6 @@
             .brand-subtitle { font-size: 1.6rem; }
             .landing-right { flex: 1.2; }
         }
-
-        /* --- ESTILOS DEL MODAL FLOTANTE: TEXTO JUSTIFICADO, CENTRADO Y CON SALTOS DE LÍNEA --- */
         .floating-credit-modal {
             position: fixed;
             top: 20px;
@@ -119,44 +125,18 @@
             color: #1E2A2A;
             background-color: #fefcf9;
             transition: opacity 0.2s ease;
-            text-align: center;      /* centrado horizontal general */
+            text-align: center;
         }
-
-        /* Cada línea separada, mostrando el texto centrado y justificado (apariencia limpia) */
         .floating-credit-modal .credit-line {
             display: block;
             text-align: center;
             margin: 0;
-            padding: 0;
-        }
-
-        /* Aplicamos justificación al texto de cada línea (se ve más armónico) */
-        .floating-credit-modal .credit-line {
-            text-align: justify;
-            text-align-last: center; /* Para que la última línea también quede centrada estéticamente */
-        }
-
-        /* Para mantener consistencia entre navegadores */
-        .floating-credit-modal {
             text-align: justify;
             text-align-last: center;
         }
-
-        .floating-credit-modal strong {
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        /* Ajuste responsive: móviles más pequeños */
+        .floating-credit-modal strong { font-weight: 800; color: var(--primary); }
         @media (max-width: 640px) {
-            .floating-credit-modal {
-                top: 12px;
-                right: 12px;
-                max-width: 250px;
-                padding: 10px 16px;
-                font-size: 0.75rem;
-                border-left-width: 4px;
-            }
+            .floating-credit-modal { top: 12px; right: 12px; max-width: 250px; padding: 10px 16px; font-size: 0.75rem; border-left-width: 4px; }
         }
     </style>
 </head>
@@ -170,8 +150,6 @@
     </div>
     <div class="landing-right" id="authPanel"></div>
 </div>
-
-<!-- MODAL FLOTANTE INFORMATIVO: estructura con líneas separadas, justificado y centrado -->
 <div id="infoCreditModal" class="floating-credit-modal">
     <span class="credit-line"><strong>Diseño y Programación:</strong></span>
     <span class="credit-line">Rómulo Fioravante</span>
@@ -179,9 +157,7 @@
     <span class="credit-line">1.0.2026</span>
     <span class="credit-line">Posadas-Misiones</span>
 </div>
-
 <script>
-    // Configuración Firebase (igual para ambos)
     const firebaseConfig = {
         apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
         authDomain: "familia-genealogia.firebaseapp.com",
@@ -222,23 +198,24 @@
         } catch(e) { console.error(e); return false; }
     }
 
+    // Ahora redirigimos a app.html
     function redirectToApp() {
         window.location.href = "app.html";
     }
 
-    // Render login
     function renderLoginView() {
         authPanel.innerHTML = `
             <div class="auth-card">
                 <h2>Bienvenido</h2>
-                <p>Ingresa tus credenciales para continuar</p>
+                <p>Ingresa tus credenciales para editar el árbol</p>
                 <div id="loginFeedback"></div>
                 <form id="loginFormElement">
                     <div class="input-group"><input type="email" id="loginEmail" placeholder="Correo electrónico" required autocomplete="email"></div>
                     <div class="input-group"><input type="password" id="loginPassword" placeholder="Contraseña" required autocomplete="current-password"></div>
-                    <button type="submit" class="btn-primary">Comenzar</button>
+                    <button type="submit" class="btn-primary">Iniciar sesión</button>
                 </form>
-                <button class="btn-outline" id="showRegisterBtn">➕ Nuevo usuario · Crear cuenta</button>
+                <button class="btn-outline" id="showRegisterBtn">➕ Crear cuenta nueva</button>
+                <button class="btn-outline btn-invited" id="guestBtn">👤 Ingresar como invitado (solo lectura)</button>
             </div>
         `;
         document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
@@ -250,7 +227,6 @@
             fbDiv.innerHTML = `<div class="success-message">⏳ Validando...</div>`;
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Redirigir a app.html directamente
                 redirectToApp();
             } catch(error) {
                 let msg = 'Error. ';
@@ -262,6 +238,7 @@
             }
         });
         document.getElementById('showRegisterBtn').addEventListener('click', () => { currentMode = 'register'; renderRegisterView(); });
+        document.getElementById('guestBtn').addEventListener('click', () => { redirectToApp(); });
     }
 
     function renderRegisterView() {
@@ -299,7 +276,6 @@
                 const user = userCred.user;
                 await user.updateProfile({ displayName: `${nombre} ${apellido}` });
                 await saveUserProfile(user.uid, nombre, apellido, email);
-                // Redirigir a app tras registro exitoso
                 redirectToApp();
             } catch(error) {
                 let errorMsg = error.message;
@@ -311,19 +287,14 @@
         document.getElementById('backToLoginBtn').addEventListener('click', () => { currentMode = 'login'; renderLoginView(); });
     }
 
-    // --- LÓGICA DEL MODAL FLOTANTE: desaparece automáticamente en 4 segundos ---
     const modalElement = document.getElementById('infoCreditModal');
     if (modalElement) {
         setTimeout(() => {
-            if (modalElement && modalElement.remove) {
-                modalElement.remove();
-            } else if (modalElement && modalElement.style) {
-                modalElement.style.display = 'none';
-            }
+            if (modalElement && modalElement.remove) modalElement.remove();
+            else if (modalElement && modalElement.style) modalElement.style.display = 'none';
         }, 4000);
     }
 
-    // Redirección si ya hay sesión activa
     auth.onAuthStateChanged((user) => {
         if(user) {
             redirectToApp();

@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <style>
+        /* (estilos exactamente igual que antes, sin cambios) */
         * {
             margin: 0;
             padding: 0;
@@ -109,7 +110,6 @@
             border: none;
         }
 
-        /* Panel inferior con nuevo orden: menú (lupa) a la izquierda, luego bienvenida, luego título + btn salir */
         .bottom-panel {
             background-color: var(--primary);
             padding: 0 1rem;
@@ -123,7 +123,6 @@
             width: 100%;
         }
 
-        /* MENÚ (LUPA) - siempre en la esquina izquierda */
         .menu-wrapper {
             position: relative;
             width: 56px;
@@ -192,7 +191,6 @@
             border-radius: 4px;
         }
 
-        /* Área de bienvenida (después del menú) */
         .welcome-area {
             display: flex;
             align-items: center;
@@ -249,7 +247,6 @@
             font-weight: normal;
         }
 
-        /* Título a la derecha (con margin-left: auto para empujar el contenido a la derecha) */
         .genealogy-title-right {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
@@ -264,10 +261,9 @@
             border-radius: 40px;
             backdrop-filter: blur(2px);
             line-height: 1.2;
-            margin-left: auto;   /* empuja título y botón hacia la derecha */
+            margin-left: auto;
         }
 
-        /* Botón salir intacto */
         .btn-exit {
             background: var(--alert-red);
             border: none;
@@ -289,7 +285,6 @@
             background: var(--alert-red-dark);
         }
 
-        /* Menú flotante */
         .floating-menu {
             position: fixed;
             bottom: 90px;
@@ -335,7 +330,6 @@
             padding-left: 30px;
         }
 
-        /* Modales */
         .alert-modal-overlay,
         .edit-name-modal-overlay {
             position: fixed;
@@ -453,115 +447,37 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* Responsive */
         @media (max-width: 640px) {
-            .app-container {
-                height: 100dvh;
-            }
-            .bottom-panel {
-                padding: 0 0.8rem;
-                gap: 0.5rem;
-                min-height: 70px;
-            }
-            .menu-wrapper {
-                width: 48px;
-                height: 48px;
-            }
-            .menu-creative {
-                width: 44px;
-                height: 44px;
-            }
-            .menu-light-aura {
-                width: 52px;
-                height: 52px;
-            }
-            .welcome-avatar {
-                width: 38px;
-                height: 38px;
-                font-size: 1.1rem;
-            }
-            .welcome-greeting {
-                font-size: 0.75rem;
-            }
-            .welcome-area {
-                max-width: 70%;
-                padding: 4px 8px 4px 2px;   /* padding izquierdo reducido */
-                margin-left: -0.25rem;        /* pegado al icono de la lupa */
-            }
-            .genealogy-title-right {
-                font-size: 0.6rem;
-                padding: 4px 8px;
-                white-space: normal;
-                line-height: 1.2;
-                max-width: 110px;
-            }
-            .btn-exit {
-                padding: 6px 14px;
-                font-size: 0.75rem;
-            }
-            .floating-menu {
-                left: 10px;
-                right: 10px;
-                bottom: 80px;
-                max-width: none;
-                width: auto;
-            }
-            .floating-menu li {
-                padding: 12px 20px;
-                font-size: 0.9rem;
-            }
-            .image-container {
-                padding: 14px;
-                border-radius: 24px;
-            }
-            .family-image {
-                max-height: 45vh;
-            }
-            .custom-toast {
-                font-size: 0.75rem;
-                padding: 8px 16px;
-                bottom: 90px;
-            }
+            .app-container { height: 100dvh; }
+            .bottom-panel { padding: 0 0.8rem; gap: 0.5rem; min-height: 70px; }
+            .menu-wrapper { width: 48px; height: 48px; }
+            .menu-creative { width: 44px; height: 44px; }
+            .menu-light-aura { width: 52px; height: 52px; }
+            .welcome-avatar { width: 38px; height: 38px; font-size: 1.1rem; }
+            .welcome-greeting { font-size: 0.75rem; }
+            .welcome-area { max-width: 70%; padding: 4px 8px 4px 2px; margin-left: -0.25rem; }
+            .genealogy-title-right { font-size: 0.6rem; padding: 4px 8px; white-space: normal; line-height: 1.2; max-width: 110px; }
+            .btn-exit { padding: 6px 14px; font-size: 0.75rem; }
+            .floating-menu { left: 10px; right: 10px; bottom: 80px; max-width: none; width: auto; }
+            .floating-menu li { padding: 12px 20px; font-size: 0.9rem; }
+            .image-container { padding: 14px; border-radius: 24px; }
+            .family-image { max-height: 45vh; }
+            .custom-toast { font-size: 0.75rem; padding: 8px 16px; bottom: 90px; }
         }
 
         @media (max-width: 480px) {
-            .welcome-area {
-                gap: 6px;
-                max-width: 75%;
-            }
-            .welcome-avatar {
-                width: 34px;
-                height: 34px;
-                font-size: 1rem;
-            }
-            .genealogy-title-right {
-                display: none;
-            }
-            .bottom-panel {
-                justify-content: space-between;
-            }
-            .btn-exit {
-                padding: 6px 12px;
-            }
+            .welcome-area { gap: 6px; max-width: 75%; }
+            .welcome-avatar { width: 34px; height: 34px; font-size: 1rem; }
+            .genealogy-title-right { display: none; }
+            .bottom-panel { justify-content: space-between; }
+            .btn-exit { padding: 6px 12px; }
         }
 
         @media (min-width: 1024px) {
-            .floating-menu {
-                left: 20px;
-                right: auto;
-                bottom: 100px;
-                min-width: 260px;
-            }
-            .genealogy-title-right {
-                display: block;
-                white-space: nowrap;
-            }
-            .bottom-panel {
-                padding: 0 2rem;
-            }
-            .welcome-area {
-                max-width: 50%;
-            }
+            .floating-menu { left: 20px; right: auto; bottom: 100px; min-width: 260px; }
+            .genealogy-title-right { display: block; white-space: nowrap; }
+            .bottom-panel { padding: 0 2rem; }
+            .welcome-area { max-width: 50%; }
         }
     </style>
 </head>
@@ -577,7 +493,6 @@
     </div>
 
     <div class="bottom-panel">
-        <!-- 1) Botón menú (LUPA) siempre en la esquina izquierda -->
         <div class="menu-wrapper">
             <div class="menu-light-aura"></div>
             <div class="menu-creative" id="creativeMenuBtn">
@@ -588,7 +503,6 @@
             </div>
         </div>
 
-        <!-- 2) Área de bienvenida (justo a la derecha del menú) -->
         <div class="welcome-area" id="welcomeArea">
             <div class="welcome-avatar" id="welcomeAvatar">👤</div>
             <div class="welcome-text">
@@ -596,12 +510,10 @@
             </div>
         </div>
 
-        <!-- 3) Título a la derecha (con margin-left:auto) -->
         <div class="genealogy-title-right">
             Archivo Genealógico <strong>Fioravante</strong> · Argentina
         </div>
 
-        <!-- 4) Botón salir intacto -->
         <button class="btn-exit" id="exitButton">Salir</button>
     </div>
 </div>
@@ -696,7 +608,10 @@
 
     function openEditModal() {
         const user = auth.currentUser;
-        if (!user) return;
+        if (!user) {
+            showToast("Debes iniciar sesión para editar tu nombre", true);
+            return;
+        }
         let fullName = user.displayName || "";
         const parts = fullName.trim().split(' ');
         editFirstName.value = parts[0] || "";
@@ -710,7 +625,10 @@
 
     async function saveFullName() {
         const user = auth.currentUser;
-        if (!user) return;
+        if (!user) {
+            showToast("No tienes permisos para editar el nombre", true);
+            return;
+        }
         const firstName = editFirstName.value.trim();
         const lastName = editLastName.value.trim();
         if (firstName === "" && lastName === "") {
@@ -729,7 +647,11 @@
     }
 
     function actualizarBienvenida(user) {
-        if (!user) return;
+        if (!user) {
+            welcomeGreeting.innerHTML = `👋 Invitado · Solo lectura`;
+            welcomeAvatar.textContent = "👤";
+            return;
+        }
         let nombreCompleto = user.displayName;
         if (!nombreCompleto || nombreCompleto.trim() === "") {
             nombreCompleto = user.email.split('@')[0];
@@ -751,11 +673,8 @@
         if (e.target === editModal) closeEditModal();
     });
 
+    // Escuchar cambios de autenticación SIN redirigir
     auth.onAuthStateChanged((user) => {
-        if (!user) {
-            window.location.href = "index.html";
-            return;
-        }
         actualizarBienvenida(user);
     });
 
@@ -781,13 +700,12 @@
             e.stopPropagation();
             const text = item.innerText;
             if (text === 'Árbol completo') {
-                showIframe('https://rfioravante73-ar.github.io/familiia/arbol.html');
+                showIframe('arbol.html');
             } else if (text === 'Origen del Apellido') {
                 showIframe('https://rfioravante73-ar.github.io/familiia/origen.html');
             } else if (text === 'Mapas') {
                 showIframe('https://rfioravante73-ar.github.io/familiia/mapas.html');
             } else if (text === 'Argentina') {
-                // Vínculo directo a la sección Argentina dentro de la app
                 showIframe('https://rfioravante73-ar.github.io/familiia/argentina.html');
             } else {
                 showImage();

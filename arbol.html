@@ -1,3 +1,4 @@
+<!-- arbol.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,503 +6,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Árbol Genealógico | Género y legado</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (app + firestore + auth) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
         /* ========== ESTILOS ORIGINALES (sin cambios) ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #F5F7F5;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-            background: #F5F7F5;
-        }
-
-        .left-panel {
-            flex: 0.85;
-            background: #FFFFFF;
-            border-right: 5px solid #2A5C4A;
-            padding: 0 1rem 1.5rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            height: 100%;
-        }
-
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            background: #FFFFFF;
-            z-index: 15;
-            padding: 1.2rem 0 0.8rem 0;
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid #E2EBE7;
-        }
-        .title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-        .title-origen {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1C3F32;
-            letter-spacing: -0.3px;
-            border-left: 5px solid #2A5C4A;
-            padding-left: 1rem;
-            line-height: 1.2;
-            margin: 0;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            flex-shrink: 0;
-        }
-        .title-origen:hover {
-            opacity: 0.85;
-        }
-
-        .btn-reset-list, .btn-new-person {
-            background: #F0F5F2;
-            border: 1.5px solid #C2D2CA;
-            color: #1C3F32;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .btn-reset-list:hover, .btn-new-person:hover {
-            background: #E2EBE7;
-            transform: scale(0.97);
-            border-color: #2A5C4A;
-        }
-        .btn-new-person {
-            background: #2A5C4A;
-            color: white;
-            border-color: #2A5C4A;
-        }
-        .btn-new-person:hover {
-            background: #1C3F32;
-            border-color: #1C3F32;
-            color: white;
-        }
-
-        .search-container {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            margin-top: 0.4rem;
-            margin-bottom: 0.2rem;
-            width: 100%;
-        }
-        .search-input-wrapper {
-            flex: 1;
-            position: relative;
-        }
-        .search-input {
-            width: 100%;
-            padding: 0.7rem 1rem 0.7rem 2.6rem;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
-            border: 1.5px solid #D0E0D8;
-            border-radius: 60px;
-            background: #FFFFFF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237B9689" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>') no-repeat 12px center;
-            background-size: 1.1rem;
-            transition: all 0.2s ease;
-        }
-        .search-input:focus {
-            outline: none;
-            border-color: #2A5C4A;
-            box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1);
-        }
-        .btn-clear-search {
-            background: #F0F5F2;
-            border: 1.5px solid #C2D2CA;
-            border-radius: 60px;
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            color: #2A5C4A;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .btn-clear-search:hover {
-            background: #E2EBE7;
-            border-color: #2A5C4A;
-            transform: scale(0.96);
-        }
-
-        .year-group {
-            margin-bottom: 2rem;
-            animation: fadeSlideUp 0.3s ease;
-        }
-
-        .group-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #10261E;
-            background: #EFF5F2;
-            display: inline-block;
-            padding: 0.3rem 1.1rem;
-            border-radius: 60px;
-            margin-bottom: 1rem;
-            letter-spacing: -0.3px;
-            border-left: 4px solid #2A5C4A;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-
-        .group-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-        }
-
-        .card-module {
-            position: relative;
-            border-radius: 20px;
-            padding: 0.9rem 1rem 0.9rem 1rem;
-            text-align: center;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #1C3F32;
-            border: 1.5px solid #D0E0D8;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            min-height: 85px;
-        }
-
-        .card-module.card-male {
-            background: #C7E9FF;
-            border-color: #9AC9E8;
-        }
-        .card-module.card-female {
-            background: #FFD6E8;
-            border-color: #F6C1DA;
-        }
-        .card-module.card-default {
-            background: #FCFEFD;
-            border-color: #D0E0D8;
-        }
-
-        .card-module.selected-card {
-            border: 3px solid #132A21;
-            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
-            transform: scale(1.01);
-        }
-
-        .card-module.dimmed-card {
-            opacity: 0.7;
-            filter: grayscale(0.15);
-            border-color: #C2D2CA;
-        }
-
-        .birth-year-badge {
-            position: absolute;
-            top: 8px;
-            left: 12px;
-            font-size: 0.9rem;
-            font-weight: 800;
-            background: rgba(42, 92, 74, 0.2);
-            padding: 0.2rem 0.7rem;
-            border-radius: 40px;
-            color: #174432;
-        }
-
-        .full-name-card {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #10261E;
-            margin-top: 0.3rem;
-        }
-
-        .right-panel {
-            flex: 1.5;
-            background: #F5F7F5;
-            display: flex;
-            flex-direction: column;
-            padding: 2rem 2.2rem 2rem 2.2rem;
-            overflow-y: auto;
-        }
-
-        .details-container {
-            background: #FFFFFF;
-            border-radius: 36px;
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
-            padding: 2rem 2.2rem;
-            height: 100%;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            border: 1px solid #E2EBE7;
-        }
-
-        .empty-detail {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100%;
-            min-height: 300px;
-            color: #2A5C4A;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-            margin: 0;
-            padding: 1rem;
-        }
-        .empty-detail strong {
-            font-size: 2.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-        }
-        .empty-detail .sub-message {
-            font-size: 1.2rem;
-            font-weight: 400;
-            color: #5C7A6A;
-            max-width: 80%;
-            margin-top: 0.5rem;
-            border-top: 2px solid #E2EBE7;
-            padding-top: 1.2rem;
-            display: inline-block;
-        }
-        @media (max-width: 768px) {
-            .empty-detail strong { font-size: 2rem; }
-            .empty-detail .sub-message { font-size: 1rem; max-width: 95%; }
-        }
-        @media (max-width: 480px) {
-            .empty-detail strong { font-size: 1.6rem; }
-            .empty-detail .sub-message { font-size: 0.9rem; }
-        }
-
-        .detail-text {
-            font-family: 'Inter', sans-serif;
-            color: #1E2E28;
-            line-height: 1.65;
-            font-size: 1.05rem;
-        }
-        .detail-text strong {
-            color: #246148;
-            font-weight: 700;
-        }
-        .detail-text .birth-date-bold {
-            font-weight: 800;
-            color: #0E4C38;
-        }
-        .detail-highlight {
-            background: #EEF4F1;
-            border-left: 5px solid #2A5C4A;
-            padding: 1.2rem 1.5rem;
-            border-radius: 24px;
-            margin: 1rem 0;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #F5F7F5; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.5; height: 100vh; width: 100vw; overflow: hidden; }
+        .app-container { display: flex; height: 100vh; width: 100%; background: #F5F7F5; }
+        .left-panel { flex: 0.85; background: #FFFFFF; border-right: 5px solid #2A5C4A; padding: 0 1rem 1.5rem 1.2rem; display: flex; flex-direction: column; overflow-y: auto; height: 100%; }
+        .sticky-header { position: sticky; top: 0; background: #FFFFFF; z-index: 15; padding: 1.2rem 0 0.8rem 0; margin-bottom: 0.8rem; border-bottom: 1px solid #E2EBE7; }
+        .title-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .title-origen { font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 700; color: #1C3F32; letter-spacing: -0.3px; border-left: 5px solid #2A5C4A; padding-left: 1rem; line-height: 1.2; margin: 0; cursor: pointer; transition: opacity 0.2s; flex-shrink: 0; }
+        .title-origen:hover { opacity: 0.85; }
+        .btn-reset-list, .btn-new-person { background: #F0F5F2; border: 1.5px solid #C2D2CA; color: #1C3F32; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+        .btn-reset-list:hover, .btn-new-person:hover { background: #E2EBE7; transform: scale(0.97); border-color: #2A5C4A; }
+        .btn-new-person { background: #2A5C4A; color: white; border-color: #2A5C4A; }
+        .btn-new-person:hover { background: #1C3F32; border-color: #1C3F32; color: white; }
+        .auth-status { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; background: #EFF5F2; padding: 0.3rem 1rem; border-radius: 40px; }
+        .login-link { color: #2A5C4A; font-weight: 700; text-decoration: none; cursor: pointer; }
+        .login-link:hover { text-decoration: underline; }
+        .search-container { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.4rem; margin-bottom: 0.2rem; width: 100%; }
+        .search-input-wrapper { flex: 1; position: relative; }
+        .search-input { width: 100%; padding: 0.7rem 1rem 0.7rem 2.6rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; border: 1.5px solid #D0E0D8; border-radius: 60px; background: #FFFFFF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237B9689" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>') no-repeat 12px center; background-size: 1.1rem; transition: all 0.2s ease; }
+        .search-input:focus { outline: none; border-color: #2A5C4A; box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1); }
+        .btn-clear-search { background: #F0F5F2; border: 1.5px solid #C2D2CA; border-radius: 60px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 600; cursor: pointer; color: #2A5C4A; transition: all 0.2s; flex-shrink: 0; }
+        .btn-clear-search:hover { background: #E2EBE7; border-color: #2A5C4A; transform: scale(0.96); }
+        .year-group { margin-bottom: 2rem; animation: fadeSlideUp 0.3s ease; }
+        .group-title { font-size: 1.4rem; font-weight: 800; color: #10261E; background: #EFF5F2; display: inline-block; padding: 0.3rem 1.1rem; border-radius: 60px; margin-bottom: 1rem; letter-spacing: -0.3px; border-left: 4px solid #2A5C4A; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .group-cards { display: flex; flex-direction: column; gap: 0.85rem; }
+        .card-module { position: relative; border-radius: 20px; padding: 0.9rem 1rem 0.9rem 1rem; text-align: center; font-weight: 600; font-size: 0.9rem; color: #1C3F32; border: 1.5px solid #D0E0D8; transition: all 0.2s ease; cursor: pointer; min-height: 85px; }
+        .card-module.card-male { background: #C7E9FF; border-color: #9AC9E8; }
+        .card-module.card-female { background: #FFD6E8; border-color: #F6C1DA; }
+        .card-module.card-default { background: #FCFEFD; border-color: #D0E0D8; }
+        .card-module.selected-card { border: 3px solid #132A21; box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12); transform: scale(1.01); }
+        .card-module.dimmed-card { opacity: 0.7; filter: grayscale(0.15); border-color: #C2D2CA; }
+        .birth-year-badge { position: absolute; top: 8px; left: 12px; font-size: 0.9rem; font-weight: 800; background: rgba(42, 92, 74, 0.2); padding: 0.2rem 0.7rem; border-radius: 40px; color: #174432; }
+        .full-name-card { font-weight: 700; font-size: 0.95rem; color: #10261E; margin-top: 0.3rem; }
+        .right-panel { flex: 1.5; background: #F5F7F5; display: flex; flex-direction: column; padding: 2rem 2.2rem 2rem 2.2rem; overflow-y: auto; }
+        .details-container { background: #FFFFFF; border-radius: 36px; box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06); padding: 2rem 2.2rem; height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 1.2rem; border: 1px solid #E2EBE7; }
+        .empty-detail { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; min-height: 300px; color: #2A5C4A; font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: -0.02em; margin: 0; padding: 1rem; }
+        .empty-detail strong { font-size: 2.6rem; font-weight: 700; background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%); background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 1rem; letter-spacing: -0.02em; line-height: 1.2; }
+        .empty-detail .sub-message { font-size: 1.2rem; font-weight: 400; color: #5C7A6A; max-width: 80%; margin-top: 0.5rem; border-top: 2px solid #E2EBE7; padding-top: 1.2rem; display: inline-block; }
+        .action-buttons { display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem; }
+        .btn { font-family: 'Inter', sans-serif; font-weight: 600; padding: 0.6rem 1.2rem; border-radius: 40px; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .btn-edit { background: #2A5C4A; color: white; }
+        .btn-edit:hover { background: #1C3F32; transform: scale(0.98); }
+        .btn-print { background: #EFF5F2; color: #1C3F32; border: 1px solid #C2D2CA; }
+        .btn-print:hover { background: #DFE9E4; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 32px; padding: 2rem; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 1.2rem; color: #1C3F32; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; color: #1C3F32; font-size: 0.9rem; }
+        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 0.8rem; border: 1px solid #D0E0D8; border-radius: 20px; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+        .photos-section { margin-top: 0.5rem; border-top: 1px solid #E2EBE7; padding-top: 1rem; }
+        .photos-section h4 { margin-bottom: 0.8rem; color: #246148; }
+        .readonly-warning { background: #FFF3E0; border-left: 4px solid #C47D57; padding: 0.5rem 1rem; border-radius: 12px; font-size: 0.8rem; margin-bottom: 0.8rem; text-align: center; }
+        
+        /* ========== NUEVOS ESTILOS: imágenes en cuadrícula mediana (sin desbordar) ========== */
         .photos-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 1.2rem;
+            gap: 1rem;
             margin-top: 1.5rem;
             justify-content: flex-start;
             align-items: center;
         }
         .photo-item {
-            flex: 0 0 auto;
-            width: 150px;
-            border-radius: 16px;
+            flex: 1 1 200px;
+            max-width: 240px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            background: #F9F9F9;
-            transition: transform 0.2s;
+            background: #F5F7F5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .photo-item:hover { transform: scale(1.02); }
         .photo-item img {
             width: 100%;
-            height: 150px;
+            height: auto;
+            max-height: 220px;
             object-fit: cover;
             display: block;
+            transition: transform 0.2s ease;
         }
-        .photo-placeholder {
-            width: 100%;
-            height: 150px;
-            background: #EFF5F2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #7B9689;
-            font-size: 0.8rem;
-            text-align: center;
+        .photo-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
-        
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-bottom: 1rem;
-        }
-        .btn {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            padding: 0.6rem 1.2rem;
-            border-radius: 40px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
-        }
-        .btn-edit {
-            background: #2A5C4A;
-            color: white;
-        }
-        .btn-edit:hover {
-            background: #1C3F32;
-            transform: scale(0.98);
-        }
-        .btn-print {
-            background: #EFF5F2;
-            color: #1C3F32;
-            border: 1px solid #C2D2CA;
-        }
-        .btn-print:hover {
-            background: #DFE9E4;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 32px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-content h3 { margin-bottom: 1.2rem; color: #1C3F32; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            color: #1C3F32;
-            font-size: 0.9rem;
-        }
-        .modal-content input, .modal-content textarea, .modal-content select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #D0E0D8;
-            border-radius: 20px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .photos-section {
-            margin-top: 0.5rem;
-            border-top: 1px solid #E2EBE7;
-            padding-top: 1rem;
-        }
-        .photos-section h4 { margin-bottom: 0.8rem; color: #246148; }
-        
-        @media print {
-            .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person, .search-container { display: none !important; }
-            .right-panel { flex: 1; padding: 0; margin: 0; }
-            .details-container { box-shadow: none; border: none; padding: 0; }
-            .photo-item { break-inside: avoid; }
-        }
-        
+        /* Ajuste para móvil: imágenes medianas sin desbordar, anulando estilos previos */
         @media (max-width: 768px) {
-            body { overflow-y: auto; height: auto; }
-            .app-container { flex-direction: column; height: auto; min-height: 100vh; }
-            .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; padding: 0 0.9rem 1.2rem 0.9rem; max-height: 60vh; overflow-y: auto; }
-            .right-panel { flex: 1; width: 100%; padding: 1.2rem 1rem 1.5rem 1rem; overflow-y: auto; }
-            .sticky-header { padding: 0.9rem 0 0.6rem 0; margin-bottom: 0.6rem; }
-            .title-row { gap: 0.7rem; margin-bottom: 0.8rem; }
-            .title-origen { font-size: 1.4rem; padding-left: 0.8rem; border-left-width: 4px; }
-            .btn-reset-list, .btn-new-person { padding: 0.4rem 1rem; font-size: 0.75rem; }
-            .search-container { gap: 0.5rem; }
-            .search-input { padding: 0.6rem 0.8rem 0.6rem 2.4rem; font-size: 0.85rem; background-size: 1rem; }
-            .btn-clear-search { width: 34px; height: 34px; }
-            .year-group { margin-bottom: 1.5rem; }
-            .group-title { font-size: 1.2rem; padding: 0.2rem 1rem; margin-bottom: 0.8rem; }
-            .group-cards { gap: 0.7rem; }
-            .card-module { padding: 0.7rem 0.9rem; min-height: 70px; border-radius: 18px; }
-            .birth-year-badge { font-size: 0.75rem; top: 6px; left: 10px; padding: 0.15rem 0.6rem; }
-            .full-name-card { font-size: 0.85rem; margin-top: 0.2rem; }
-            .details-container { padding: 1.2rem 1.2rem; border-radius: 28px; gap: 0.9rem; }
-            .detail-text { font-size: 0.95rem; }
-            .detail-highlight { padding: 1rem 1.2rem; margin: 0.8rem 0; }
-            .action-buttons { gap: 0.8rem; justify-content: flex-end; margin-bottom: 0.8rem; }
-            .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
-            .photos-container { gap: 0.8rem; justify-content: center; margin-top: 1rem; }
-            .photo-item { width: 105px; }
-            .photo-item img { height: 105px; }
-            .photo-placeholder { height: 105px; font-size: 0.7rem; }
-            .modal-content { width: 92%; max-width: 92%; padding: 1.5rem; border-radius: 28px; max-height: 90vh; }
-            .empty-detail { min-height: 250px; }
+            .photo-item {
+                width: auto;               /* anula el width:105px anterior */
+                flex-basis: 140px;
+                max-width: 160px;
+            }
+            .photo-item img {
+                width: 100%;
+                height: auto;
+                max-height: 140px;        /* anula height:105px anterior */
+            }
         }
-        @media (max-width: 480px) {
-            .title-origen { font-size: 1.2rem; }
-            .btn-reset-list, .btn-new-person { font-size: 0.7rem; padding: 0.35rem 0.9rem; }
-            .card-module { padding: 0.6rem 0.7rem; }
-            .birth-year-badge { font-size: 0.7rem; top: 5px; left: 8px; }
-            .full-name-card { font-size: 0.8rem; }
-            .details-container { padding: 1rem; }
-            .detail-text { font-size: 0.9rem; }
-            .photo-item { width: 85px; }
-            .photo-item img { height: 85px; }
-        }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(8px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
+        
+        @media print { .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person, .search-container, .auth-status { display: none !important; } .right-panel { flex: 1; padding: 0; margin: 0; } .details-container { box-shadow: none; border: none; padding: 0; } .photo-item { break-inside: avoid; } }
+        @media (max-width: 768px) { body { overflow-y: auto; height: auto; } .app-container { flex-direction: column; height: auto; min-height: 100vh; } .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; padding: 0 0.9rem 1.2rem 0.9rem; max-height: 60vh; overflow-y: auto; } .right-panel { flex: 1; width: 100%; padding: 1.2rem 1rem 1.5rem 1rem; overflow-y: auto; } .title-row { gap: 0.7rem; } .title-origen { font-size: 1.4rem; } .btn-reset-list, .btn-new-person { padding: 0.4rem 1rem; font-size: 0.75rem; } .auth-status { font-size: 0.7rem; padding: 0.2rem 0.8rem; } .details-container { padding: 1.2rem; } }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
     </style>
 </head>
 <body>
@@ -511,7 +122,8 @@
             <div class="title-row">
                 <h1 class="title-origen">Árbol Genealógico</h1>
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <button class="btn-new-person" id="newPersonBtn">＋ Nuevo</button>
+                    <div id="authStatusContainer" class="auth-status"></div>
+                    <button class="btn-new-person" id="newPersonBtn" style="display: none;">＋ Nuevo</button>
                     <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
                 </div>
             </div>
@@ -537,65 +149,21 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle">Editar ancestro</h3>
-        <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" id="editFirstName" placeholder="Nombre">
+        <div class="form-group"><label>Nombre</label><input type="text" id="editFirstName" placeholder="Nombre"></div>
+        <div class="form-group"><label>Apellido</label><input type="text" id="editLastName" placeholder="Apellido"></div>
+        <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="editBirthDate"></div>
+        <div class="form-group"><label>Lugar de nacimiento</label><input type="text" id="editBirthPlace" placeholder="Ciudad, País"></div>
+        <div class="form-group"><label>Fecha de fallecimiento</label><input type="date" id="editDeathDate"></div>
+        <div class="form-group"><label>Lugar de fallecimiento</label><input type="text" id="editDeathPlace" placeholder="Ciudad, País"></div>
+        <div class="form-group"><label>Género</label><select id="editGender"><option value="">Seleccionar género</option><option value="male">Hombre</option><option value="female">Mujer</option></select></div>
+        <div class="form-group"><label>Biografía</label><textarea id="editBiography" rows="4" placeholder="Escribe aquí su historia..."></textarea></div>
+        <div class="photos-section"><h4>Fotos (hasta 4 imágenes, pega URL directa)</h4>
+            <div class="form-group"><label>Foto 1</label><input type="url" id="editPhoto1" placeholder="https://ejemplo.com/foto1.jpg"></div>
+            <div class="form-group"><label>Foto 2</label><input type="url" id="editPhoto2" placeholder="https://ejemplo.com/foto2.jpg"></div>
+            <div class="form-group"><label>Foto 3</label><input type="url" id="editPhoto3" placeholder="https://ejemplo.com/foto3.jpg"></div>
+            <div class="form-group"><label>Foto 4</label><input type="url" id="editPhoto4" placeholder="https://ejemplo.com/foto4.jpg"></div>
         </div>
-        <div class="form-group">
-            <label>Apellido</label>
-            <input type="text" id="editLastName" placeholder="Apellido">
-        </div>
-        <div class="form-group">
-            <label>Fecha de nacimiento</label>
-            <input type="date" id="editBirthDate">
-        </div>
-        <div class="form-group">
-            <label>Lugar de nacimiento</label>
-            <input type="text" id="editBirthPlace" placeholder="Ciudad, País">
-        </div>
-        <div class="form-group">
-            <label>Fecha de fallecimiento</label>
-            <input type="date" id="editDeathDate">
-        </div>
-        <div class="form-group">
-            <label>Lugar de fallecimiento</label>
-            <input type="text" id="editDeathPlace" placeholder="Ciudad, País">
-        </div>
-        <div class="form-group">
-            <label>Género</label>
-            <select id="editGender">
-                <option value="">Seleccionar género</option>
-                <option value="male">Hombre</option>
-                <option value="female">Mujer</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Biografía</label>
-            <textarea id="editBiography" rows="4" placeholder="Escribe aquí su historia..."></textarea>
-        </div>
-        <div class="photos-section">
-            <h4>Fotos (hasta 4 imágenes, pega URL directa)</h4>
-            <div class="form-group">
-                <label>Foto 1</label>
-                <input type="url" id="editPhoto1" placeholder="https://ejemplo.com/foto1.jpg">
-            </div>
-            <div class="form-group">
-                <label>Foto 2</label>
-                <input type="url" id="editPhoto2" placeholder="https://ejemplo.com/foto2.jpg">
-            </div>
-            <div class="form-group">
-                <label>Foto 3</label>
-                <input type="url" id="editPhoto3" placeholder="https://ejemplo.com/foto3.jpg">
-            </div>
-            <div class="form-group">
-                <label>Foto 4</label>
-                <input type="url" id="editPhoto4" placeholder="https://ejemplo.com/foto4.jpg">
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn btn-print" id="modalCancel">Cancelar</button>
-            <button class="btn btn-edit" id="modalSave">Guardar cambios</button>
-        </div>
+        <div class="modal-buttons"><button class="btn btn-print" id="modalCancel">Cancelar</button><button class="btn btn-edit" id="modalSave">Guardar cambios</button></div>
     </div>
 </div>
 
@@ -610,17 +178,21 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
 
     let allPersons = [];
     let currentSelectedId = null;
     let currentPersonData = null;
     let currentSearchTerm = "";
+    let isEditingAllowed = false; // control de permisos
 
     const groupsContainer = document.getElementById('groupsContainer');
     const rightDetailsDiv = document.getElementById('rightDetails');
     const editModal = document.getElementById('editModal');
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const newPersonBtn = document.getElementById('newPersonBtn');
+    const authStatusContainer = document.getElementById('authStatusContainer');
 
     const YEAR_RANGES = [
         { label: "1740 — 1800", min: 1740, max: 1800 },
@@ -793,11 +365,13 @@
             nameColorStyle = "color: #1C3F32;";
         }
 
-        let bioHtml = `
-            <div class="action-buttons">
-                <button class="btn btn-print" id="printBtn">Imprimir</button>
-                <button class="btn btn-edit" id="editBtn">Editar</button>
-            </div>
+        let actionButtons = `<div class="action-buttons"><button class="btn btn-print" id="printBtn">Imprimir</button>`;
+        if (isEditingAllowed) {
+            actionButtons += `<button class="btn btn-edit" id="editBtn">Editar</button>`;
+        }
+        actionButtons += `</div>`;
+
+        let bioHtml = actionButtons + `
             <div class="detail-text" id="printableArea">
                 <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;">
                     <strong style="font-size:1.6rem; ${nameColorStyle}">${escapeHtml(fullName)}</strong>
@@ -830,11 +404,17 @@
         bioHtml += `</div>`;
         rightDetailsDiv.innerHTML = bioHtml;
 
-        document.getElementById('editBtn')?.addEventListener('click', () => openEditModal(docId, person));
+        if (isEditingAllowed) {
+            document.getElementById('editBtn')?.addEventListener('click', () => openEditModal(docId, person));
+        }
         document.getElementById('printBtn')?.addEventListener('click', () => window.print());
     }
 
     function openEditModal(docId, person) {
+        if (!isEditingAllowed) {
+            alert("Debes iniciar sesión para editar el árbol genealógico.");
+            return;
+        }
         document.getElementById('modalTitle').textContent = 'Editar ancestro';
         currentSelectedId = docId;
         currentPersonData = { ...person };
@@ -879,6 +459,10 @@
     }
 
     function openCreateModal() {
+        if (!isEditingAllowed) {
+            alert("Debes iniciar sesión para agregar nuevos ancestros.");
+            return;
+        }
         document.getElementById('modalTitle').textContent = 'Nuevo ancestro';
         currentSelectedId = null;
         currentPersonData = null;
@@ -898,6 +482,11 @@
     }
 
     async function savePersonChanges() {
+        if (!isEditingAllowed) {
+            alert("No tienes permisos para editar. Inicia sesión.");
+            editModal.style.display = 'none';
+            return;
+        }
         const updatedData = {
             firstName: document.getElementById('editFirstName').value,
             lastName: document.getElementById('editLastName').value,
@@ -1037,16 +626,12 @@
         syncSelectionAfterRender();
     }
 
-    // ========== NUEVA FUNCIÓN: seleccionar ancestro por ID (usado al cargar con parámetro URL) ==========
     function selectPersonById(id) {
         const found = allPersons.find(p => p.id === id);
         if (found) {
             onPersonCardClick(found.person, id);
-            // Opcional: hacer scroll hasta la tarjeta seleccionada
             const targetCard = document.querySelector(`.card-module[data-id="${id}"]`);
-            if (targetCard) {
-                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return true;
         } else {
             console.warn(`No se encontró ancestro con ID: ${id}`);
@@ -1086,19 +671,10 @@
             allPersons = personsArray;
             refreshFilteredView();
 
-            // ========== LEER PARÁMETRO DE LA URL Y SELECCIONAR ANCESTRO ==========
             const urlParams = new URLSearchParams(window.location.search);
             const selectedId = urlParams.get('selectedId');
             if (selectedId) {
-                // Esperar un breve momento a que las tarjetas estén renderizadas
-                setTimeout(() => {
-                    const success = selectPersonById(selectedId);
-                    if (!success) {
-                        console.log("ID no encontrado, mostrando mensaje de error en consola");
-                    }
-                    // Limpiar el parámetro de la URL para evitar reselección al recargar (opcional)
-                    // window.history.replaceState({}, document.title, window.location.pathname);
-                }, 300);
+                setTimeout(() => { selectPersonById(selectedId); }, 300);
             }
         } catch (error) {
             console.error(error);
@@ -1120,25 +696,45 @@
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
     }
 
+    // Actualizar UI según autenticación
+    function updateUIBasedOnAuth(user) {
+        isEditingAllowed = !!user;
+        if (user) {
+            authStatusContainer.innerHTML = `<span>✅ Editando como ${user.email}</span>`;
+            newPersonBtn.style.display = 'inline-flex';
+            // Si ya hay detalles visibles, refrescar para mostrar botón Editar
+            if (currentSelectedId) {
+                const personObj = allPersons.find(p => p.id === currentSelectedId)?.person;
+                if (personObj) renderPersonDetailsInRightPanel(personObj, currentSelectedId);
+            }
+        } else {
+            authStatusContainer.innerHTML = `<span>🔍 Modo solo lectura</span> <a class="login-link" id="loginLink">Iniciar sesión</a>`;
+            newPersonBtn.style.display = 'none';
+            // Ocultar botón editar si estaba visible
+            if (currentSelectedId) {
+                const personObj = allPersons.find(p => p.id === currentSelectedId)?.person;
+                if (personObj) renderPersonDetailsInRightPanel(personObj, currentSelectedId);
+            }
+            const loginLink = document.getElementById('loginLink');
+            if (loginLink) loginLink.addEventListener('click', () => { window.location.href = 'index.html'; });
+        }
+    }
+
+    // Escuchar cambios de autenticación
+    auth.onAuthStateChanged((user) => {
+        updateUIBasedOnAuth(user);
+        loadAndGroupPersons(); // siempre cargar datos
+    });
+
     // Eventos
     document.getElementById('modalCancel')?.addEventListener('click', () => editModal.style.display = 'none');
     document.getElementById('modalSave')?.addEventListener('click', savePersonChanges);
     window.addEventListener('click', (e) => { if (e.target === editModal) editModal.style.display = 'none'; });
     document.querySelector('.title-origen')?.addEventListener('click', () => { currentSelectedId = null; resetRightPanelToWelcome(); applyCardSelection(null); });
     document.getElementById('resetListBtn')?.addEventListener('click', resetToListFirst);
-    document.getElementById('newPersonBtn')?.addEventListener('click', openCreateModal);
-    
-    searchInput?.addEventListener('input', (e) => {
-        currentSearchTerm = e.target.value;
-        refreshFilteredView();
-    });
-    clearSearchBtn?.addEventListener('click', () => {
-        currentSearchTerm = "";
-        if (searchInput) searchInput.value = "";
-        refreshFilteredView();
-    });
-
-    loadAndGroupPersons();
+    newPersonBtn?.addEventListener('click', openCreateModal);
+    searchInput?.addEventListener('input', (e) => { currentSearchTerm = e.target.value; refreshFilteredView(); });
+    clearSearchBtn?.addEventListener('click', () => { currentSearchTerm = ""; if (searchInput) searchInput.value = ""; refreshFilteredView(); });
 </script>
 </body>
 </html>
