@@ -5,25 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Genealogia Fioravante</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Se actualizó Google Fonts para incluir Playfair Display en lugar de Dancing Script -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
-        /* (igual que antes, sin cambios) */
         :root {
             --primary: #2C423F;
             --accent: #C47D57;
+            --subtitle-color: #E2B091; /* Nuevo color elegante para el subtítulo */
             --text-light: #F7F4EF;
             --font-main: 'Inter', sans-serif;
-            --font-fancy: 'Dancing Script', cursive;
+            --font-fancy: 'Playfair Display', serif; /* Tipografía más moderna y sofisticada */
             --error-bg: #FDF2F2;
             --error-border: #E57373;
             --success-bg: #EDF7ED;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
         body, html { height: 100%; background-color: #FAF8F5; overflow: hidden; }
+        
         #landing-page { display: flex; height: 100vh; width: 100vw; }
+        
         .landing-left {
             flex: 1.2;
             background-color: var(--primary);
@@ -32,7 +35,9 @@
             justify-content: center;
             padding: 3rem;
         }
+        
         .title-container { text-align: center; color: var(--text-light); }
+        
         .brand-name {
             display: block;
             font-size: 5.5rem;
@@ -46,7 +51,20 @@
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
-        .brand-subtitle { font-family: var(--font-fancy); font-size: 2.2rem; color: var(--accent); display: block; margin-top: -10px; }
+        
+        /* Mejoras aplicadas al subtítulo */
+        .brand-subtitle { 
+            font-family: var(--font-fancy); 
+            font-size: 1.8rem; 
+            font-weight: 500;
+            font-style: italic;
+            color: var(--subtitle-color); 
+            letter-spacing: 1.5px;
+            display: block; 
+            margin-top: 5px; 
+            opacity: 0.95;
+        }
+        
         .landing-right {
             flex: 0.8;
             display: flex;
@@ -56,58 +74,112 @@
             padding: 1.5rem;
             overflow-y: auto;
         }
+        
         .auth-card { width: 100%; max-width: 400px; }
         .auth-card h2 { font-weight: 700; font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
         .auth-card p { color: #7A7571; font-size: 0.9rem; margin-bottom: 24px; }
+        
         .input-group { margin-bottom: 1rem; }
+        
         input {
             width: 100%;
-            padding: 14px;
-            border: 1.5px solid #E5E0D8;
-            border-radius: 10px;
+            padding: 14px 16px;
+            border: 2px solid #E5E0D8;
+            border-radius: 12px;
             font-size: 1rem;
             background: #FFFFFF;
+            transition: all 0.3s ease;
         }
-        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(196,125,87,0.15); }
-        .btn-primary {
+        
+        input:focus { 
+            outline: none; 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px rgba(196, 125, 87, 0.15); 
+        }
+
+        /* Botones modernos */
+        .btn {
             width: 100%;
-            padding: 14px;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(44, 66, 63, 0.2);
             margin-top: 0.5rem;
         }
-        .btn-primary:hover { transform: translateY(-2px); background: #1F302D; }
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid var(--primary);
-            color: var(--primary);
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
+
+        .btn-primary:hover { 
+            transform: translateY(-2px); 
+            background: #1F302D; 
+            box-shadow: 0 6px 16px rgba(44, 66, 63, 0.3);
         }
-        .btn-outline:hover { background: rgba(44,66,63,0.05); border-color: var(--accent); color: var(--accent); }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(44, 66, 63, 0.2);
+        }
+
         .btn-invited {
             background: transparent;
-            border: 1.5px solid var(--accent);
+            border: 2px solid var(--accent);
             color: var(--accent);
         }
-        .btn-invited:hover { background: rgba(196,125,87,0.08); border-color: var(--primary); color: var(--primary); }
+
+        .btn-invited:hover { 
+            background: var(--accent); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(196, 125, 87, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-invited:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(196, 125, 87, 0.2);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+            color: #A09C96;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #E5E0D8;
+        }
+
+        .divider span {
+            padding: 0 12px;
+        }
+
         .error-message { background: var(--error-bg); border-left: 4px solid var(--error-border); padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #C62828; margin-bottom: 16px; }
         .success-message { background: var(--success-bg); border-left: 4px solid #4CAF50; padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #1E4620; margin-bottom: 16px; }
+        
         @media (max-width: 768px) {
             #landing-page { flex-direction: column; }
             .landing-left { padding: 2rem; flex: 0.8; }
             .brand-name { font-size: 3.5rem; }
-            .brand-subtitle { font-size: 1.6rem; }
+            .brand-subtitle { font-size: 1.4rem; }
             .landing-right { flex: 1.2; }
         }
+        
         .floating-credit-modal {
             position: fixed;
             top: 20px;
@@ -119,7 +191,6 @@
             padding: 14px 22px;
             z-index: 10000;
             max-width: 280px;
-            font-family: var(--font-main);
             font-size: 0.88rem;
             line-height: 1.45;
             color: #1E2A2A;
@@ -131,8 +202,6 @@
             display: block;
             text-align: center;
             margin: 0;
-            text-align: justify;
-            text-align-last: center;
         }
         .floating-credit-modal strong { font-weight: 800; color: var(--primary); }
         @media (max-width: 640px) {
@@ -150,6 +219,7 @@
     </div>
     <div class="landing-right" id="authPanel"></div>
 </div>
+
 <div id="infoCreditModal" class="floating-credit-modal">
     <span class="credit-line"><strong>Diseño y Programación:</strong></span>
     <span class="credit-line">Rómulo Fioravante</span>
@@ -157,6 +227,7 @@
     <span class="credit-line">1.0.2026</span>
     <span class="credit-line">Posadas-Misiones</span>
 </div>
+
 <script>
     const firebaseConfig = {
         apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
@@ -170,7 +241,6 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let currentMode = 'login';
     const authPanel = document.getElementById('authPanel');
 
     function showError(containerId, message) {
@@ -180,25 +250,7 @@
             setTimeout(() => { if(document.getElementById(containerId)) document.getElementById(containerId).innerHTML = ''; }, 4000);
         }
     }
-    function showSuccess(containerId, message) {
-        const container = document.getElementById(containerId);
-        if(container) {
-            container.innerHTML = `<div class="success-message">✓ ${message}</div>`;
-            setTimeout(() => { if(document.getElementById(containerId)) document.getElementById(containerId).innerHTML = ''; }, 3000);
-        }
-    }
 
-    async function saveUserProfile(uid, nombre, apellido, email) {
-        try {
-            await db.collection('users').doc(uid).set({
-                nombre, apellido, email,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            return true;
-        } catch(e) { console.error(e); return false; }
-    }
-
-    // Ahora redirigimos a app.html
     function redirectToApp() {
         window.location.href = "app.html";
     }
@@ -210,21 +262,32 @@
                 <p>Ingresa tus credenciales para editar el árbol</p>
                 <div id="loginFeedback"></div>
                 <form id="loginFormElement">
-                    <div class="input-group"><input type="email" id="loginEmail" placeholder="Correo electrónico" required autocomplete="email"></div>
-                    <div class="input-group"><input type="password" id="loginPassword" placeholder="Contraseña" required autocomplete="current-password"></div>
-                    <button type="submit" class="btn-primary">Iniciar sesión</button>
+                    <div class="input-group">
+                        <input type="email" id="loginEmail" placeholder="Correo electrónico" required autocomplete="email">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="loginPassword" placeholder="Contraseña" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Iniciar sesión</button>
                 </form>
-                <button class="btn-outline" id="showRegisterBtn">➕ Crear cuenta nueva</button>
-                <button class="btn-outline btn-invited" id="guestBtn">👤 Ingresar como invitado (solo lectura)</button>
+                
+                <div class="divider">
+                    <span>O</span>
+                </div>
+                
+                <button type="button" class="btn btn-invited" id="guestBtn">👤 Ingresar como invitado</button>
             </div>
         `;
+
         document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             if(!email || !password) { showError('loginFeedback', 'Completa ambos campos.'); return; }
+            
             const fbDiv = document.getElementById('loginFeedback');
             fbDiv.innerHTML = `<div class="success-message">⏳ Validando...</div>`;
+            
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 redirectToApp();
@@ -237,56 +300,13 @@
                 showError('loginFeedback', msg);
             }
         });
-        document.getElementById('showRegisterBtn').addEventListener('click', () => { currentMode = 'register'; renderRegisterView(); });
-        document.getElementById('guestBtn').addEventListener('click', () => { redirectToApp(); });
-    }
 
-    function renderRegisterView() {
-        authPanel.innerHTML = `
-            <div class="auth-card">
-                <h2>Crear cuenta nueva</h2>
-                <p>Registra tu legado en el árbol familiar Fioravante</p>
-                <div id="registerFeedback"></div>
-                <form id="registerFormElement">
-                    <div class="input-group"><input type="text" id="regNombre" placeholder="Nombre" required></div>
-                    <div class="input-group"><input type="text" id="regApellido" placeholder="Apellido" required></div>
-                    <div class="input-group"><input type="email" id="regEmail" placeholder="Correo electrónico" required></div>
-                    <div class="input-group"><input type="password" id="regPassword" placeholder="Contraseña (mínimo 6 caracteres)" required></div>
-                    <div class="input-group"><input type="password" id="regConfirmPassword" placeholder="Confirmar contraseña" required></div>
-                    <button type="submit" class="btn-primary">Registrarse</button>
-                </form>
-                <button class="btn-outline" id="backToLoginBtn">← Volver a inicio de sesión</button>
-            </div>
-        `;
-        const regForm = document.getElementById('registerFormElement');
-        regForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nombre = document.getElementById('regNombre').value.trim();
-            const apellido = document.getElementById('regApellido').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const confirm = document.getElementById('regConfirmPassword').value;
-            if(!nombre || !apellido || !email || !password) { showError('registerFeedback', 'Todos los campos son obligatorios.'); return; }
-            if(password !== confirm) { showError('registerFeedback', 'Las contraseñas no coinciden.'); return; }
-            if(password.length < 6) { showError('registerFeedback', 'Mínimo 6 caracteres.'); return; }
-            const fbDiv = document.getElementById('registerFeedback');
-            fbDiv.innerHTML = `<div class="success-message">⏳ Creando cuenta...</div>`;
-            try {
-                const userCred = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCred.user;
-                await user.updateProfile({ displayName: `${nombre} ${apellido}` });
-                await saveUserProfile(user.uid, nombre, apellido, email);
-                redirectToApp();
-            } catch(error) {
-                let errorMsg = error.message;
-                if(error.code === 'auth/email-already-in-use') errorMsg = 'Este correo ya está registrado.';
-                else if(error.code === 'auth/weak-password') errorMsg = 'Contraseña débil.';
-                showError('registerFeedback', errorMsg);
-            }
+        document.getElementById('guestBtn').addEventListener('click', () => { 
+            redirectToApp(); 
         });
-        document.getElementById('backToLoginBtn').addEventListener('click', () => { currentMode = 'login'; renderLoginView(); });
     }
 
+    // Lógica para ocultar los créditos después de 4 segundos
     const modalElement = document.getElementById('infoCreditModal');
     if (modalElement) {
         setTimeout(() => {
@@ -295,12 +315,12 @@
         }, 4000);
     }
 
+    // Observador de estado de autenticación
     auth.onAuthStateChanged((user) => {
         if(user) {
             redirectToApp();
         } else {
-            if(currentMode === 'login') renderLoginView();
-            else renderRegisterView();
+            renderLoginView();
         }
     });
 </script>
