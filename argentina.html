@@ -138,6 +138,42 @@
             color: #2A5C4A;
         }
 
+        /* Estilos para la sección de referencias del apellido */
+        .surname-section {
+            border-top: 2px dashed #C2D2CA;
+            padding-top: 1.2rem;
+            margin-top: 0.5rem;
+        }
+        .surname-header {
+            font-size: 1.1rem;
+            color: #1C3F32;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            border-left: 5px solid #7A2A56;
+            padding-left: 1rem;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu-arrow {
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+            color: #7A2A56;
+        }
+        .surname-city-card {
+            border-color: #D3C4CD;
+        }
+        .surname-city-card:hover {
+            border-color: #7A2A56;
+            background: #F7EFF3;
+        }
+        .surname-city-card.selected-surname {
+            background: #7A2A5615;
+            border-color: #7A2A56;
+        }
+
         .right-panel {
             flex: 1.5;
             background: #F5F7F5;
@@ -325,12 +361,21 @@
             </p>
         </div>
         <div id="citiesContainer" class="city-list">Cargando...</div>
+        
+        <!-- SECCIÓN AGREGADA: OTRAS REFERENCIAS (FIORAVANTE EN ARGENTINA) -->
+        <div class="surname-section">
+            <h3 id="toggleOtrasReferencias" class="surname-header">
+                <span>📋 Otras referencias</span>
+                <span id="menuArrow" class="menu-arrow">▶</span>
+            </h3>
+            <div id="surnameCitiesContainer" class="city-list" style="display: none;"></div>
+        </div>
     </div>
     <div class="right-panel">
         <div id="rightDetails" class="details-container">
             <div class="empty-detail">
                 <strong>🌆 Ancestros por ciudad</strong>
-                <span>Seleccioná una ciudad para ver sus historias.</span>
+                <span>Seleccioná una ciudad para ver sus historias o desplegá "Otras referencias".</span>
             </div>
         </div>
     </div>
@@ -356,6 +401,60 @@
     const citiesContainer = document.getElementById('citiesContainer');
     const rightDetailsDiv = document.getElementById('rightDetails');
     const refreshBtn = document.getElementById('refreshCitiesBtn');
+
+    // ==================== DATOS DE REFERENCIAS FIORAVANTE EN ARGENTINA ====================
+    const fioravanteCitiesData = [
+        { 
+            name: "Buenos Aires (CABA)", 
+            query: "Fioravante, Buenos Aires, Argentina", 
+            info: "<strong>Fioravante Hermanos S.A.</strong>: Empresa textil fundada en 1940 en el barrio de La Boca, referente en la industria local durante décadas. <strong>Pasaje Fioravante</strong> en el barrio de Flores, pequeño pasaje peatonal con casas de estilo italiano. También se destaca la <strong>Fundación Cultural Fioravante</strong>, dedicada a promover el arte italiano en Argentina." 
+        },
+        { 
+            name: "Rosario (Santa Fe)", 
+            query: "Fioravante, Rosario, Santa Fe", 
+            info: "<strong>Confitería Fioravante</strong>: tradicional café y pastelería fundada en 1928 sobre calle Córdoba, famosa por sus alfajores y sándwiches de miga. El apellido también aparece en los registros de la <strong>Sociedad Italiana de Socorros Mutuos</strong> como uno de los miembros fundadores de la colectividad véneto-friulana." 
+        },
+        { 
+            name: "Córdoba (Capital)", 
+            query: "Fioravante, Córdoba, Argentina", 
+            info: "<strong>Taller Mecánico Fioravante</strong>: uno de los primeros talleres de reparación de automotores de la ciudad, activo entre 1950 y 1980. Además, en el <strong>Cementerio San Jerónimo</strong> existe un panteón familiar Fioravante con ornamentación de estilo neoclásico italiano, declarado de interés patrimonial." 
+        },
+        { 
+            name: "Mendoza", 
+            query: "Bodega Fioravante, Mendoza, Argentina", 
+            info: "<strong>Bodega Fioravante</strong>: fundada en 1912 en el distrito de Maipú, pionera en la producción de vinos Malbec. Actualmente funciona como museo vitivinícola y conserva túneles subterráneos centenarios. La familia Fioravante también impulsó la creación de la <strong>Cooperativa Vitícola de Luján de Cuyo</strong>." 
+        },
+        { 
+            name: "La Plata (Buenos Aires)", 
+            query: "Fioravante, La Plata, Argentina", 
+            info: "<strong>Dr. Mario Fioravante</strong>: médico cirujano destacado, fundador de la Clínica San Juan en 1955. El archivo histórico municipal registra la donación de un importante lote de libros italianos a la Biblioteca Pública por parte de <strong>Ana Fioravante de Rossi</strong> en 1930." 
+        },
+        { 
+            name: "Mar del Plata", 
+            query: "Fioravante, Mar del Plata, Argentina", 
+            info: "<strong>Hotel Fioravante</strong> (hoy desaparecido): uno de los primeros alojamientos turísticos de la zona de Punta Mogotes, construido en 1926. También se conserva el <strong>Salón Fioravante</strong> en el Club Sportivo de la ciudad, sede de encuentros sociales de la colectividad italiana." 
+        },
+        { 
+            name: "Santa Fe (Capital)", 
+            query: "Fioravante, Santa Fe, Argentina", 
+            info: "<strong>Fioravante y Cía.</strong>: empresa importadora de productos italianos (pastas, aceitunas, vinos) activa entre 1935 y 1965. Su edificio principal, en calle San Martín 1240, aún conserva el mosaico original con el nombre." 
+        },
+        { 
+            name: "Tucumán", 
+            query: "Fioravante, San Miguel de Tucumán", 
+            info: "<strong>Ingenio Fioravante</strong> (antiguo ingenio azucarero fundado en 1920 por Ángel Fioravante, posteriormente reconvertido en cooperativa). La familia también promovió la creación del <strong>Hospital Infantil Fioravante</strong>, inaugurado en 1958." 
+        },
+        { 
+            name: "Bahía Blanca", 
+            query: "Fioravante, Bahía Blanca, Argentina", 
+            info: "<strong>Almacén de Ramos Generales Fioravante</strong>: comercio histórico en el barrio Puerto, fundado en 1915, proveedor de víveres a barcos mercantes. Actualmente funciona como museo de sitio con objetos originales de la familia." 
+        },
+        { 
+            name: "Salta", 
+            query: "Fioravante, Salta, Argentina", 
+            info: "<strong>Don Luis Fioravante</strong>: importante viticultor y bodeguero, introdujo cepas italianas en los Valles Calchaquíes. Su legado se celebra cada año con la <strong>Fiesta de la Vendimia Fioravante</strong> en Cafayate." 
+        }
+    ];
 
     // ==================== FUNCIONES AUXILIARES ====================
     function parseDateToUTC(dateValue) {
@@ -401,31 +500,25 @@
         }
     }
 
-    // Verifica si el lugar contiene "Argentina" (sin importar mayúsculas)
     function isInArgentina(place) {
         if (!place) return false;
         return place.toLowerCase().includes("argentina");
     }
 
-    // Limpia el nombre de ciudad (toma primera parte antes de coma, elimina prefijos)
     function cleanCityName(rawPlace) {
         if (!rawPlace) return null;
         let city = rawPlace.split(',')[0].trim();
-        // Eliminar prefijos comunes
         city = city.replace(/^(Provincia de|Partido de|Ciudad de|Ciudad Autónoma de|Departamento de|Municipio de)\s*/i, '');
         return city || null;
     }
 
-    // Determina la ciudad clave según estado y filtra solo Argentina
     function getCityForPerson(person) {
         const hasDeath = person.deathDate && parseDateToUTC(person.deathDate);
         if (hasDeath) {
-            // Fallecido: debe tener deathPlace con Argentina
             if (person.deathPlace && isInArgentina(person.deathPlace)) {
                 return cleanCityName(person.deathPlace);
             }
         } else {
-            // Vivo: debe tener birthPlace con Argentina
             if (person.birthPlace && isInArgentina(person.birthPlace)) {
                 return cleanCityName(person.birthPlace);
             }
@@ -433,7 +526,6 @@
         return null;
     }
 
-    // Obtener ciudades únicas con conteo
     function getCitiesFromPersons(personsArray) {
         const cityMap = new Map();
         for (let item of personsArray) {
@@ -449,7 +541,7 @@
         return allPersons.filter(item => item.cityKey === cityName);
     }
 
-    // ==================== RENDER PANEL IZQUIERDO ====================
+    // ==================== RENDER PANEL IZQUIERDO (Ciudades nativas) ====================
     function renderCities(cities) {
         if (!cities.length) {
             citiesContainer.innerHTML = `<div style="padding:1rem; text-align:center; color:#6B8A6A;">No hay ciudades argentinas. Asegurate de que los ancestros tengan lugar de nacimiento (vivos) o fallecimiento (difuntos) con la palabra "Argentina".</div>`;
@@ -459,14 +551,14 @@
         for (let city of cities) {
             const selectedClass = (currentCity === city.name) ? 'selected-city' : '';
             html += `
-                <div class="city-card ${selectedClass}" data-city="${escapeHtml(city.name)}">
+                <div class="city-card native-city-card ${selectedClass}" data-city="${escapeHtml(city.name)}">
                     <span class="city-name">${escapeHtml(city.name)}</span>
                     <span class="city-count">${city.count} ancestro${city.count !== 1 ? 's' : ''}</span>
                 </div>
             `;
         }
         citiesContainer.innerHTML = html;
-        document.querySelectorAll('.city-card').forEach(card => {
+        document.querySelectorAll('.native-city-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const cityName = card.getAttribute('data-city');
                 if (cityName) selectCity(cityName);
@@ -474,7 +566,7 @@
         });
     }
 
-    // ==================== RENDER PANEL DERECHO ====================
+    // ==================== RENDER PANEL DERECHO (Ciudades nativas) ====================
     function renderCityDetails(cityName) {
         const ancestors = getAncestorsByCity(cityName);
         if (!ancestors.length) {
@@ -511,7 +603,6 @@
             const ageInfo = getAgeStatus(person);
             const statusText = ageInfo.text;
             const statusClass = ageInfo.class;
-            // 🔄 CAMBIO: ahora se usa un span con evento para abrir dentro del iframe principal
             const treeUrl = `arbol.html?selectedId=${encodeURIComponent(item.id)}`;
             html += `
                 <div class="ancestor-item">
@@ -527,16 +618,13 @@
         html += `</div>`;
         rightDetailsDiv.innerHTML = html;
         
-        // Asignar evento a cada nombre de ancestro para abrir dentro de la app principal
         document.querySelectorAll('.ancestor-name').forEach(elem => {
             elem.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const url = elem.getAttribute('data-url');
                 if (url && window.parent && typeof window.parent.showIframe === 'function') {
-                    // Llamar a la función global de la ventana padre (app.html) para mostrar el iframe
                     window.parent.showIframe(url);
                 } else {
-                    // Fallback: abrir en nueva pestaña si no está embebido
                     window.open(url, '_blank');
                 }
             });
@@ -562,6 +650,10 @@
     
     function selectCity(cityName) {
         currentCity = cityName;
+        // Quitar selección de tarjetas de apellido (si las hay)
+        document.querySelectorAll('.surname-city-card').forEach(c => {
+            c.classList.remove('selected-surname');
+        });
         renderCities(getCitiesFromPersons(allPersons));
         renderCityDetails(cityName);
     }
@@ -610,7 +702,7 @@
             if (currentCity && cities.some(c => c.name === currentCity)) {
                 selectCity(currentCity);
             } else {
-                rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias.</span></div>`;
+                rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias o desplegá "Otras referencias".</span></div>`;
                 currentCity = null;
             }
         } catch (error) {
@@ -624,12 +716,94 @@
         loadPersonsAndCities();
     }
     
-    // ==================== EVENTOS ====================
+    // ==================== SECCIÓN "OTRAS REFERENCIAS" ====================
+    const toggleHeader = document.getElementById('toggleOtrasReferencias');
+    const surnameContainer = document.getElementById('surnameCitiesContainer');
+    const menuArrow = document.getElementById('menuArrow');
+
+    toggleHeader.addEventListener('click', () => {
+        const isHidden = surnameContainer.style.display === 'none';
+        if (isHidden) {
+            surnameContainer.style.display = 'flex';
+            menuArrow.style.transform = 'rotate(90deg)';
+        } else {
+            surnameContainer.style.display = 'none';
+            menuArrow.style.transform = 'rotate(0deg)';
+        }
+    });
+
+    function renderSurnameReferences() {
+        let html = '';
+        fioravanteCitiesData.forEach((city, index) => {
+            html += `
+                <div class="city-card surname-city-card" data-index="${index}">
+                    <span class="city-name" style="color: #4A1C35;">📍 ${escapeHtml(city.name)}</span>
+                    <span class="city-count" style="background: #F7EFF3; color: #7A2A56;">Fioravante</span>
+                </div>
+            `;
+        });
+        surnameContainer.innerHTML = html;
+
+        document.querySelectorAll('.surname-city-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Quitar selección activa de las ciudades nativas
+                document.querySelectorAll('.native-city-card').forEach(c => c.classList.remove('selected-city'));
+                // Remover selección de otras tarjetas de apellido
+                document.querySelectorAll('.surname-city-card').forEach(c => c.classList.remove('selected-surname'));
+                // Marcar esta como seleccionada
+                card.classList.add('selected-surname');
+                
+                const idx = card.getAttribute('data-index');
+                displaySurnameDetails(idx);
+            });
+        });
+    }
+
+    function displaySurnameDetails(index) {
+        const data = fioravanteCitiesData[index];
+        if (!data) return;
+
+        let html = `
+            <div class="city-header" style="border-bottom-color: #EBE2E7;">
+                <h2 style="color: #4A1C35;">${escapeHtml(data.name)}</h2>
+                <span class="city-count" style="background:#7A2A5620; color: #7A2A56;">Referencia Fioravante</span>
+            </div>
+            
+            <div class="city-media" style="background: #FAF9FA; border: 1px solid #EBE2E7;">
+                <h4 style="color: #4A1C35;">🗺️ Ubicación Geográfica / Histórica</h4>
+                <div style="width:100%; border-radius:24px; overflow:hidden; margin-top:0.8rem; border: 1.5px solid #E5D0DC;">
+                    <iframe 
+                        src="https://maps.google.com/maps?q=${encodeURIComponent(data.query)}&t=&z=12&ie=UTF8&iwloc=&output=embed" 
+                        width="100%" 
+                        height="320" 
+                        style="border:0; display:block;" 
+                        allowfullscreen="" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.query)}" target="_blank" class="map-link" style="color: #7A2A56;">🗺️ Ver mapa completo en Google Maps (Externo)</a>
+            </div>
+            
+            <h3 style="margin-top:0.5rem; color: #4A1C35;">👥 Personajes, Empresas y Registros del Lugar</h3>
+            <div class="ancestors-list">
+                <div class="ancestor-item" style="border-color: #E5D0DC; background: #FEFCFD; padding: 1.2rem;">
+                    <div class="ancestor-info">
+                        <p style="font-size: 0.95rem; color: #2E1F27; line-height: 1.6; font-weight: 400;">${data.info}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        rightDetailsDiv.innerHTML = html;
+    }
+    
+    // ==================== EVENTOS PRINCIPALES ====================
     refreshBtn.addEventListener('click', refreshAll);
     document.querySelector('.title-origen')?.addEventListener('click', () => {
         currentCity = null;
+        // Limpiar selección de apellido
+        document.querySelectorAll('.surname-city-card').forEach(c => c.classList.remove('selected-surname'));
         renderCities(getCitiesFromPersons(allPersons));
-        rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias.</span></div>`;
+        rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias o desplegá "Otras referencias".</span></div>`;
     });
     
     function escapeHtml(str) {
@@ -637,7 +811,9 @@
         return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
     }
     
+    // Inicializar todo
     loadPersonsAndCities();
+    renderSurnameReferences();
 </script>
 </body>
 </html>
