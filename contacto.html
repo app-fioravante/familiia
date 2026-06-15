@@ -2,9 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Contacto</title>
+    <!-- Google Fonts & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -23,28 +25,29 @@
             padding: 2rem 1rem;
         }
 
-        /* Contenedor central con efecto glass y borde verde oscuro */
+        /* Contenedor principal con efecto glass y borde característico */
         .contact-container {
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.68);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid #2A5C4A;
-            border-radius: 24px;
+            border-radius: 28px;
             padding: 3rem 2.5rem;
-            max-width: 950px;
+            max-width: 1100px;
             width: 100%;
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 36px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s;
         }
 
-        /* Disposición en malla/columnas para escritorio */
+        /* Grid principal: info + formulario */
         .contact-layout {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
-            gap: 3.5rem;
+            gap: 3rem;
             align-items: start;
         }
 
-        /* Columna Izquierda (Texto informativo) */
+        /* Columna izquierda (texto) */
         .contact-info {
             text-align: left;
         }
@@ -54,16 +57,17 @@
             font-weight: 700;
             font-size: 2rem;
             margin-bottom: 1rem;
+            letter-spacing: -0.3px;
         }
 
         .info-description {
             color: #2A5C4A;
             font-weight: 400;
             font-size: 1.05rem;
-            line-height: 1.6;
+            line-height: 1.65;
         }
 
-        /* Columna Derecha (Formulario) */
+        /* Columna derecha (wrapper) */
         .contact-form-wrapper {
             text-align: left;
         }
@@ -71,17 +75,74 @@
         .main-text {
             color: #1C3F32;
             font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.4;
+            font-size: 1.3rem;
+            margin-bottom: 1.75rem;
+            line-height: 1.3;
+            border-left: 4px solid #2A5C4A;
+            padding-left: 1rem;
         }
 
+        /* Contenedor flexible: formulario + bloque whatsapp lateral */
+        .form-and-sidebar {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        /* Formulario ocupa la mayor parte */
         .contact-form {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 1.2rem;
         }
 
+        /* Bloque lateral WhatsApp (al margen derecho) */
+        .whatsapp-sidebar {
+            flex-shrink: 0;
+            width: 190px;
+            background: rgba(42, 92, 74, 0.08);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(42, 92, 74, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .whatsapp-sidebar:hover {
+            background: rgba(42, 92, 74, 0.15);
+            border-color: #2A5C4A;
+        }
+
+        .whatsapp-link {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            color: #1C3F32;
+        }
+
+        .whatsapp-link i {
+            font-size: 2.8rem;
+            color: #25D366;
+            transition: transform 0.2s;
+        }
+
+        .whatsapp-link span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.3;
+            color: #1C3F32;
+        }
+
+        .whatsapp-link:hover i {
+            transform: scale(1.05);
+        }
+
+        /* Estilos campos formulario */
         .form-group {
             display: flex;
             flex-direction: column;
@@ -94,13 +155,13 @@
             font-weight: 600;
         }
 
-        .form-group input, 
+        .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1px solid #D0E0D8;
-            border-radius: 16px;
+            border-radius: 20px;
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             background: rgba(255, 255, 255, 0.9);
@@ -109,7 +170,7 @@
             color: #10261E;
         }
 
-        /* Estilo específico para corregir apariencia del select en algunos navegadores */
+        /* Select con custom arrow */
         .form-group select {
             appearance: none;
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232A5C4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
@@ -119,11 +180,11 @@
             padding-right: 2.5rem;
         }
 
-        .form-group input:focus, 
+        .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             border-color: #2A5C4A;
-            box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1);
+            box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.15);
         }
 
         .btn-submit {
@@ -137,8 +198,9 @@
             border-radius: 40px;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.5rem;
+            margin-top: 0.4rem;
             text-align: center;
+            letter-spacing: 0.3px;
         }
 
         .btn-submit:hover {
@@ -146,52 +208,131 @@
             transform: scale(0.99);
         }
 
-        /* Responsive para tablets y móviles */
-        @media (max-width: 768px) {
+        .btn-submit:disabled {
+            background: #9eb7ae;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* MODAL FLOTANTE CENTRAL (toast / modal) */
+        .modal-success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 1.2rem 2rem;
+            border-radius: 60px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2), 0 0 0 1000px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1C3F32;
+            border-left: 6px solid #2A5C4A;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.96);
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .modal-success i {
+            font-size: 1.6rem;
+            color: #25D366;
+        }
+
+        /* Responsive: pantallas menores */
+        @media (max-width: 850px) {
             .contact-container {
                 padding: 2rem 1.5rem;
             }
-
             .contact-layout {
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-
             .info-title {
-                font-size: 1.6rem;
+                font-size: 1.7rem;
             }
-
             .main-text {
-                font-size: 1.15rem;
-                border-top: 1px solid #D0E0D8;
-                padding-top: 1.5rem;
+                font-size: 1.2rem;
+                border-left: 3px solid #2A5C4A;
             }
+            .form-and-sidebar {
+                flex-direction: column;
+            }
+            .whatsapp-sidebar {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                padding: 0.9rem;
+            }
+            .whatsapp-link {
+                flex-direction: row;
+                justify-content: center;
+                gap: 0.8rem;
+            }
+            .whatsapp-link i {
+                font-size: 2rem;
+            }
+            .whatsapp-link span {
+                font-size: 0.9rem;
+            }
+            .modal-success {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+                white-space: normal;
+                text-align: center;
+                border-radius: 40px;
+                max-width: 85%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-success {
+                font-size: 0.9rem;
+                padding: 0.7rem 1.2rem;
+            }
+        }
+
+        /* Pequeño ajuste para el textarea */
+        textarea {
+            resize: vertical;
         }
     </style>
 </head>
 <body>
 
-    <div class="contact-container">
-        <div class="contact-layout">
-            
-            <div class="contact-info">
-                <h1 class="info-title">Contacto</h1>
-                <p class="info-description">
-                    Podes enviar tus sugerencias, biografia, fotos, anecdotas, etc que no se encuentran registradas en esta aplicación de genalogía.
-                </p>
-            </div>
+<div class="contact-container">
+    <div class="contact-layout">
+        <!-- COLUMNA IZQUIERDA: información -->
+        <div class="contact-info">
+            <h1 class="info-title">Contacto</h1>
+            <p class="info-description">
+                Podés enviar tus sugerencias, biografía, fotos, anécdotas, documentos o datos que aún no se encuentren registrados en esta aplicación de genealogía. ¡Tu colaboración enriquece la historia familiar!
+            </p>
+        </div>
 
-            <div class="contact-form-wrapper">
-                <p class="main-text">
-                    Aplicación web de Genealogía Fioravante.
-                </p>
+        <!-- COLUMNA DERECHA: formulario + bloque whatsapp lateral -->
+        <div class="contact-form-wrapper">
+            <p class="main-text">
+                Aplicación web de Genealogía Fioravante
+            </p>
 
-                <form action="https://formsubmit.co/setiposadas@gmail.com" method="POST" class="contact-form">
-                    <input type="hidden" name="_subject" value="Nuevo mensaje desde la App Genealogía">
+            <!-- Contenedor flexible: form + bloque whatsapp (al margen derecho) -->
+            <div class="form-and-sidebar">
+                <!-- FORMULARIO (sin action nativa, manejado con fetch) -->
+                <form id="contactForm" class="contact-form">
+                    <!-- Campos ocultos para formsubmit.co -->
+                    <input type="hidden" name="_subject" value="Nuevo mensaje desde la App Genealogía Fioravante">
+                    <!-- No agregamos _next ni _captcha para evitar redirección, usamos fetch -->
 
                     <div class="form-group">
                         <label for="nombre">Tu nombre y apellido completo:</label>
-                        <input type="text" id="nombre" name="Nombre" required>
+                        <input type="text" id="nombre" name="Nombre" required autocomplete="name">
                     </div>
 
                     <div class="form-group">
@@ -203,7 +344,6 @@
                         <label for="pais">País:</label>
                         <select id="pais" name="Pais" required>
                             <option value="" disabled selected>Selecciona tu país</option>
-                            
                             <optgroup label="América del Sur">
                                 <option value="Argentina">Argentina</option>
                                 <option value="Bolivia">Bolivia</option>
@@ -216,7 +356,6 @@
                                 <option value="Uruguay">Uruguay</option>
                                 <option value="Venezuela">Venezuela</option>
                             </optgroup>
-
                             <optgroup label="América Central y Caribe">
                                 <option value="Costa Rica">Costa Rica</option>
                                 <option value="Cuba">Cuba</option>
@@ -225,13 +364,11 @@
                                 <option value="Puerto Rico">Puerto Rico</option>
                                 <option value="República Dominicana">República Dominicana</option>
                             </optgroup>
-
                             <optgroup label="América del Norte">
                                 <option value="Canadá">Canadá</option>
                                 <option value="Estados Unidos">Estados Unidos</option>
                                 <option value="México">México</option>
                             </optgroup>
-
                             <optgroup label="Europa">
                                 <option value="Alemania">Alemania</option>
                                 <option value="España">España</option>
@@ -242,7 +379,6 @@
                                 <option value="Reino Unido">Reino Unido</option>
                                 <option value="Suiza">Suiza</option>
                             </optgroup>
-
                             <optgroup label="Asia">
                                 <option value="China">China</option>
                                 <option value="Corea del Sur">Corea del Sur</option>
@@ -251,14 +387,12 @@
                                 <option value="Israel">Israel</option>
                                 <option value="Japón">Japón</option>
                             </optgroup>
-
                             <optgroup label="África">
                                 <option value="Egipto">Egipto</option>
                                 <option value="Marruecos">Marruecos</option>
                                 <option value="Nigeria">Nigeria</option>
                                 <option value="Sudáfrica">Sudáfrica</option>
                             </optgroup>
-
                             <optgroup label="Oceanía">
                                 <option value="Australia">Australia</option>
                                 <option value="Nueva Zelanda">Nueva Zelanda</option>
@@ -268,7 +402,7 @@
 
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="Email" required>
+                        <input type="email" id="email" name="Email" required autocomplete="email">
                     </div>
 
                     <div class="form-group">
@@ -281,53 +415,224 @@
                         <textarea id="mensaje" name="Mensaje" rows="4" required placeholder="Escribe tu mensaje aquí..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn-submit">Enviar tu mensaje</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Enviar tu mensaje
+                    </button>
                 </form>
-            </div>
 
+                <!-- BLOQUE WHATSAPP (lateral derecho) -->
+                <div class="whatsapp-sidebar">
+                    <a href="https://wa.me/5493764850728" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Podés comunicarte por WhatsApp también.</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
+<!-- MODAL FLOTANTE (éxito) -->
+<div id="successModal" class="modal-success" style="display: none;">
+    <i class="fas fa-check-circle"></i>
+    <span>Haz enviado tu mensaje con exito!!!</span>
+</div>
+
+<script>
+    (function() {
+        // -------- AUTOCOMPLETADO DE PAÍS SEGÚN CIUDAD (funcionalidad original mejorada) --------
         const cityToCountryMap = {
             // Argentina
             'posadas': 'Argentina', 'buenos aires': 'Argentina', 'cordoba': 'Argentina', 'rosario': 'Argentina', 'mendoza': 'Argentina', 'obera': 'Argentina', 'eldorado': 'Argentina',
+            'la plata': 'Argentina', 'salta': 'Argentina', 'tucumán': 'Argentina', 'tucuman': 'Argentina',
             // Brasil
-            'sao paulo': 'Brasil', 'são paulo': 'Brasil', 'rio de janeiro': 'Brasil', 'brasilia': 'Brasil', 'curitiba': 'Brasil',
+            'sao paulo': 'Brasil', 'são paulo': 'Brasil', 'rio de janeiro': 'Brasil', 'brasilia': 'Brasil', 'curitiba': 'Brasil', 'belo horizonte': 'Brasil', 'salvador': 'Brasil',
             // Uruguay
-            'montevideo': 'Uruguay', 'punta del este': 'Uruguay',
+            'montevideo': 'Uruguay', 'punta del este': 'Uruguay', 'colonia': 'Uruguay',
             // Paraguay
-            'asuncion': 'Paraguay', 'asunción': 'Paraguay', 'encarnacion': 'Paraguay', 'encarnación': 'Paraguay',
+            'asuncion': 'Paraguay', 'asunción': 'Paraguay', 'encarnacion': 'Paraguay', 'encarnación': 'Paraguay', 'ciudad del este': 'Paraguay',
             // Chile
-            'santiago': 'Chile', 'valparaiso': 'Chile', 'viña del mar': 'Chile',
+            'santiago': 'Chile', 'valparaiso': 'Chile', 'viña del mar': 'Chile', 'concepción': 'Chile', 'concepcion': 'Chile',
             // España
-            'madrid': 'España', 'barcelona': 'España', 'valencia': 'España', 'sevilla': 'España',
+            'madrid': 'España', 'barcelona': 'España', 'valencia': 'España', 'sevilla': 'España', 'zaragoza': 'España', 'malaga': 'España',
             // Italia
-            'roma': 'Italia', 'milan': 'Italia', 'milán': 'Italia', 'florencia': 'Italia', 'venecia': 'Italia',
+            'roma': 'Italia', 'milan': 'Italia', 'milán': 'Italia', 'florencia': 'Italia', 'venecia': 'Italia', 'napoles': 'Italia', 'turin': 'Italia',
             // Estados Unidos
-            'miami': 'Estados Unidos', 'new york': 'Estados Unidos', 'nueva york': 'Estados Unidos', 'los angeles': 'Estados Unidos', 'washington': 'Estados Unidos',
+            'miami': 'Estados Unidos', 'new york': 'Estados Unidos', 'nueva york': 'Estados Unidos', 'los angeles': 'Estados Unidos', 'washington': 'Estados Unidos', 'chicago': 'Estados Unidos', 'houston': 'Estados Unidos',
             // México
-            'mexico df': 'México', 'ciudad de mexico': 'México', 'cdmx': 'México', 'guadalajara': 'México',
+            'mexico df': 'México', 'ciudad de mexico': 'México', 'cdmx': 'México', 'guadalajara': 'México', 'monterrey': 'México', 'puebla': 'México',
             // Colombia
-            'bogota': 'Colombia', 'bogotá': 'Colombia', 'medellin': 'Colombia', 'cali': 'Colombia',
+            'bogota': 'Colombia', 'bogotá': 'Colombia', 'medellin': 'Colombia', 'cali': 'Colombia', 'barranquilla': 'Colombia',
             // Perú
-            'lima': 'Perú', 'cusco': 'Perú',
-            // Otros principales del mundo
-            'paris': 'Francia', 'parís': 'Francia', 'londres': 'Reino Unido', 'london': 'Reino Unido', 'berlin': 'Alemania', 'berlín': 'Alemania', 'lisboa': 'Portugal',
-            'tokio': 'Japón', 'tokyo': 'Japón', 'pekin': 'China', 'beijing': 'China', 'sidney': 'Australia', 'sydney': 'Australia'
+            'lima': 'Perú', 'cusco': 'Perú', 'arequipa': 'Perú',
+            // Francia
+            'paris': 'Francia', 'parís': 'Francia', 'lyon': 'Francia', 'marsella': 'Francia',
+            // Reino Unido
+            'londres': 'Reino Unido', 'london': 'Reino Unido', 'manchester': 'Reino Unido', 'birmingham': 'Reino Unido',
+            // Alemania
+            'berlin': 'Alemania', 'berlín': 'Alemania', 'munich': 'Alemania', 'hamburgo': 'Alemania',
+            // Portugal
+            'lisboa': 'Portugal', 'oporto': 'Portugal',
+            // Japón
+            'tokio': 'Japón', 'tokyo': 'Japón', 'osaka': 'Japón',
+            // China
+            'pekin': 'China', 'beijing': 'China', 'shanghai': 'China',
+            // Australia
+            'sidney': 'Australia', 'sydney': 'Australia', 'melbourne': 'Australia', 'brisbane': 'Australia',
+            // Otros
+            'viena': 'Austria', 'bruselas': 'Bélgica', 'amsterdam': 'Países Bajos', 'berna': 'Suiza', 'zurich': 'Suiza'
         };
 
         const ciudadInput = document.getElementById('ciudad');
         const paisSelect = document.getElementById('pais');
 
-        ciudadInput.addEventListener('input', function() {
-            // Convertimos a minúsculas y limpiamos espacios extra
-            const valorCiudad = this.value.toLowerCase().trim();
-            
-            if (cityToCountryMap[valorCiudad]) {
-                paisSelect.value = cityToCountryMap[valorCiudad];
+        if (ciudadInput && paisSelect) {
+            ciudadInput.addEventListener('input', function() {
+                let valorCiudad = this.value.toLowerCase().trim();
+                if (cityToCountryMap[valorCiudad]) {
+                    paisSelect.value = cityToCountryMap[valorCiudad];
+                }
+            });
+        }
+
+        // -------- ENVÍO CON FETCH + MODAL FLOTANTE (sin recarga) --------
+        const form = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const modal = document.getElementById('successModal');
+        let timeoutId = null;
+
+        // Función para mostrar el modal de éxito y auto-ocultarlo tras 3 segundos
+        function showSuccessModal() {
+            if (timeoutId) clearTimeout(timeoutId);
+            // Resetear cualquier animación/display previo
+            modal.style.display = 'flex';
+            modal.style.opacity = '1';
+            // Ocultar automáticamente después de 3 segundos
+            timeoutId = setTimeout(() => {
+                modal.style.display = 'none';
+                timeoutId = null;
+            }, 3000);
+        }
+
+        // Función para limpiar el formulario después del envío exitoso
+        function resetFormFields() {
+            form.reset();
+            // Luego de reset, aseguramos que el select quede en placeholder (primera opción deshabilitada)
+            // El reset() deja el select en el valor por defecto (el option disabled selected)
+            // pero algunos navegadores podrían no resetear select con valores dinámicos; lo forzamos
+            paisSelect.value = '';  // para que quede el placeholder "Selecciona tu país"
+            // Adicionalmente, se limpia cualquier autocompletado visual
+        }
+
+        // Función para deshabilitar/habilitar botón durante el envío
+        function setButtonLoading(isLoading) {
+            if (isLoading) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enviando...';
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Enviar tu mensaje';
             }
-        });
-    </script>
+        }
+
+        // Interceptar envío del formulario
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Validación rápida de campos requeridos (HTML5 ya lo hace, pero reforzamos)
+                const nombre = document.getElementById('nombre')?.value.trim();
+                const ciudad = ciudadInput?.value.trim();
+                const email = document.getElementById('email')?.value.trim();
+                const asunto = document.getElementById('asunto')?.value.trim();
+                const mensaje = document.getElementById('mensaje')?.value.trim();
+
+                if (!nombre || !ciudad || !email || !asunto || !mensaje) {
+                    // Mostrar alerta sutil nativa? No se pide modal de error, pero para UX podemos mostrar algo simple.
+                    // Sin embargo mejor usar un modal rápido de advertencia? No es requisito, pero para robustez:
+                    const warningModal = document.createElement('div');
+                    warningModal.className = 'modal-success';
+                    warningModal.style.background = '#fff2e8';
+                    warningModal.style.borderLeftColor = '#c95a2e';
+                    warningModal.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#c95a2e;"></i><span>Por favor, completa todos los campos.</span>';
+                    document.body.appendChild(warningModal);
+                    warningModal.style.display = 'flex';
+                    setTimeout(() => {
+                        warningModal.style.display = 'none';
+                        warningModal.remove();
+                    }, 2000);
+                    return;
+                }
+
+                // Validar formato email básico (opcional)
+                const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+                if (!emailRegex.test(email)) {
+                    const emailError = document.createElement('div');
+                    emailError.className = 'modal-success';
+                    emailError.style.background = '#fff2e8';
+                    emailError.style.borderLeftColor = '#c95a2e';
+                    emailError.innerHTML = '<i class="fas fa-envelope"></i><span>Email inválido. Ingresa una dirección correcta.</span>';
+                    document.body.appendChild(emailError);
+                    emailError.style.display = 'flex';
+                    setTimeout(() => {
+                        emailError.style.display = 'none';
+                        emailError.remove();
+                    }, 2000);
+                    return;
+                }
+
+                // Preparar datos para enviar a formsubmit.co
+                const formData = new FormData(form);
+                // Añadir campo adicional para evitar redirección (formsubmit acepta el parámetro _ajax? pero con fetch ya es asíncrono)
+                // No es necesario agregar _redirect porque no redirigirá.
+                // URL de destino (la misma del action original)
+                const submitUrl = 'https://formsubmit.co/setiposadas@gmail.com';
+
+                setButtonLoading(true);
+
+                try {
+                    const response = await fetch(submitUrl, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    // Formsubmit devuelve respuesta JSON si el accept está presente, o redirección.
+                    // Consideramos cualquier respuesta 2xx como exitosa.
+                    if (response.ok || response.status === 200 || response.status === 201) {
+                        // Mostrar modal de éxito
+                        showSuccessModal();
+                        // Limpiar todos los campos del formulario
+                        resetFormFields();
+                    } else {
+                        // Respuesta no exitosa
+                        throw new Error(`Error en envío: ${response.status}`);
+                    }
+                } catch (err) {
+                    console.error('Error al enviar mensaje:', err);
+                    // Mostrar modal de error opcional (suave, no bloqueante)
+                    const errorModal = document.createElement('div');
+                    errorModal.className = 'modal-success';
+                    errorModal.style.background = '#fff2f0';
+                    errorModal.style.borderLeftColor = '#c7362b';
+                    errorModal.innerHTML = '<i class="fas fa-times-circle" style="color:#c7362b;"></i><span>Error al enviar. Intentalo nuevamente.</span>';
+                    document.body.appendChild(errorModal);
+                    errorModal.style.display = 'flex';
+                    setTimeout(() => {
+                        errorModal.style.display = 'none';
+                        errorModal.remove();
+                    }, 2500);
+                } finally {
+                    setButtonLoading(false);
+                }
+            });
+        }
+
+        // Aseguramos que el modal no tenga fugas visuales al hacer clic en overlay (solo desaparece después de 3 segundos)
+        // Si se hace clic fuera? No es necesario porque no tiene overlay opaco, pero es solo toast central.
+        // Además, para preservar la experiencia, cualquier clic en el modal no hace nada (se cierra por timeout).
+    })();
+</script>
 </body>
 </html>
