@@ -1,11 +1,9 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Genealogia Fioravante</title>
-    <!-- Se actualizó Google Fonts para incluir Playfair Display en lugar de Dancing Script -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -14,21 +12,21 @@
         :root {
             --primary: #2C423F;
             --accent: #C47D57;
-            --subtitle-color: #E2B091; /* Nuevo color elegante para el subtítulo */
+            --subtitle-color: #E2B091;
             --text-light: #F7F4EF;
             --font-main: 'Inter', sans-serif;
-            --font-fancy: 'Playfair Display', serif; /* Tipografía más moderna y sofisticada */
+            --font-fancy: 'Playfair Display', serif;
             --error-bg: #FDF2F2;
             --error-border: #E57373;
             --success-bg: #EDF7ED;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
-        body, html { height: 100%; background-color: #FAF8F5; overflow: hidden; }
+        body, html { height: 100%; background-color: var(--primary); overflow: hidden; }
         
         #landing-page { display: flex; height: 100vh; width: 100vw; }
         
         .landing-left {
-            flex: 1.2;
+            flex: 1;
             background-color: var(--primary);
             display: flex;
             align-items: center;
@@ -36,8 +34,15 @@
             padding: 3rem;
         }
         
-        .title-container { text-align: center; color: var(--text-light); }
+        .title-container { 
+            text-align: center; 
+            color: var(--text-light); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         
+        /* Texto principal restaurado al original con transición de tamaño */
         .brand-name {
             display: block;
             font-size: 5.5rem;
@@ -50,9 +55,17 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            
+            /* Transición suave para el aumento de tamaño */
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
         }
         
-        /* Mejoras aplicadas al subtítulo */
+        /* Clase que aumenta levemente el tamaño al finalizar la escritura */
+        .brand-name.scale-active {
+            transform: scale(1.06);
+        }
+        
         .brand-subtitle { 
             font-family: var(--font-fancy); 
             font-size: 1.8rem; 
@@ -64,18 +77,131 @@
             margin-top: 5px; 
             opacity: 0.95;
         }
-        
-        .landing-right {
-            flex: 0.8;
+
+        .brand-name span, .brand-subtitle span {
+            opacity: 0;
+        }
+
+        #enterNowBtnContainer {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            margin-top: 3rem;
+        }
+
+        /* Botón compacto con efecto glass luminoso animado cada 2s */
+        .btn-enter-now {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 10px 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 25px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            animation: glass-pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes glass-pulse {
+            0%, 100% {
+                background: rgba(255, 255, 255, 0.04);
+                border-color: rgba(255, 255, 255, 0.25);
+                box-shadow: 
+                    0 6px 20px rgba(0, 0, 0, 0.2), 
+                    0 0 10px rgba(226, 176, 145, 0.15),
+                    inset 0 0 10px rgba(255, 255, 255, 0.05);
+            }
+            50% {
+                background: rgba(255, 255, 255, 0.12);
+                border-color: rgba(226, 176, 145, 0.6);
+                box-shadow: 
+                    0 6px 25px rgba(0, 0, 0, 0.3), 
+                    0 0 20px rgba(226, 176, 145, 0.5), 
+                    inset 0 0 15px rgba(255, 255, 255, 0.25);
+            }
+        }
+
+        .btn-enter-now:hover {
+            animation: none; 
+            background: rgba(226, 176, 145, 0.2);
+            border-color: rgba(226, 176, 145, 0.8);
+            color: #FFFFFF;
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 30px rgba(226, 176, 145, 0.3),
+                0 0 25px rgba(226, 176, 145, 0.7),
+                inset 0 0 20px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-enter-now:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estilos del Modal Flotante */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(20, 32, 30, 0.82); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #FAF8F5;
-            padding: 1.5rem;
-            overflow-y: auto;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #FAF8F5;
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            position: relative;
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            font-weight: 300;
+            cursor: pointer;
+            color: #A09C96;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close-modal:hover { color: var(--primary); }
         
-        .auth-card { width: 100%; max-width: 400px; }
+        .auth-card { width: 100%; }
         .auth-card h2 { font-weight: 700; font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
         .auth-card p { color: #7A7571; font-size: 0.9rem; margin-bottom: 24px; }
         
@@ -97,7 +223,6 @@
             box-shadow: 0 0 0 4px rgba(196, 125, 87, 0.15); 
         }
 
-        /* Botones modernos */
         .btn {
             width: 100%;
             padding: 14px 20px;
@@ -159,65 +284,84 @@
             font-weight: 600;
         }
 
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #E5E0D8;
-        }
-
-        .divider span {
-            padding: 0 12px;
-        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #E5E0D8; }
+        .divider span { padding: 0 12px; }
 
         .error-message { background: var(--error-bg); border-left: 4px solid var(--error-border); padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #C62828; margin-bottom: 16px; }
         .success-message { background: var(--success-bg); border-left: 4px solid #4CAF50; padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #1E4620; margin-bottom: 16px; }
         
         @media (max-width: 768px) {
-            #landing-page { flex-direction: column; }
-            .landing-left { padding: 2rem; flex: 0.8; }
             .brand-name { font-size: 3.5rem; }
             .brand-subtitle { font-size: 1.4rem; }
-            .landing-right { flex: 1.2; }
+            .landing-left { padding: 2rem; }
+            .modal-content { padding: 2rem 1.5rem; }
         }
         
+        /* --- ESTILOS DEL MODAL INFORMATIVO ACTUALIZADOS --- */
         .floating-credit-modal {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #FFFFFF;
-            border-left: 5px solid var(--accent, #C47D57);
-            border-radius: 16px;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
-            padding: 14px 22px;
+            background: rgba(250, 248, 245, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 3px solid var(--accent);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 10px 14px;
             z-index: 10000;
-            max-width: 280px;
-            font-size: 0.88rem;
-            line-height: 1.45;
-            color: #1E2A2A;
-            background-color: #fefcf9;
-            transition: opacity 0.2s ease;
-            text-align: center;
+            max-width: 200px; /* Más pequeño */
+            font-size: 0.75rem; /* Letra más pequeña */
+            line-height: 1.3;
+            color: var(--primary);
+            transition: opacity 0.4s ease, transform 0.4s ease; /* Transición suave al desaparecer */
+            text-align: left; /* Aspecto más estructurado y moderno */
         }
-        .floating-credit-modal .credit-line {
-            display: block;
-            text-align: center;
-            margin: 0;
+        .floating-credit-modal .credit-line { display: block; margin-bottom: 2px; }
+        .floating-credit-modal .credit-line:last-child { margin-bottom: 0; }
+        .floating-credit-modal strong { 
+            font-weight: 700; 
+            color: var(--accent); 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            display: block; 
+            margin-top: 4px; 
         }
-        .floating-credit-modal strong { font-weight: 800; color: var(--primary); }
+        .floating-credit-modal strong:first-child { margin-top: 0; }
+        
         @media (max-width: 640px) {
-            .floating-credit-modal { top: 12px; right: 12px; max-width: 250px; padding: 10px 16px; font-size: 0.75rem; border-left-width: 4px; }
+            .floating-credit-modal { 
+                top: 12px; 
+                right: 12px; 
+                max-width: 170px; 
+                padding: 8px 12px; 
+                font-size: 0.7rem; 
+            }
         }
     </style>
 </head>
 <body>
+
 <div id="landing-page">
     <div class="landing-left">
         <div class="title-container">
-            <span class="brand-name">Fioravante</span>
-            <span class="brand-subtitle">Historia de una familia</span>
+            <h1 class="brand-name" id="brandTitle"></h1>
+            <span class="brand-subtitle" id="brandSubtitle"></span>
+            
+            <div id="enterNowBtnContainer">
+                <button class="btn-enter-now" id="openAuthModalBtn">Ingresar</button>
+            </div>
         </div>
     </div>
-    <div class="landing-right" id="authPanel"></div>
+</div>
+
+<div id="authModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-modal" id="closeModalBtn">&times;</button>
+        <div id="authPanel"></div>
+    </div>
 </div>
 
 <div id="infoCreditModal" class="floating-credit-modal">
@@ -229,6 +373,82 @@
 </div>
 
 <script>
+    // --- Lógica de Animación de Texto ---
+    const titleText = "Fioravante";
+    const subtitleText = "Historia de una familia";
+
+    function createTypingSpans(elementId, text) {
+        const el = document.getElementById(elementId);
+        el.innerHTML = '';
+        const spans = [];
+        text.split('').forEach(char => {
+            const span = document.createElement('span');
+            span.innerHTML = char === ' ' ? '&nbsp;' : char; 
+            el.appendChild(span);
+            spans.push(span);
+        });
+        return spans;
+    }
+
+    const titleSpans = createTypingSpans('brandTitle', titleText);
+    const subtitleSpans = createTypingSpans('brandSubtitle', subtitleText);
+    
+    let currentIndex = 0;
+
+    function animateTyping() {
+        let isWriting = false;
+
+        if (currentIndex < titleSpans.length) {
+            titleSpans[currentIndex].style.opacity = '1';
+            isWriting = true;
+        }
+        if (currentIndex < subtitleSpans.length) {
+            subtitleSpans[currentIndex].style.opacity = '1';
+            isWriting = true;
+        }
+
+        currentIndex++;
+
+        if (isWriting) {
+            setTimeout(animateTyping, 100); 
+        } else {
+            // EFECTO NUEVO: El texto aumenta levemente de tamaño de forma suave
+            document.getElementById('brandTitle').classList.add('scale-active');
+
+            // Mostrar el botón compacto "Ingresar"
+            const btnContainer = document.getElementById('enterNowBtnContainer');
+            btnContainer.style.display = 'block';
+            setTimeout(() => {
+                btnContainer.style.opacity = '1';
+                btnContainer.style.transform = 'translateY(0)';
+            }, 50);
+        }
+    }
+
+    window.onload = () => {
+        setTimeout(animateTyping, 500);
+    };
+
+    // --- Lógica del Modal ---
+    const authModal = document.getElementById('authModal');
+    const openAuthModalBtn = document.getElementById('openAuthModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    openAuthModalBtn.addEventListener('click', () => {
+        authModal.classList.add('active');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        authModal.classList.remove('active');
+    });
+
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) {
+            authModal.classList.remove('active');
+        }
+    });
+
+    // --- Lógica de Firebase Original ---
     const firebaseConfig = {
         apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
         authDomain: "familia-genealogia.firebaseapp.com",
@@ -306,16 +526,21 @@
         });
     }
 
-    // Lógica para ocultar los créditos después de 4 segundos
+    // --- TIMEOUT DEL MODAL REDUCIDO A 2 SEGUNDOS ---
     const modalElement = document.getElementById('infoCreditModal');
     if (modalElement) {
         setTimeout(() => {
-            if (modalElement && modalElement.remove) modalElement.remove();
-            else if (modalElement && modalElement.style) modalElement.style.display = 'none';
-        }, 4000);
+            // Efecto de desvanecimiento suave antes de eliminarlo
+            modalElement.style.opacity = '0';
+            modalElement.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                if (modalElement && modalElement.remove) modalElement.remove();
+                else if (modalElement && modalElement.style) modalElement.style.display = 'none';
+            }, 400); // Espera a que termine la transición CSS
+        }, 2000); // Cambiado a 2000ms (2 segundos)
     }
 
-    // Observador de estado de autenticación
     auth.onAuthStateChanged((user) => {
         if(user) {
             redirectToApp();
