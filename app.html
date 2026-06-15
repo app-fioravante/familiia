@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <style>
-        /* (estilos exactamente igual que antes, sin cambios) */
         * {
             margin: 0;
             padding: 0;
@@ -23,6 +23,7 @@
             --bg-soft: #FAF8F5;
             --alert-red: #b91c1c;
             --alert-red-dark: #7f1a1a;
+            --gold: #E6B422;
         }
 
         body, html {
@@ -52,6 +53,7 @@
             min-height: 0;
             padding: 16px;
             width: 100%;
+            position: relative;
         }
 
         .image-container {
@@ -84,12 +86,95 @@
             transform: scale(0.99);
         }
 
-        .image-caption {
-            margin-top: 12px;
-            font-size: 0.75rem;
+        /* ----- MODAL DE CUMPLEAÑOS (limpio, centrado, debajo de la imagen) ----- */
+        .birthday-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%;
+            max-width: 480px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2), 0 0 0 1000px rgba(0, 0, 0, 0.3);
+            padding: 1.8rem 1.5rem;
+            text-align: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            backdrop-filter: blur(0px);
+            font-family: var(--font-main);
+        }
+
+        .birthday-modal.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .birthday-modal .modal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .birthday-modal h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
             color: var(--primary);
-            font-weight: 500;
-            opacity: 0.75;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.3px;
+        }
+
+        .birthday-modal .birthday-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--gold));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .birthday-modal p {
+            font-size: 1rem;
+            color: #3A5E54;
+            margin-bottom: 1.8rem;
+            line-height: 1.4;
+        }
+
+        .birthday-modal button {
+            background: var(--primary);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: var(--font-main);
+        }
+
+        .birthday-modal button:hover {
+            background: #1F312E;
+        }
+
+        @media (max-width: 550px) {
+            .birthday-modal {
+                width: 85%;
+                padding: 1.4rem 1.2rem;
+            }
+            .birthday-modal h3 {
+                font-size: 1.3rem;
+            }
+            .birthday-modal .birthday-name {
+                font-size: 1.2rem;
+            }
+            .birthday-modal .modal-icon {
+                font-size: 2.8rem;
+            }
         }
 
         .iframe-container {
@@ -325,9 +410,22 @@
             margin: 2px 8px;
         }
 
-        .floating-menu li:active {
-            background: #F3EBE6;
-            padding-left: 30px;
+        .floating-menu li:hover {
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            transform: translateX(4px);
+        }
+
+        /* ---- SOLO PARA MÓVIL: mismo sombreado que el escritorio al pulsar (efecto táctil) ---- */
+        @media (hover: none) and (pointer: coarse) {
+            .floating-menu li:active {
+                background: var(--primary);
+                color: white;
+                font-weight: 700;
+                transform: translateX(4px);
+                transition: all 0.08s ease;
+            }
         }
 
         .alert-modal-overlay,
@@ -518,6 +616,14 @@
     </div>
 </div>
 
+<div id="birthdayModal" class="birthday-modal">
+    <div class="modal-icon">🎂</div>
+    <h3>¡Celebramos el cumpleaños!</h3>
+    <div class="birthday-name" id="birthdayPersonName"></div>
+    <p>Hoy es un día especial para la familia.</p>
+    <button id="closeBirthdayModal">Seguir explorando</button>
+</div>
+
 <div class="floating-menu" id="floatingMenu">
     <ul>
         <li data-section="arbol">Árbol completo</li>
@@ -572,6 +678,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
 
     const welcomeArea = document.getElementById('welcomeArea');
     const welcomeAvatar = document.getElementById('welcomeAvatar');
@@ -584,6 +691,35 @@
     const imageContainer = document.querySelector('.image-container');
     const iframeContainer = document.getElementById('iframeContainer');
     const webIframe = document.getElementById('webIframe');
+    const birthdayModal = document.getElementById('birthdayModal');
+    const birthdayPersonNameSpan = document.getElementById('birthdayPersonName');
+    const closeBirthdayBtn = document.getElementById('closeBirthdayModal');
+
+    // --- NUEVO SISTEMA DE AUDIO (Preparado para Móviles y Escritorio) ---
+    const menuHoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); 
+    menuHoverSound.volume = 0.3; // Volumen sutil
+    menuHoverSound.preload = 'auto'; // Forzar precarga
+
+    let audioDesbloqueado = false;
+
+    // Función que "engaña" al navegador y desbloquea el sonido en el primer clic/toque de la app
+    const desbloquearAudio = () => {
+        if (audioDesbloqueado) return;
+        menuHoverSound.play().then(() => {
+            menuHoverSound.pause();
+            menuHoverSound.currentTime = 0;
+            audioDesbloqueado = true;
+        }).catch(() => {});
+        
+        // Quitar los detectores una vez que se desbloqueó
+        document.removeEventListener('click', desbloquearAudio);
+        document.removeEventListener('touchstart', desbloquearAudio);
+    };
+
+    // Escuchamos la primera interacción global del usuario
+    document.addEventListener('click', desbloquearAudio);
+    document.addEventListener('touchstart', desbloquearAudio, { passive: true });
+    // ----------------------------------------------------------------------
 
     function showImage() {
         if (imageContainer) imageContainer.style.display = 'flex';
@@ -663,6 +799,57 @@
         welcomeAvatar.textContent = inicial;
     }
 
+    // Verificar cumpleaños y mostrar modal elegante
+    async function checkAndShowBirthdayModal() {
+        try {
+            const snapshot = await db.collection("persons").get();
+            if (snapshot.empty) return;
+            
+            const today = new Date();
+            const todayMonth = today.getMonth();
+            const todayDay = today.getDate();
+            let birthdayPerson = null;
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const birthDateValue = data.birthDate;
+                if (!birthDateValue) return;
+                
+                let birthDateObj;
+                if (birthDateValue && typeof birthDateValue.toDate === 'function') {
+                    birthDateObj = birthDateValue.toDate();
+                } else if (birthDateValue && birthDateValue.seconds) {
+                    birthDateObj = new Date(birthDateValue.seconds * 1000);
+                } else {
+                    return;
+                }
+                
+                if (isNaN(birthDateObj.getTime())) return;
+                
+                const birthMonth = birthDateObj.getMonth();
+                const birthDay = birthDateObj.getDate();
+                
+                if (birthMonth === todayMonth && birthDay === todayDay) {
+                    const firstName = data.firstName || "";
+                    const lastName = data.lastName || "";
+                    const fullName = `${firstName} ${lastName}`.trim();
+                    if (fullName) birthdayPerson = fullName;
+                }
+            });
+            
+            if (birthdayPerson) {
+                birthdayPersonNameSpan.textContent = birthdayPerson;
+                birthdayModal.classList.add('open');
+            }
+        } catch (error) {
+            console.error("Error al consultar cumpleaños:", error);
+        }
+    }
+    
+    function closeBirthdayModal() {
+        birthdayModal.classList.remove('open');
+    }
+
     welcomeArea.addEventListener('click', (e) => {
         e.stopPropagation();
         openEditModal();
@@ -672,10 +859,11 @@
     editModal.addEventListener('click', (e) => {
         if (e.target === editModal) closeEditModal();
     });
-
-    // Escuchar cambios de autenticación SIN redirigir
+    closeBirthdayBtn.addEventListener('click', closeBirthdayModal);
+    
     auth.onAuthStateChanged((user) => {
         actualizarBienvenida(user);
+        checkAndShowBirthdayModal();
     });
 
     const menuBtn = document.getElementById('creativeMenuBtn');
@@ -696,6 +884,19 @@
     });
 
     floatingMenu.querySelectorAll('li').forEach(item => {
+        // --- FUNCIÓN UNIFICADA DE REPRODUCCIÓN (ESCRITORIO + MÓVIL) ---
+        const reproducirSonido = () => {
+            if (audioDesbloqueado) {
+                menuHoverSound.currentTime = 0;
+                menuHoverSound.play().catch(() => {});
+            }
+        };
+
+        // Evento Escritorio (Puntero/Mouse)
+        item.addEventListener('mouseenter', reproducirSonido);
+        // Evento Móvil (Toque táctil)
+        item.addEventListener('touchstart', reproducirSonido, { passive: true });
+
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             const text = item.innerText;
@@ -769,6 +970,7 @@
     });
 
     showImage();
+    checkAndShowBirthdayModal();
 </script>
 </body>
 </html>
