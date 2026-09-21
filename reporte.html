@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Reportes Genealógicos · Familia Fioravante</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --primary:#2A5C4A;
+  --primary-dark:#1C3F32;
+  --primary-deep:#10261E;
+  --accent:#C47D57;
+  --accent-soft:#E2B091;
+  --bg:#F5F7F5;
+  --card:#FFFFFF;
+  --text:#1C3F32;
+  --muted:#5C7A6A;
+  --line:#E2EBE7;
+  --line-soft:#D0E0D8;
+  --male:#1E6FDF;
+  --male-soft:#C7E9FF;
+  --female:#D43F87;
+  --female-soft:#FFD6E8;
+  --radius:20px;
+  --shadow:0 10px 30px rgba(28,63,50,.08);
+  --shadow-lg:0 18px 45px rgba(28,63,50,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select{font-family:inherit;}
+
+/* ============ TOPBAR ============ */
+.topbar{
+  background:linear-gradient(135deg,#2A5C4A 0%,#1C3F32 55%,#2A5C4A 100%);
+  color:#fff;
+  padding:20px 30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:22px;
+  flex-wrap:wrap;
+  position:sticky;
+  top:0;
+  z-index:60;
+  box-shadow:0 8px 28px rgba(0,0,0,.18);
+  border-bottom:4px solid var(--accent);
+}
+.brand h1{
+  font-size:1.55rem;
+  font-weight:800;
+  letter-spacing:-.6px;
+  line-height:1.1;
+  background:linear-gradient(180deg,#FFFFFF 0%,#CFCAC2 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.brand .brand-sub{
+  display:block;
+  font-family:'Playfair Display',serif;
+  font-style:italic;
+  font-size:.95rem;
+  color:var(--accent-soft);
+  letter-spacing:.6px;
+  margin-top:3px;
+  opacity:.95;
+}
+.topbar-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.user-chip{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:40px;
+  padding:7px 14px;
+  font-size:.78rem;
+  font-weight:600;
+  color:#F7F4EF;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  backdrop-filter:blur(8px);
+}
+.user-chip .chip-dot{
+  width:7px;height:7px;border-radius:50%;background:#7BE38F;
+  box-shadow:0 0 0 3px rgba(123,227,143,.2);
+  animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ============ BOTONES ============ */
+.btn{
+  border:none;border-radius:11px;cursor:pointer;
+  padding:11px 18px;font-size:.85rem;font-weight:600;letter-spacing:.3px;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:all .3s cubic-bezier(.25,.8,.25,1);
+  white-space:nowrap;text-decoration:none;
+}
+.btn-ghost{
+  background:rgba(255,255,255,.07);
+  color:#F7F4EF;
+  border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(8px);
+}
+.btn-ghost:hover{
+  background:rgba(226,176,145,.22);
+  border-color:rgba(226,176,145,.75);
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,.22);
+}
+.btn-accent{
+  background:var(--accent);color:#fff;
+  box-shadow:0 6px 18px rgba(196,125,87,.35);
+}
+.btn-accent:hover{
+  background:#B06C48;transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(196,125,87,.45);
+}
+.btn-primary{
+  background:var(--primary);color:#fff;width:100%;
+  justify-content:center;padding:14px 20px;font-size:.95rem;
+  box-shadow:0 6px 16px rgba(42,92,74,.25);
+}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px);}
+.btn-soft{
+  background:#EFF5F2;color:var(--primary);
+  border:1.5px solid var(--line-soft);
+}
+.btn-soft:hover{background:#DFE9E4;transform:translateY(-2px);border-color:var(--primary);}
+.btn:active{transform:translateY(0);}
+
+/* ============ LAYOUT ============ */
+.wrap{max-width:1500px;margin:0 auto;padding:26px 24px 70px;}
+
+.status-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-size:.8rem;color:var(--muted);
+  margin-bottom:18px;
+  background:#fff;padding:10px 16px;border-radius:14px;
+  border:1px solid var(--line);
+}
+.dot{
+  width:8px;height:8px;border-radius:50%;background:#4CAF50;
+  box-shadow:0 0 0 4px rgba(76,175,80,.15);
+  animation:pulse-dot 2s infinite;
+}
+.dot.warn{background:#E0A030;box-shadow:0 0 0 4px rgba(224,160,48,.15);}
+.dot.err{background:#E57373;box-shadow:0 0 0 4px rgba(229,115,115,.15);animation:none;}
+
+/* ============ KPIs ============ */
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
+  gap:16px;margin-bottom:22px;
+}
+.kpi{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  box-shadow:var(--shadow);
+  border:1px solid var(--line);
+  position:relative;overflow:hidden;
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+.kpi:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.kpi::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--accent),var(--accent-soft));
+  opacity:.85;
+}
+.kpi .kpi-label{
+  font-size:.68rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;
+}
+.kpi .kpi-value{
+  font-size:1.85rem;font-weight:800;color:var(--primary-deep);
+  letter-spacing:-1px;line-height:1;
+}
+.kpi .kpi-value.small{font-size:1.15rem;letter-spacing:-.3px;}
+
+/* ============ CARDS ============ */
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  border:1px solid var(--line);
+  padding:20px 22px;
+  margin-bottom:22px;
+}
+.card-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;margin-bottom:16px;
+}
+.card-head h3{
+  font-size:1rem;font-weight:700;color:var(--primary-dark);letter-spacing:-.2px;
+}
+.card-head p{font-size:.76rem;color:var(--muted);margin-top:3px;}
+
+/* ============ FILTROS ============ */
+.filters-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(165px,1fr));
+  gap:13px;align-items:end;
+}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{
+  font-size:.68rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;color:var(--muted);
+}
+.field input,.field select{
+  width:100%;padding:11px 13px;
+  border:1.5px solid var(--line-soft);border-radius:11px;
+  font-size:.86rem;background:#fff;color:var(--text);
+  transition:border-color .25s ease, box-shadow .25s ease;
+}
+.field input:focus,.field select:focus{
+  outline:none;border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(42,92,74,.12);
+}
+.field.span-2{grid-column:span 2;}
+.filters-actions{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);
+}
+.toggle{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;
+  user-select:none;
+}
+.toggle input{
+  appearance:none;width:38px;height:21px;border-radius:20px;
+  background:#DED8CF;position:relative;cursor:pointer;
+  transition:background .25s ease;
+}
+.toggle input::after{
+  content:'';position:absolute;top:2.5px;left:3px;
+  width:16px;height:16px;border-radius:50%;background:#fff;
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+}
+.toggle input:checked{background:var(--primary);}
+.toggle input:checked::after{transform:translateX(16px);}
+
+/* ============ CHARTS ============ */
+.charts-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;margin-bottom:22px;
+}
+.chart-card{
+  background:var(--card);border-radius:var(--radius);
+  box-shadow:var(--shadow);border:1px solid var(--line);
+  padding:20px 22px 14px;
+  display:flex;flex-direction:column;
+  transition:box-shadow .3s ease;
+}
+.chart-card:hover{box-shadow:var(--shadow-lg);}
+.chart-card.span-2{grid-column:span 2;}
+.chart-box{position:relative;height:300px;width:100%;}
+.chart-box.tall{height:330px;}
+.chart-empty{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;color:#B5AFA7;font-style:italic;
+}
+
+/* ============ TABLA ============ */
+.table-scroll{overflow-x:auto;border-radius:12px;border:1px solid var(--line);}
+table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:820px;}
+thead th{
+  background:#EFF5F2;color:var(--primary-deep);
+  font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  padding:13px 14px;text-align:left;white-space:nowrap;
+  position:sticky;top:0;z-index:2;cursor:pointer;user-select:none;
+  transition:background .2s ease;
+}
+thead th:hover{background:#DFE9E4;}
+thead th .arrow{opacity:.35;margin-left:5px;font-size:.7rem;}
+tbody td{padding:11px 14px;border-top:1px solid #EFF5F2;color:#3A4A42;vertical-align:middle;}
+tbody tr{transition:background .18s ease;}
+tbody tr:hover{background:#FAFCFB;}
+.tag{
+  display:inline-block;padding:3px 10px;border-radius:20px;
+  font-size:.7rem;font-weight:600;background:#EFF5F2;color:var(--primary-deep);
+}
+.tag.pais{background:rgba(196,125,87,.14);color:#9A5C3B;}
+.tag.ciudad{background:rgba(42,92,74,.10);color:var(--primary-dark);}
+.tag.male{background:var(--male-soft);color:var(--male);}
+.tag.female{background:var(--female-soft);color:var(--female);}
+.empty-row td{text-align:center;color:#B5AFA7;font-style:italic;padding:34px;}
+
+.pagination{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;margin-top:16px;
+}
+.pagination .info{font-size:.78rem;color:var(--muted);}
+.page-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.page-btns button{
+  min-width:36px;height:36px;padding:0 10px;
+  border-radius:9px;border:1.5px solid var(--line-soft);background:#fff;
+  color:var(--primary);font-weight:600;font-size:.8rem;cursor:pointer;
+  transition:all .22s ease;
+}
+.page-btns button:hover:not(:disabled){background:#EFF5F2;transform:translateY(-1px);}
+.page-btns button.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.page-btns button:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ============ GATE / LOGIN ============ */
+.auth-gate{
+  position:fixed;inset:0;z-index:3000;
+  background:linear-gradient(140deg,#2A5C4A 0%,#1C3F32 60%,#2A5C4A 100%);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.gate-card{
+  background:#FAFCFB;border-radius:22px;padding:38px 34px;
+  width:100%;max-width:400px;box-shadow:0 26px 60px rgba(0,0,0,.45);
+  text-align:center;border-top:4px solid var(--accent);
+}
+.gate-card h2{font-size:1.5rem;font-weight:800;color:var(--primary-deep);margin-bottom:8px;}
+.gate-card p{font-size:.85rem;color:var(--muted);margin-bottom:24px;line-height:1.5;}
+.gate-card form{display:flex;flex-direction:column;gap:12px;}
+.gate-card input{
+  padding:13px 15px;border:1.5px solid var(--line-soft);border-radius:12px;
+  font-size:.92rem;background:#fff;transition:all .25s ease;
+}
+.gate-card input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(42,92,74,.13);}
+.gate-link{
+  display:inline-block;margin-top:20px;font-size:.8rem;color:var(--muted);
+  text-decoration:none;font-weight:600;transition:color .2s;
+}
+.gate-link:hover{color:var(--accent);}
+.msg{
+  padding:10px 14px;border-radius:9px;font-size:.79rem;
+  margin-bottom:14px;text-align:left;line-height:1.4;
+}
+.msg.error{background:#FDF2F2;border-left:4px solid #E57373;color:#C62828;}
+.msg.ok{background:#EDF7ED;border-left:4px solid #4CAF50;color:#1E4620;}
+
+/* ============ LOADER ============ */
+#loader{
+  position:fixed;inset:0;z-index:2500;
+  background:rgba(245,247,245,.94);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+}
+#loader.show{display:flex;}
+.spinner{
+  width:46px;height:46px;border-radius:50%;
+  border:3px solid rgba(42,92,74,.2);
+  border-top-color:var(--primary);
+  animation:spin .85s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loader p{font-size:.85rem;color:var(--muted);font-weight:600;}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1000px){
+  .charts-grid{grid-template-columns:1fr;}
+  .chart-card.span-2{grid-column:span 1;}
+}
+@media (max-width:640px){
+  .wrap{padding:18px 14px 60px;}
+  .topbar{padding:16px 16px;}
+  .brand h1{font-size:1.2rem;}
+  .btn{padding:9px 13px;font-size:.78rem;}
+  .kpi .kpi-value{font-size:1.5rem;}
+  .chart-box{height:250px;}
+  .field.span-2{grid-column:span 1;}
+}
+
+@media print{
+  .topbar-actions,.filters-actions,.pagination,.status-bar,.auth-gate,.user-chip{display:none !important;}
+  body{background:#fff;}
+  .card,.chart-card,.kpi{box-shadow:none;border:1px solid #ddd;break-inside:avoid;}
+  .topbar{position:static;background:#2A5C4A !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN GATE ================= -->
+<div id="authGate" class="auth-gate">
+  <div class="gate-card">
+    <h2>Acceso restringido</h2>
+    <p>Inicia sesión para consultar los reportes genealógicos de la familia.</p>
+    <div id="gateFeedback"></div>
+    <form id="gateForm">
+      <input type="email" id="gateEmail" placeholder="Correo electrónico" required autocomplete="email">
+      <input type="password" id="gatePass" placeholder="Contraseña" required autocomplete="current-password">
+      <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+    </form>
+    <a href="arbol.html" class="gate-link">← Volver al árbol</a>
+  </div>
+</div>
+
+<!-- ================= LOADER ================= -->
+<div id="loader">
+  <div class="spinner"></div>
+  <p id="loaderText">Cargando datos…</p>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="reportApp" style="display:none;">
+
+  <header class="topbar">
+    <div class="brand">
+      <h1>Reportes Genealógicos</h1>
+      <span class="brand-sub">Familia Fioravante · Análisis de registros</span>
+    </div>
+    <div class="topbar-actions">
+      <span class="user-chip" id="userChip" style="display:none;"><span class="chip-dot"></span><span id="userChipText">…</span></span>
+      <button class="btn btn-ghost" id="btnRefresh">↻ Actualizar</button>
+      <button class="btn btn-ghost" id="btnCsv">⤓ Exportar CSV</button>
+      <button class="btn btn-ghost" id="btnPrint">⎙ Imprimir</button>
+      <button class="btn btn-accent" id="btnBack">← Volver al árbol</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <div class="status-bar">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">Iniciando…</span>
+    </div>
+
+    <!-- KPIs -->
+    <section class="kpis">
+      <div class="kpi"><div class="kpi-label">Registros</div><div class="kpi-value" id="kpiTotal">—</div></div>
+      <div class="kpi"><div class="kpi-label">Países</div><div class="kpi-value" id="kpiPaises">—</div></div>
+      <div class="kpi"><div class="kpi-label">Ciudades</div><div class="kpi-value" id="kpiCiudades">—</div></div>
+      <div class="kpi"><div class="kpi-label">Apellidos</div><div class="kpi-value" id="kpiApellidos">—</div></div>
+      <div class="kpi"><div class="kpi-label">Edad promedio</div><div class="kpi-value" id="kpiEdad">—</div></div>
+      <div class="kpi"><div class="kpi-label">Rango cronológico</div><div class="kpi-value small" id="kpiRango">—</div></div>
+    </section>
+
+    <!-- FILTROS -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h3>Filtros de análisis</h3>
+          <p>Refina los datos para actualizar los gráficos y la tabla en tiempo real.</p>
+        </div>
+      </div>
+
+      <div class="filters-grid">
+        <div class="field span-2">
+          <label>Búsqueda libre</label>
+          <input type="text" id="searchInput" placeholder="Nombre, apellido, ciudad, biografía…">
+        </div>
+        <div class="field">
+          <label>País</label>
+          <select id="paisSelect"><option value="">Todos</option></select>
+        </div>
+        <div class="field">
+          <label>Ciudad</label>
+          <select id="ciudadSelect"><option value="">Todas</option></select>
+        </div>
+        <div class="field">
+          <label>Apellido</label>
+          <select id="apellidoSelect"><option value="">Todos</option></select>
+        </div>
+        <div class="field">
+          <label>Género</label>
+          <select id="sexoSelect">
+            <option value="">Todos</option>
+            <option value="Hombre">Hombre</option>
+            <option value="Mujer">Mujer</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Año desde</label>
+          <input type="number" id="yearFrom" placeholder="1700" min="1000" max="2200">
+        </div>
+        <div class="field">
+          <label>Año hasta</label>
+          <input type="number" id="yearTo" placeholder="2026" min="1000" max="2200">
+        </div>
+        <div class="field">
+          <label>Cronología por</label>
+          <select id="basisSelect">
+            <option value="birth">Año de nacimiento</option>
+            <option value="death">Año de fallecimiento</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filters-actions">
+        <button class="btn btn-accent" id="btnApply">✓ Aplicar filtros</button>
+        <button class="btn btn-soft" id="btnClear">✕ Limpiar</button>
+        <button class="btn btn-soft" id="btnReload">↻ Recargar datos</button>
+        <label class="toggle" style="margin-left:auto;">
+          <input type="checkbox" id="cumulativeToggle">
+          <span>Ver acumulado</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- GRÁFICOS -->
+    <section class="charts-grid">
+
+      <div class="chart-card span-2">
+        <div class="card-head">
+          <div>
+            <h3>Línea cronológica general</h3>
+            <p id="timelineSubtitle">Cantidad de registros por año</p>
+          </div>
+        </div>
+        <div class="chart-box tall">
+          <canvas id="chartTimeline"></canvas>
+          <div class="chart-empty" id="emptyTimeline" style="display:none;">Sin datos cronológicos disponibles</div>
+        </div>
+      </div>
+
+      <div class="chart-card span-2">
+        <div class="card-head">
+          <div>
+            <h3>Evolución por país</h3>
+            <p>Top 5 países con mayor presencia a lo largo del tiempo</p>
+          </div>
+        </div>
+        <div class="chart-box tall">
+          <canvas id="chartCountries"></canvas>
+          <div class="chart-empty" id="emptyCountries" style="display:none;">Sin datos de país</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Distribución por ciudad</h3>
+            <p>Top 10 ciudades registradas</p>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartCities"></canvas>
+          <div class="chart-empty" id="emptyCities" style="display:none;">Sin datos de ciudad</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Distribución por edad</h3>
+            <p>Personas agrupadas por franja etaria</p>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartAges"></canvas>
+          <div class="chart-empty" id="emptyAges" style="display:none;">Sin datos de edad</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Apellidos más frecuentes</h3>
+            <p>Top 12 apellidos en los registros filtrados</p>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartSurnames"></canvas>
+          <div class="chart-empty" id="emptySurnames" style="display:none;">Sin datos de apellido</div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Composición por género</h3>
+            <p>Proporción de registros según género</p>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="chartSex"></canvas>
+          <div class="chart-empty" id="emptySex" style="display:none;">Sin datos de género</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TABLA -->
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h3>Detalle de registros</h3>
+          <p id="tableInfo">—</p>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="nombreCompleto">Nombre completo <span class="arrow">↕</span></th>
+              <th data-key="apellido">Apellido <span class="arrow">↕</span></th>
+              <th data-key="birthYear">Nacimiento <span class="arrow">↕</span></th>
+              <th data-key="deathYear">Fallecimiento <span class="arrow">↕</span></th>
+              <th data-key="edad">Edad <span class="arrow">↕</span></th>
+              <th data-key="pais">País <span class="arrow">↕</span></th>
+              <th data-key="ciudad">Ciudad <span class="arrow">↕</span></th>
+              <th data-key="sexo">Género <span class="arrow">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr class="empty-row"><td colspan="8">Sin registros</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <span class="info" id="pageInfo">—</span>
+        <div class="page-btns" id="pageButtons"></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   1. FIREBASE (mismo proyecto que arbol.html)
+   ========================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+  authDomain: "familia-genealogia.firebaseapp.com",
+  projectId: "familia-genealogia",
+  storageBucket: "familia-genealogia.firebasestorage.app",
+  messagingSenderId: "923693678578",
+  appId: "1:923693678578:web:bfed5d66d564d00847356b"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+/* Colección exacta usada por arbol.html */
+const COLLECTION = "persons";
+
+/* =========================================================
+   2. UTILIDADES (extraídas de arbol.html para consistencia)
+   ========================================================= */
+const PALETTE = ['#2A5C4A','#C47D57','#1E6FDF','#D43F87','#6B8F8A',
+                 '#E2B091','#1C3F32','#8FADA8','#B98A6B','#A65C3E',
+                 '#3C5A55','#DDBFA5'];
+
+/* --- Conversión robusta a Date (idéntica a arbol.html) --- */
+function parseDateToUTC(dateValue){
+  if (!dateValue) return null;
+  let d;
+  if (typeof dateValue === 'object' && dateValue !== null && 'seconds' in dateValue){
+    d = new Date(dateValue.seconds * 1000);
+  } else if (typeof dateValue === 'object' && dateValue !== null && typeof dateValue.toDate === 'function'){
+    try { d = dateValue.toDate(); } catch(e){ return null; }
+  } else if (dateValue instanceof Date){
+    d = dateValue;
+  } else if (typeof dateValue === 'string'){
+    d = new Date(dateValue);
+    if (isNaN(d.getTime())){
+      const m = dateValue.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+      if (m) d = new Date(+m[3], +m[2]-1, +m[1]);
+    }
+  } else if (typeof dateValue === 'number'){
+    if (dateValue > 1000 && dateValue < 2200) d = new Date(dateValue, 0, 1);
+    else if (dateValue > 1e11) d = new Date(dateValue);
+    else if (dateValue > 1e9) d = new Date(dateValue * 1000);
+    else return null;
+  } else {
+    return null;
+  }
+  return (d && !isNaN(d.getTime())) ? d : null;
+}
+
+/* --- Extraer año (idéntica a arbol.html) --- */
+function extractYear(birthDate){
+  if (!birthDate) return null;
+  const d = parseDateToUTC(birthDate);
+  return d ? d.getUTCFullYear() : null;
+}
+
+/* --- Cálculo de edad (idéntica a arbol.html) --- */
+function calculateAgeNumber(birthDate, deathDate){
+  const birth = parseDateToUTC(birthDate);
+  if (!birth) return null;
+  const death = parseDateToUTC(deathDate);
+  const ref = death || new Date();
+  let age = ref.getUTCFullYear() - birth.getUTCFullYear();
+  const mDiff = ref.getUTCMonth() - birth.getUTCMonth();
+  if (mDiff < 0 || (mDiff === 0 && ref.getUTCDate() < birth.getUTCDate())) age--;
+  return age >= 0 ? age : 0;
+}
+
+function fmtDate(d){
+  if (!d) return '';
+  return String(d.getUTCDate()).padStart(2,'0') + '/' +
+         String(d.getUTCMonth()+1).padStart(2,'0') + '/' +
+         d.getUTCFullYear();
+}
+
+/* --- Parseo de "Ciudad, País" o "Ciudad, Región, País" --- */
+function parsePlace(place){
+  if (!place) return { ciudad:'', pais:'' };
+  const raw = String(place).trim();
+  if (!raw) return { ciudad:'', pais:'' };
+  const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+  if (parts.length === 0) return { ciudad:'', pais:'' };
+  if (parts.length === 1) return { ciudad:titleCase(parts[0]), pais:'' };
+  const pais = titleCase(parts[parts.length - 1]);
+  const ciudad = titleCase(parts[0]);
+  return { ciudad, pais };
+}
+
+function titleCase(s){
+  if (!s) return '';
+  return String(s).toLowerCase().replace(/(^|\s|\/|-)\p{L}/gu, m => m.toUpperCase());
+}
+
+function clean(s){ return String(s ?? '').trim().replace(/\s+/g,' '); }
+function norm(s){
+  return String(s ?? '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]/g,'');
+}
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+
+/* =========================================================
+   3. ESTADO GLOBAL
+   ========================================================= */
+let RECORDS  = [];
+let FILTERED = [];
+let charts   = {};
+let sortKey  = 'nombreCompleto';
+let sortDir  = 1;
+let page     = 1;
+const PAGE_SIZE = 12;
+let booted   = false;
+
+/* =========================================================
+   4. NORMALIZACIÓN DE UN DOCUMENTO "persons"
+   ========================================================= */
+function buildRecord(id, data){
+  const firstName = clean(data.firstName || '');
+  const lastName  = clean(data.lastName  || '');
+  const nombreCompleto = clean((firstName + ' ' + lastName).trim()) || '(sin nombre)';
+
+  const birthDate = data.birthDate || null;
+  const deathDate = data.deathDate || null;
+
+  const birthYear = Number.isFinite(data.birthYear)
+      ? data.birthYear
+      : extractYear(birthDate);
+
+  const deathYear = extractYear(deathDate);
+
+  const edad = calculateAgeNumber(birthDate, deathDate);
+
+  const genderRaw = String(data.gender || '').toLowerCase();
+  let sexo = '';
+  if (genderRaw === 'male')   sexo = 'Hombre';
+  else if (genderRaw === 'female') sexo = 'Mujer';
+  else if (data.gender) sexo = titleCase(data.gender);
+
+  const bp = parsePlace(data.birthPlace || '');
+  const dp = parsePlace(data.deathPlace || '');
+  /* Fallback: si no hay lugar de nacimiento, usamos el de fallecimiento */
+  const pais   = bp.pais   || dp.pais   || '';
+  const ciudad = bp.ciudad || dp.ciudad || '';
+
+  const apellidosList = lastName
+      ? lastName.split(/[\s,;\/]+/).map(a => titleCase(a)).filter(a => a.length > 1)
+      : [];
+
+  return {
+    id,
+    firstName,
+    lastName,
+    apellido: apellidosList.length ? apellidosList[apellidosList.length - 1] : titleCase(lastName),
+    nombreCompleto,
+    apellidosList,
+    birthDate, deathDate,
+    birthYear: birthYear || null,
+    deathYear: deathYear || null,
+    edad: Number.isFinite(edad) ? edad : null,
+    pais, ciudad, sexo,
+    biography: data.biography || '',
+    photos: Array.isArray(data.photos) ? data.photos : [],
+    _raw: data
+  };
+}
+
+/* =========================================================
+   5. CARGA DE DATOS
+   ========================================================= */
+function setStatus(text, type){
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'dot' + (type === 'warn' ? ' warn' : type === 'err' ? ' err' : '');
+}
+function showLoader(show, text){
+  const el = document.getElementById('loader');
+  if (text) document.getElementById('loaderText').textContent = text;
+  el.classList.toggle('show', !!show);
+}
+
+async function loadData(){
+  showLoader(true, 'Leyendo colección "' + COLLECTION + '"…');
+  setStatus('Conectando con Firestore…', 'warn');
+
+  try{
+    const snap = await db.collection(COLLECTION).get();
+    RECORDS = snap.docs.map(d => buildRecord(d.id, d.data()));
+
+    if (!RECORDS.length){
+      setStatus('La colección "' + COLLECTION + '" está vacía.', 'warn');
+    } else {
+      setStatus('Colección "' + COLLECTION + '" · ' + RECORDS.length + ' documentos cargados.', 'ok');
+    }
+
+    buildFilterOptions();
+    applyFilters();
+
+  }catch(err){
+    console.error(err);
+    setStatus('Error: ' + (err.message || err), 'err');
+    RECORDS = [];
+    FILTERED = [];
+    buildFilterOptions();
+    applyFilters();
+  }finally{
+    showLoader(false);
+  }
+}
+
+/* =========================================================
+   6. FILTROS
+   ========================================================= */
+function fillSelect(id, values, allLabel){
+  const sel = document.getElementById(id);
+  const current = sel.value;
+  sel.innerHTML = '<option value="">' + allLabel + '</option>';
+  values.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    sel.appendChild(o);
+  });
+  if (values.indexOf(current) !== -1) sel.value = current;
+}
+
+function buildFilterOptions(){
+  const paises    = [...new Set(RECORDS.map(r => r.pais).filter(Boolean))].sort();
+  const ciudades  = [...new Set(RECORDS.map(r => r.ciudad).filter(Boolean))].sort();
+  const apellidos = [...new Set(RECORDS.flatMap(r => r.apellidosList))].sort();
+
+  fillSelect('paisSelect', paises, 'Todos');
+  fillSelect('ciudadSelect', ciudades, 'Todas');
+  fillSelect('apellidoSelect', apellidos, 'Todos');
+}
+
+function yearFor(r, basis){
+  if (basis === 'death') return r.deathYear;
+  return r.birthYear;
+}
+
+function applyFilters(){
+  const q = norm(document.getElementById('searchInput').value);
+  const p = document.getElementById('paisSelect').value;
+  const c = document.getElementById('ciudadSelect').value;
+  const a = document.getElementById('apellidoSelect').value;
+  const s = document.getElementById('sexoSelect').value;
+
+  const yFromRaw = document.getElementById('yearFrom').value.trim();
+  const yToRaw   = document.getElementById('yearTo').value.trim();
+  const yFrom = yFromRaw ? parseInt(yFromRaw,10) : -Infinity;
+  const yTo   = yToRaw   ? parseInt(yToRaw,10)   :  Infinity;
+  const yearFilterActive = yFromRaw !== '' || yToRaw !== '';
+  const basis = document.getElementById('basisSelect').value;
+
+  FILTERED = RECORDS.filter(r => {
+    if (p && r.pais !== p) return false;
+    if (c && r.ciudad !== c) return false;
+    if (s && r.sexo !== s) return false;
+    if (a && r.apellidosList.indexOf(a) === -1) return false;
+
+    if (yearFilterActive){
+      const y = yearFor(r, basis);
+      if (y === null) return false;
+      if (y < yFrom || y > yTo) return false;
+    }
+
+    if (q){
+      const hay = norm([
+        r.nombreCompleto, r.apellido, r.pais, r.ciudad, r.sexo,
+        r.biography || ''
+      ].join(' '));
+      if (hay.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+
+  page = 1;
+  renderAll();
+}
+
+function clearFilters(){
+  document.getElementById('searchInput').value = '';
+  document.getElementById('paisSelect').value = '';
+  document.getElementById('ciudadSelect').value = '';
+  document.getElementById('apellidoSelect').value = '';
+  document.getElementById('sexoSelect').value = '';
+  document.getElementById('yearFrom').value = '';
+  document.getElementById('yearTo').value = '';
+  document.getElementById('cumulativeToggle').checked = false;
+  applyFilters();
+}
+
+/* =========================================================
+   7. AGREGACIONES
+   ========================================================= */
+function countBy(arr, keyFn){
+  const m = new Map();
+  arr.forEach(r => {
+    const k = keyFn(r);
+    if (k === null || k === undefined || k === '') return;
+    m.set(k, (m.get(k) || 0) + 1);
+  });
+  return m;
+}
+function topEntries(map, n){
+  return [...map.entries()].sort((a,b) => b[1] - a[1]).slice(0, n);
+}
+
+/* =========================================================
+   8. KPIs
+   ========================================================= */
+function renderKPIs(){
+  const total = FILTERED.length;
+  const paises = new Set(FILTERED.map(r => r.pais).filter(Boolean)).size;
+  const ciudades = new Set(FILTERED.map(r => r.ciudad).filter(Boolean)).size;
+  const apellidos = new Set(FILTERED.flatMap(r => r.apellidosList)).size;
+
+  const edades = FILTERED.map(r => r.edad).filter(e => Number.isFinite(e) && e >= 0);
+  const prom = edades.length
+    ? Math.round(edades.reduce((a,b) => a + b, 0) / edades.length) + ' años'
+    : '—';
+
+  const years = FILTERED.map(r => r.birthYear).filter(Boolean).sort((a,b) => a - b);
+  const rango = years.length ? (years[0] + ' – ' + years[years.length - 1]) : '—';
+
+  document.getElementById('kpiTotal').textContent    = total.toLocaleString('es-AR');
+  document.getElementById('kpiPaises').textContent   = paises;
+  document.getElementById('kpiCiudades').textContent = ciudades;
+  document.getElementById('kpiApellidos').textContent= apellidos;
+  document.getElementById('kpiEdad').textContent     = prom;
+  document.getElementById('kpiRango').textContent    = rango;
+}
+
+/* =========================================================
+   9. GRÁFICOS
+   ========================================================= */
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#8B857E';
+
+function makeChart(id, config){
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  charts[id] = new Chart(canvas.getContext('2d'), config);
+}
+function toggleEmpty(emptyId, hasData){
+  const el = document.getElementById(emptyId);
+  if (el) el.style.display = hasData ? 'none' : 'flex';
+}
+function baseOptions(opts){
+  opts = opts || {};
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 650, easing: 'easeOutQuart' },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: !!opts.legend, position: 'bottom',
+        labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true,
+                  pointStyle: 'circle', padding: 14, font: { size: 11, weight: '600' } } },
+      tooltip: {
+        backgroundColor: 'rgba(28,63,50,.95)',
+        padding: 11, cornerRadius: 9, displayColors: !!opts.legend,
+        titleFont: { weight: '700', size: 12 },
+        bodyFont: { size: 12 },
+        borderColor: 'rgba(226,176,145,.4)', borderWidth: 1
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 16, font: { size: 10.5 } },
+        title: opts.xTitle ? { display: true, text: opts.xTitle, color: '#A9A29A', font: { size: 10.5, weight: '600' } } : undefined
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(42,92,74,.07)' },
+        border: { display: false },
+        ticks: { precision: 0, font: { size: 10.5 } },
+        title: opts.yTitle ? { display: true, text: opts.yTitle, color: '#A9A29A', font: { size: 10.5, weight: '600' } } : undefined
+      }
+    }
+  };
+}
+
+/* ---------- 9.1 Línea cronológica ---------- */
+function renderTimeline(){
+  const basis = document.getElementById('basisSelect').value;
+  const cumulative = document.getElementById('cumulativeToggle').checked;
+  const labelsMap = { birth:'Año de nacimiento', death:'Año de fallecimiento' };
+  document.getElementById('timelineSubtitle').textContent =
+    'Cantidad de registros por ' + labelsMap[basis].toLowerCase() + (cumulative ? ' (acumulado)' : '');
+
+  const map = new Map();
+  FILTERED.forEach(r => {
+    const y = yearFor(r, basis);
+    if (y) map.set(y, (map.get(y) || 0) + 1);
+  });
+
+  const years = [...map.keys()].sort((a,b) => a - b);
+  let values = years.map(y => map.get(y));
+  if (cumulative){
+    let acc = 0;
+    values = values.map(v => acc += v);
+  }
+  toggleEmpty('emptyTimeline', years.length > 0);
+
+  const ctx = document.getElementById('chartTimeline').getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 340);
+  grad.addColorStop(0, 'rgba(42,92,74,.45)');
+  grad.addColorStop(1, 'rgba(42,92,74,.02)');
+
+  makeChart('chartTimeline', {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [{
+        label: cumulative ? 'Registros acumulados' : 'Registros',
+        data: values,
+        borderColor: '#2A5C4A',
+        backgroundColor: grad,
+        borderWidth: 2.6,
+        fill: true,
+        tension: 0.34,
+        pointRadius: years.length > 60 ? 0 : 3.5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#2A5C4A',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2
+      }]
+    },
+    options: baseOptions({ xTitle: 'Año', yTitle: 'Cantidad' })
+  });
+}
+
+/* ---------- 9.2 Evolución por país ---------- */
+function renderCountries(){
+  const basis = document.getElementById('basisSelect').value;
+  const byCountry = countBy(FILTERED, r => r.pais || 'Sin datos');
+  const top = topEntries(byCountry, 5).map(e => e[0]);
+  toggleEmpty('emptyCountries', top.length > 0);
+
+  const yearsSet = new Set();
+  FILTERED.forEach(r => { const y = yearFor(r, basis); if (y) yearsSet.add(y); });
+  const years = [...yearsSet].sort((a,b) => a - b);
+
+  const matrix = new Map();
+  top.forEach(c => matrix.set(c, new Map()));
+  FILTERED.forEach(r => {
+    const c = r.pais || 'Sin datos';
+    const y = yearFor(r, basis);
+    if (!matrix.has(c) || !y) return;
+    const m = matrix.get(c);
+    m.set(y, (m.get(y) || 0) + 1);
+  });
+
+  const datasets = top.map((country, i) => ({
+    label: country,
+    data: years.map(y => matrix.get(country).get(y) || 0),
+    borderColor: PALETTE[i % PALETTE.length],
+    backgroundColor: PALETTE[i % PALETTE.length] + '1F',
+    borderWidth: 2.3,
+    tension: 0.34,
+    fill: false,
+    pointRadius: years.length > 45 ? 0 : 2.6,
+    pointHoverRadius: 6,
+    pointBackgroundColor: PALETTE[i % PALETTE.length]
+  }));
+
+  makeChart('chartCountries', {
+    type: 'line',
+    data: { labels: years, datasets },
+    options: baseOptions({ legend: true, xTitle: 'Año', yTitle: 'Registros' })
+  });
+}
+
+/* ---------- 9.3 Ciudades ---------- */
+function renderCities(){
+  const map = countBy(FILTERED, r => r.ciudad);
+  const top = topEntries(map, 10).reverse();
+  toggleEmpty('emptyCities', top.length > 0);
+
+  const labels = top.map(e => e[0]);
+  const values = top.map(e => e[1]);
+
+  makeChart('chartCities', {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Registros',
+        data: values,
+        backgroundColor: labels.map((_, i) =>
+          'rgba(42,92,74,' + (0.45 + (i / Math.max(labels.length - 1, 1)) * 0.5) + ')'),
+        hoverBackgroundColor: '#C47D57',
+        borderRadius: 7,
+        borderSkipped: false,
+        maxBarThickness: 22
+      }]
+    },
+    options: (() => {
+      const o = baseOptions({ xTitle: 'Cantidad' });
+      o.indexAxis = 'y';
+      o.scales.x.grid = { color: 'rgba(42,92,74,.07)' };
+      o.scales.x.ticks.precision = 0;
+      o.scales.y.grid = { display: false };
+      o.scales.y.ticks.font = { size: 11, weight: '600' };
+      o.plugins.tooltip.displayColors = false;
+      return o;
+    })()
+  });
+}
+
+/* ---------- 9.4 Edades ---------- */
+function renderAges(){
+  const buckets = ['0-9','10-19','20-29','30-39','40-49','50-59','60-69','70-79','80-89','90+'];
+  const counts = new Array(buckets.length).fill(0);
+  let hay = false;
+
+  FILTERED.forEach(r => {
+    if (!Number.isFinite(r.edad) || r.edad < 0) return;
+    let i = Math.floor(r.edad / 10);
+    if (i >= buckets.length) i = buckets.length - 1;
+    counts[i]++;
+    hay = true;
+  });
+  toggleEmpty('emptyAges', hay);
+
+  const ctx = document.getElementById('chartAges').getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 300);
+  grad.addColorStop(0, 'rgba(196,125,87,.42)');
+  grad.addColorStop(1, 'rgba(196,125,87,.02)');
+
+  makeChart('chartAges', {
+    type: 'line',
+    data: {
+      labels: buckets,
+      datasets: [{
+        label: 'Personas',
+        data: counts,
+        borderColor: '#C47D57',
+        backgroundColor: grad,
+        borderWidth: 2.6,
+        fill: true,
+        tension: 0.38,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        pointBackgroundColor: '#C47D57',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2
+      }]
+    },
+    options: baseOptions({ xTitle: 'Franja etaria (años)', yTitle: 'Personas' })
+  });
+}
+
+/* ---------- 9.5 Apellidos ---------- */
+function renderSurnames(){
+  const map = new Map();
+  FILTERED.forEach(r => {
+    r.apellidosList.forEach(a => map.set(a, (map.get(a) || 0) + 1));
+  });
+  const top = topEntries(map, 12).reverse();
+  toggleEmpty('emptySurnames', top.length > 0);
+
+  const labels = top.map(e => e[0]);
+  const values = top.map(e => e[1]);
+
+  makeChart('chartSurnames', {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Frecuencia',
+        data: values,
+        backgroundColor: labels.map((_, i) =>
+          'rgba(196,125,87,' + (0.42 + (i / Math.max(labels.length - 1, 1)) * 0.55) + ')'),
+        hoverBackgroundColor: '#2A5C4A',
+        borderRadius: 7,
+        borderSkipped: false,
+        maxBarThickness: 20
+      }]
+    },
+    options: (() => {
+      const o = baseOptions({ xTitle: 'Cantidad' });
+      o.indexAxis = 'y';
+      o.scales.x.grid = { color: 'rgba(42,92,74,.07)' };
+      o.scales.x.ticks.precision = 0;
+      o.scales.y.grid = { display: false };
+      o.scales.y.ticks.font = { size: 11, weight: '600' };
+      o.plugins.tooltip.displayColors = false;
+      return o;
+    })()
+  });
+}
+
+/* ---------- 9.6 Género ---------- */
+function renderSex(){
+  const map = countBy(FILTERED, r => r.sexo || 'Sin datos');
+  const entries = topEntries(map, 6);
+  toggleEmpty('emptySex', entries.length > 0);
+
+  const colorMap = { 'Hombre':'#1E6FDF', 'Mujer':'#D43F87', 'Sin datos':'#B5AFA7' };
+  const colors = entries.map(e => colorMap[e[0]] || PALETTE[entries.indexOf(e) % PALETTE.length]);
+
+  makeChart('chartSex', {
+    type: 'doughnut',
+    data: {
+      labels: entries.map(e => e[0]),
+      datasets: [{
+        data: entries.map(e => e[1]),
+        backgroundColor: colors,
+        borderColor: '#FFFFFF',
+        borderWidth: 3,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      animation: { duration: 700 },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 10, boxHeight: 10, usePointStyle: true,
+                    pointStyle: 'circle', padding: 14, font: { size: 11, weight: '600' } }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(28,63,50,.95)',
+          padding: 11, cornerRadius: 9,
+          callbacks: {
+            label: function(ctx){
+              const total = ctx.dataset.data.reduce((a,b) => a + b, 0) || 1;
+              const pct = Math.round((ctx.parsed / total) * 100);
+              return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderCharts(){
+  renderTimeline();
+  renderCountries();
+  renderCities();
+  renderAges();
+  renderSurnames();
+  renderSex();
+}
+
+/* =========================================================
+   10. TABLA
+   ========================================================= */
+function sortRecords(arr){
+  const dir = sortDir;
+  return arr.slice().sort((a,b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (va === null || va === undefined || va === '') va = dir > 0 ? Infinity : -Infinity;
+    if (vb === null || vb === undefined || vb === '') vb = dir > 0 ? Infinity : -Infinity;
+    if (typeof va === 'number' && typeof vb === 'number') return (va - vb) * dir;
+    return String(va).localeCompare(String(vb), 'es', { sensitivity: 'base' }) * dir;
+  });
+}
+
+function renderTable(){
+  const sorted = sortRecords(FILTERED);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  if (page > totalPages) page = totalPages;
+
+  const start = (page - 1) * PAGE_SIZE;
+  const slice = sorted.slice(start, start + PAGE_SIZE);
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  if (!slice.length){
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No hay registros que coincidan con los filtros aplicados</td></tr>';
+  } else {
+    slice.forEach(r => {
+      const tr = document.createElement('tr');
+      let sexoTag = '';
+      if (r.sexo === 'Hombre') sexoTag = '<span class="tag male">Hombre</span>';
+      else if (r.sexo === 'Mujer') sexoTag = '<span class="tag female">Mujer</span>';
+      else if (r.sexo) sexoTag = '<span class="tag">' + escapeHtml(r.sexo) + '</span>';
+      else sexoTag = '—';
+
+      tr.innerHTML =
+        '<td><strong>' + escapeHtml(r.nombreCompleto) + '</strong></td>' +
+        '<td>' + (r.apellido ? escapeHtml(r.apellido) : '—') + '</td>' +
+        '<td>' + (r.birthYear || '—') + '</td>' +
+        '<td>' + (r.deathYear || '—') + '</td>' +
+        '<td>' + (Number.isFinite(r.edad) ? r.edad : '—') + '</td>' +
+        '<td>' + (r.pais ? '<span class="tag pais">' + escapeHtml(r.pais) + '</span>' : '—') + '</td>' +
+        '<td>' + (r.ciudad ? '<span class="tag ciudad">' + escapeHtml(r.ciudad) + '</span>' : '—') + '</td>' +
+        '<td>' + sexoTag + '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('tableInfo').textContent =
+    sorted.length + ' registro' + (sorted.length === 1 ? '' : 's') +
+    ' · mostrando ' + (slice.length ? (start + 1) : 0) + '–' + (start + slice.length) +
+    ' de ' + sorted.length;
+
+  document.getElementById('pageInfo').textContent =
+    'Página ' + page + ' de ' + totalPages;
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  const cont = document.getElementById('pageButtons');
+  cont.innerHTML = '';
+
+  const mk = (label, targetPage, disabled, active) => {
+    const b = document.createElement('button');
+    b.textContent = label;
+    if (disabled) b.disabled = true;
+    if (active) b.classList.add('active');
+    b.addEventListener('click', () => {
+      page = targetPage;
+      renderTable();
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+    return b;
+  };
+
+  cont.appendChild(mk('«', 1, page === 1, false));
+  cont.appendChild(mk('‹', page - 1, page === 1, false));
+
+  let from = Math.max(1, page - 2);
+  let to = Math.min(totalPages, from + 4);
+  from = Math.max(1, to - 4);
+
+  for (let i = from; i <= to; i++){
+    cont.appendChild(mk(String(i), i, false, i === page));
+  }
+  cont.appendChild(mk('›', page + 1, page === totalPages, false));
+  cont.appendChild(mk('»', totalPages, page === totalPages, false));
+}
+
+/* =========================================================
+   11. RENDER GLOBAL
+   ========================================================= */
+function renderAll(){
+  renderKPIs();
+  renderCharts();
+  renderTable();
+}
+
+/* =========================================================
+   12. EXPORTAR CSV
+   ========================================================= */
+function exportCSV(){
+  if (!FILTERED.length){ alert('No hay datos para exportar con los filtros actuales.'); return; }
+
+  const rows = [['Nombre','Apellido','Nacimiento','Fallecimiento','Edad','País','Ciudad','Género','ID']];
+  sortRecords(FILTERED).forEach(r => {
+    rows.push([
+      r.firstName, r.lastName,
+      r.birthYear || '',
+      r.deathYear || '',
+      Number.isFinite(r.edad) ? r.edad : '',
+      r.pais, r.ciudad, r.sexo, r.id
+    ]);
+  });
+
+  const csv = rows.map(row =>
+    row.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')
+  ).join('\r\n');
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'reporte_fioravante_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* =========================================================
+   13. EVENTOS
+   ========================================================= */
+function bindEvents(){
+  document.getElementById('btnApply').addEventListener('click', applyFilters);
+  document.getElementById('btnClear').addEventListener('click', clearFilters);
+  document.getElementById('btnReload').addEventListener('click', loadData);
+  document.getElementById('btnRefresh').addEventListener('click', loadData);
+  document.getElementById('btnCsv').addEventListener('click', exportCSV);
+  document.getElementById('btnPrint').addEventListener('click', () => window.print());
+  document.getElementById('btnBack').addEventListener('click', () => { window.location.href = 'arbol.html'; });
+
+  document.getElementById('cumulativeToggle').addEventListener('change', renderTimeline);
+  document.getElementById('basisSelect').addEventListener('change', applyFilters);
+
+  let debounce = null;
+  document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(applyFilters, 320);
+  });
+
+  ['yearFrom','yearTo'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') applyFilters();
+    });
+  });
+
+  // Filtros que aplican al cambiar
+  ['paisSelect','ciudadSelect','apellidoSelect','sexoSelect'].forEach(id => {
+    document.getElementById(id).addEventListener('change', applyFilters);
+  });
+
+  // Ordenamiento de tabla
+  document.querySelectorAll('thead th[data-key]').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.getAttribute('data-key');
+      if (sortKey === key) sortDir *= -1;
+      else { sortKey = key; sortDir = 1; }
+      document.querySelectorAll('thead th .arrow').forEach(a => a.textContent = '↕');
+      th.querySelector('.arrow').textContent = sortDir > 0 ? '↑' : '↓';
+      renderTable();
+    });
+  });
+}
+
+/* =========================================================
+   14. AUTENTICACIÓN
+   ========================================================= */
+document.getElementById('gateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('gateEmail').value.trim();
+  const pass  = document.getElementById('gatePass').value;
+  const fb = document.getElementById('gateFeedback');
+
+  if (!email || !pass){
+    fb.innerHTML = '<div class="msg error">Completa ambos campos.</div>';
+    return;
+  }
+  fb.innerHTML = '<div class="msg ok">⏳ Validando credenciales…</div>';
+
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+  }catch(err){
+    let msg = 'No se pudo iniciar sesión.';
+    if (err.code === 'auth/user-not-found')      msg = 'No existe una cuenta con este correo.';
+    else if (err.code === 'auth/wrong-password') msg = 'Contraseña incorrecta.';
+    else if (err.code === 'auth/invalid-email')  msg = 'Correo electrónico inválido.';
+    else if (err.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Intenta más tarde.';
+    fb.innerHTML = '<div class="msg error">⚠️ ' + msg + '</div>';
+  }
+});
+
+auth.onAuthStateChanged(user => {
+  const gate = document.getElementById('authGate');
+  const app  = document.getElementById('reportApp');
+  const chip = document.getElementById('userChip');
+
+  if (user){
+    gate.style.display = 'none';
+    app.style.display = 'block';
+    chip.style.display = 'inline-flex';
+    document.getElementById('userChipText').textContent = user.email;
+    document.getElementById('gateFeedback').innerHTML = '';
+    document.getElementById('gatePass').value = '';
+
+    if (!booted){
+      booted = true;
+      bindEvents();
+      loadData();
+    }
+  } else {
+    gate.style.display = 'flex';
+    app.style.display = 'none';
+    booted = false;
+  }
+});
+</script>
+</body>
+</html>
