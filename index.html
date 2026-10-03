@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fioravante, la historia de una familia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400..800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#d2f0e8;--pn:#fff;--ink:#1a1530;--mu:#6a6480;--ln:#e9e1d6;--iris:#6b4cff;--mead:#10b981;--petal:#ff4f81;--sun:#ffb020;--night:#120d2e;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.1rem/1.6 "Outfit",system-ui,sans-serif;overflow-x:hidden}
+h1,h2,h3{font-family:"Outfit",system-ui,sans-serif;margin:0;line-height:1.05;letter-spacing:-.025em}
+h3{font-size:1.2rem}p{margin:0}a{color:var(--iris)}[hidden]{display:none!important}
+:is(a,button,input,select,textarea,summary):focus-visible{outline:3px solid var(--iris);outline-offset:3px}
+button{font:inherit;cursor:pointer;color:inherit}
+.mu{color:var(--mu)}
+/* inicio */
+.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;max-width:1120px;margin:0 auto;padding:1rem 1.25rem}
+.top b{font:800 1.2rem "Outfit"}
+.top nav{display:flex;gap:.2rem;overflow-x:auto}
+.top nav button{border:0;background:none;padding:.4rem .8rem;border-radius:999px;color:var(--mu);font-weight:600;font-size:.92rem;white-space:nowrap}
+.top nav button:hover{background:var(--ink);color:#fff}
+.hero{position:relative;overflow:hidden}
+.hero .in{position:relative;z-index:2;max-width:1120px;margin:0 auto;padding:2rem 1.25rem 1.5rem}
+.hero h1{font-size:clamp(3.2rem,15vw,9rem);font-weight:800;background:linear-gradient(100deg,var(--iris),var(--petal) 55%,var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent;animation:in 1s cubic-bezier(.2,.9,.2,1) both}
+@keyframes in{from{opacity:0;transform:translateY(.25em)}}
+.sub{font:500 clamp(1.2rem,3.5vw,1.9rem)/1.2 "Outfit",system-ui,sans-serif;margin-top:.5rem}
+.et{max-width:52ch;margin-top:.9rem}
+.flower{position:absolute;right:max(-150px,calc(50% - 700px));top:-60px;width:min(70vw,520px);z-index:1;animation:spin 90s linear infinite}
+@keyframes spin{to{rotate:360deg}}
+.status{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.2rem;background:#fff;border:1px solid var(--ln);border-radius:999px;padding:.3rem .9rem;font-size:.86rem;color:var(--mu)}
+.status i{width:9px;height:9px;border-radius:50%;background:var(--sun)}.status.ok i{background:var(--mead)}.status.err i{background:var(--petal)}
+.bday{margin-top:.9rem;background:linear-gradient(100deg,#fff4d6,#ffe3ec);border:1px solid #f6d6a8;border-radius:18px;padding:.6rem 1rem;max-width:460px;font-size:.95rem}
+.tiles{max-width:1120px;margin:0 auto;padding:0 1.25rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.9rem}
+.tile{display:flex;flex-direction:column;gap:.35rem;text-align:left;background:#fff;border:1px solid var(--ln);border-radius:24px;padding:1.2rem;transition:transform .2s,box-shadow .2s,border-color .2s;min-height:150px}
+.tile:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(60,80,160,.16);border-color:var(--iris)}
+.tile .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:1.4rem;margin-bottom:auto}
+.tile h3{margin-top:.6rem}.tile small{color:var(--mu);font-size:.88rem}
+.strip{max-width:1120px;margin:1.6rem auto 0;padding:0 1.25rem;display:flex;gap:.6rem;overflow-x:auto}
+
+footer{text-align:center;color:var(--mu);padding:2.5rem 1rem 3rem;font-size:.9rem}
+/* paneles */
+dialog{border:0;padding:0;color:var(--ink);box-shadow:0 30px 80px rgba(20,30,70,.35)}
+dialog::backdrop{background:rgba(20,30,70,.45)}
+#sheet{width:min(1120px,100vw);max-width:none;height:min(92vh,920px);max-height:none;border-radius:28px;overflow:hidden}
+#sheet[open]{display:flex;flex-direction:column}
+.sh{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 1.3rem;border-bottom:1px solid var(--ln);background:#fff}
+.sh h2{font-size:1.5rem}
+.x{border:1px solid var(--ln);background:#fff;border-radius:999px;width:40px;height:40px;font-size:1.2rem;line-height:1}
+.x:hover{background:var(--ink);color:#fff}
+#sb{overflow:auto;padding:1.3rem;flex:1;background:var(--bg)}
+#pdlg{width:min(620px,94vw);max-width:none;border-radius:26px;max-height:90vh;padding:1.5rem;overflow:auto}
+#lb{width:min(96vw,1000px);max-width:none;max-height:96vh;padding:0;border-radius:26px;overflow:hidden;background:#0f0b24;color:#fff}
+.lbf{position:relative;margin:0}#lb img{display:block;width:100%;max-height:90vh;min-height:55vh;object-fit:contain}
+.lbinfo{position:absolute;inset:auto 0 0;padding:4.5rem clamp(1rem,4vw,2rem) 1.2rem;background:linear-gradient(transparent,rgba(15,11,36,.96) 50%)}
+.lbinfo h3{font-size:clamp(1.5rem,5vw,2.2rem)}.lbinfo .sm{opacity:.8;margin:.2rem 0 .5rem}
+.lbinfo dl{margin:.4rem 0}.lbinfo dt{color:#ffffffa0}.lbinfo .bio{font-size:.93rem;max-height:6em;overflow:auto;opacity:.92}
+.lbinfo .mini{background:#ffffff26;color:#fff;border:0;padding:.2rem .75rem;font-size:.8rem;margin-top:.25rem}
+.lbc,.lbar{position:absolute;z-index:3;border:0;border-radius:50%;background:#0f0b24b3;color:#fff;width:44px;height:44px;font-size:1.4rem;backdrop-filter:blur(6px)}
+.lbc{top:.8rem;right:.8rem}.lbar{top:38%}.lbar.l{left:.8rem}.lbar.r{right:.8rem}
+.lbk{position:absolute;top:1rem;left:1rem;z-index:3;font-size:.85rem;background:#0f0b24b3;padding:.25rem .7rem;border-radius:99px}
+@media(max-width:700px){#sheet{width:100vw;height:100dvh;border-radius:0;margin:0}.flower{opacity:.3}}
+/* componentes */
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:22px;padding:1.3rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.quote{border-left:4px solid var(--petal);padding-left:1rem;margin:1rem 0;font-size:1.1rem}
+.empty{border:2px dashed var(--ln);border-radius:22px;padding:1.6rem;text-align:center;color:var(--mu)}
+.bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+input[type=search],select,textarea,.f input{font:inherit;border:1px solid var(--ln);border-radius:14px;padding:.6rem .85rem;background:#fff;color:var(--ink);min-width:0}
+input[type=search]{flex:1 1 200px}
+.chip{border:1px solid var(--ln);background:#fff;border-radius:999px;padding:.4rem .9rem;font-weight:600;font-size:.9rem;color:var(--mu)}
+.chip[aria-pressed=true]{background:var(--iris);border-color:var(--iris);color:#fff}
+.btn{border:0;border-radius:999px;padding:.65rem 1.2rem;font-weight:600;text-decoration:none;display:inline-block;font-size:.95rem}
+.btn.a{background:var(--ink);color:#fff}.btn.b{background:#fff;border:1px solid var(--ln);color:var(--ink)}.btn.wa{background:#1fa855;color:#fff}.btn.g{background:var(--iris);color:#fff}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;background:var(--iris);flex:none;overflow:hidden}
+.av.f{background:var(--petal)}.av.u{background:var(--mead)}.av img{width:100%;height:100%;object-fit:cover}
+details.g{background:#fff;border:1px solid var(--ln);border-radius:20px;margin-bottom:.7rem;overflow:hidden}
+details.g summary{cursor:pointer;padding:.9rem 1.1rem;font:800 1.1rem "Outfit";display:flex;justify-content:space-between;list-style:none}
+details.g summary::-webkit-details-marker{display:none}details.g summary span{font:400 .9rem "Outfit";color:var(--mu)}
+.nodes{display:flex;flex-wrap:wrap;gap:.5rem;padding:0 1rem 1rem}
+.node{display:flex;align-items:center;gap:.6rem;background:var(--bg);border:1px solid var(--ln);border-radius:16px;padding:.4rem .9rem .4rem .4rem;text-align:left}
+.node:hover{border-color:var(--iris);background:#f1efff}.node small{display:block;color:var(--mu);font-size:.78rem}
+/* fotos con los detalles dentro de la foto */
+.mas{columns:230px;column-gap:1rem}
+.pc{position:relative;margin:0 0 1rem;break-inside:avoid;border-radius:24px;overflow:hidden;background:var(--ln);box-shadow:0 14px 34px -16px rgba(40,20,90,.5);transition:transform .3s}
+.pc:hover{transform:translateY(-4px)}
+.pc>button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.pc img{display:block;width:100%;height:auto;min-height:150px;object-fit:cover;transition:transform .6s}.pc:hover img{transform:scale(1.05)}
+.pc figcaption{position:absolute;inset:auto 0 0;padding:3rem 1rem .9rem;color:#fff;pointer-events:none;background:linear-gradient(transparent,rgba(18,13,46,.9))}
+.pc figcaption b{display:block;font:700 1.1rem/1.15 "Outfit",system-ui,sans-serif}.pc figcaption small{display:block;opacity:.85;font-size:.8rem;margin-top:.15rem}
+.pc figcaption p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.82rem;line-height:1.35;max-height:0;opacity:0;transition:.35s}
+.pc:hover figcaption p,.pc:focus-within figcaption p{max-height:3em;opacity:.9;margin-top:.4rem}
+@media(hover:none){.pc figcaption p{display:none}}
+@media(max-width:560px){.mas{columns:2;column-gap:.6rem}.pc{margin-bottom:.6rem;border-radius:18px}.pc figcaption{padding:2rem .6rem .6rem}.pc figcaption b{font-size:.95rem}.pc figcaption small{font-size:.7rem}}
+.fab:hover{transform:translateY(-3px)}
+.fab{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:50;border:0;border-radius:999px;background:#1fa855;color:#fff;font-weight:600;padding:.85rem 1.3rem;box-shadow:0 12px 28px rgba(31,168,85,.4);transition:transform .2s}
+.fab:hover{transform:translateY(-3px)}
+.stories{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-top:1.4rem}
+.stories p{font-size:.93rem;color:var(--mu);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;margin-top:.3rem}
+.title{border:0;background:none;padding:0;font:800 1.15rem "Outfit";color:var(--ink);text-align:left}.title:hover{color:var(--iris);text-decoration:underline}
+.more{display:block;margin:1rem auto 0}
+.mapgrid{display:grid;grid-template-columns:270px 1fr;gap:1rem;align-items:start}
+.clist{max-height:min(58vh,520px);overflow:auto;display:grid;gap:.4rem;align-content:start}
+.clist button{display:flex;justify-content:space-between;gap:.5rem;text-align:left;background:#fff;border:1px solid var(--ln);border-radius:14px;padding:.5rem .8rem}
+.clist button[aria-pressed=true],.clist button:hover{border-color:var(--iris);background:#f1efff}
+.clist span{color:var(--mu);font-size:.82rem;white-space:nowrap}
+#gm{width:100%;height:min(46vh,420px);border:1px solid var(--ln);border-radius:22px;background:#e8eef7}
+.mact{display:flex;gap:.5rem;flex-wrap:wrap;margin:.7rem 0}
+.rows{display:grid;margin-top:.5rem}
+.row{display:flex;justify-content:space-between;align-items:center;gap:1rem;border-bottom:1px solid var(--ln);padding:.45rem 0;font-size:.95rem}.row>span{color:var(--mu);font-size:.88rem}
+.row .title{font-size:1rem}
+.who{display:flex;gap:.9rem;align-items:center;margin-bottom:.8rem}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem .9rem;margin:.8rem 0}dt{color:var(--mu)}dd{margin:0}
+.thumbs{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.8rem}.thumbs img{width:72px;height:72px;object-fit:cover;border-radius:12px;cursor:zoom-in}
+.rep{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.hb{display:grid;grid-template-columns:62px 1fr 28px;gap:.5rem;align-items:center;font-size:.88rem;margin:.25rem 0}.hb div{height:12px;border-radius:99px;background:linear-gradient(90deg,var(--iris),var(--petal))}
+.f{display:grid;gap:.8rem;max-width:620px}.f label{display:grid;gap:.3rem;font-weight:600;font-size:.92rem}
+@media(max-width:760px){.two,.mapgrid{grid-template-columns:1fr}.clist{max-height:190px}.top nav{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
+/* v3 · aurora, bento y colores */
+.hero{--deep:#0a3b36;background:radial-gradient(70% 90% at 90% 0,#f1fffb 0,transparent 60%),radial-gradient(55% 70% at 5% 110%,#9fe3cf 0,transparent 65%),linear-gradient(160deg,#cdf6ea,#b2ecdc);color:var(--deep);border-radius:0 0 44px 44px;padding-bottom:5.5rem}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;border:2px solid #ffffff8c;pointer-events:none}
+.hero::before{width:440px;height:440px;left:-150px;bottom:-200px}.hero::after{width:240px;height:240px;left:42%;top:42%;border-color:#ffffff73}
+i,em{font-style:normal}
+.top{position:relative;z-index:3}.top b{color:var(--deep);font-size:clamp(.95rem,2.4vw,1.15rem);line-height:1.2;max-width:30ch}
+.top nav button{color:#0a3b36d9}.top nav button:hover{background:var(--deep);color:#fff}
+.hero .in{padding-top:2.5rem}
+.hero h1{font-size:clamp(2.6rem,12vw,7rem);background:linear-gradient(100deg,#0a2f6b,#0b5d4a 60%,#0a3b36);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .mu{color:#0a3b36e0}
+.flower{top:4.8rem;right:max(1.25rem,calc(50% - 560px + 1.25rem));width:min(36vw,270px);opacity:1}
+@media(max-width:700px){.flower{width:42vw;opacity:.35}}
+.status{background:#ffffffb3;border-color:#ffffffd9;color:var(--deep);backdrop-filter:blur(8px)}.bday{color:var(--ink)}
+.tiles{grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:-3.4rem;position:relative;z-index:3}
+.tile{position:relative;overflow:hidden;color:#fff;border:0;background:linear-gradient(145deg,var(--a),var(--b));min-height:170px;border-radius:28px}
+.tile::after{content:"";position:absolute;right:-30px;bottom:-40px;width:140px;height:140px;border-radius:50%;background:#ffffff1a;pointer-events:none}
+.tile:hover{border-color:transparent;box-shadow:0 20px 40px -14px var(--b)}
+.tile h3{font-size:1.5rem}.tile small{color:#ffffffd6}.tile .ic{background:#ffffff30}
+.tile .ic svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tile:nth-child(2),.tile:nth-child(4),.tile:nth-child(5){grid-column:span 2}
+.album{max-width:1120px;margin:2.5rem auto 0;padding:0 1.25rem}.album h2{font-size:clamp(1.8rem,5vw,2.6rem);margin-bottom:.6rem}
+.strip{display:block;max-width:none;margin:0 -1.25rem;padding:1rem 0 1.5rem;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.mtrack{display:flex;width:max-content;animation:rl var(--d,40s) linear infinite}
+@keyframes rl{to{transform:translateX(-50%)}}
+.sc{--s:180px;flex:none;width:var(--s);height:var(--s);margin:0 1.2rem 0 0;border-radius:50%;border:4px solid #fff;box-shadow:0 10px 26px -10px rgba(40,20,90,.55),0 0 0 2px var(--iris)}
+.sc:hover{transform:none}.sc>button{height:100%}.sc img{height:100%;min-height:0}
+.sc figcaption{padding:2.4rem .8rem 1.1rem;text-align:center}.sc figcaption b{font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc figcaption small{font-size:.7rem}.sc figcaption p{display:none}
+@media(max-width:700px){.sc{--s:132px}.sc figcaption{padding:1.8rem .5rem .9rem}.sc figcaption b{font-size:.78rem}}
+@media(prefers-reduced-motion:reduce){.strip{overflow-x:auto}}
+.card{border-radius:26px;box-shadow:0 12px 30px -20px rgba(40,20,90,.45)}
+.chip[aria-pressed=true]{background:linear-gradient(100deg,var(--iris),var(--petal));border-color:transparent}
+.btn.a{background:var(--night)}.av{background:linear-gradient(135deg,var(--iris),#a78bff)}.av.f{background:linear-gradient(135deg,var(--petal),#ff9a6b)}.av.u{background:linear-gradient(135deg,#10b981,#6ee7b7)}
+@media(max-width:700px){.tiles{grid-template-columns:1fr 1fr}.tile:nth-child(2){order:-1}.tile:nth-child(4),.tile:nth-child(5){grid-column:auto}.tile{min-height:140px;padding:1rem}.hero{border-radius:0 0 30px 30px}}
+</style></head>
+<body>
+<header class="hero"><div class="top"><b>Sitio de Genealogía de la familia Fioravante</b><nav><button data-open="origen">Origen</button><button data-open="arbol">Árbol</button><button data-open="recuerdos">Recuerdos</button><button data-open="mapas">Mapas</button><button data-open="reportes">Reportes</button></nav></div><svg class="flower" viewBox="-300 -300 600 600" aria-hidden="true"><defs>
+<linearGradient id="pb" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#1e3a8a"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+<linearGradient id="po" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c2410c"/><stop offset="1" stop-color="#fb923c"/></linearGradient>
+<linearGradient id="pr" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#991b1b"/><stop offset="1" stop-color="#ef4444"/></linearGradient>
+<linearGradient id="pg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#052e16"/><stop offset="1" stop-color="#15803d"/></linearGradient></defs>
+<g id="fl"></g><circle r="38" fill="#ffd23f"/><circle r="38" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="4"/><circle r="14" fill="#fff" opacity=".8"/></svg>
+<div class="in"><h1>Fioravante</h1><p class="sub">La historia de una familia</p>
+<p class="et mu">Un apellido que significa «flor»: raíces en Italia, ramas en Argentina y Brasil. Elegí por dónde empezar.</p>
+<div id="bday"></div><div class="status" id="status"><i></i><span>Conectando con la base de datos…</span></div></div></header>
+
+<main><div class="tiles" id="tiles"></div><section class="album"><h2>Álbum familiar</h2><div class="strip" id="strip"></div></section></main>
+<footer>Fioravante, la historia de una familia</footer>
+
+<button class="fab" data-open="contacto" aria-label="Abrir contacto">💬 Contacto</button>
+
+<dialog id="sheet" aria-labelledby="st"><div class="sh"><h2 id="st"></h2><button class="x" id="sx" aria-label="Cerrar">✕</button></div>
+<div id="sb">
+<div class="view" id="v-origen" hidden><p class="mu" style="max-width:60ch;margin-bottom:1rem">Fioravante viene de «Fiore», que a su vez deriva del latín <i>flos, floris</i>: flor.</p>
+<div class="two"><div class="card"><h3>Significado</h3><p class="quote">Andrea da Barberino interpreta Fioravante como «deja que esta flor avance».</p><p>Un nombre cargado de belleza, que pasó de nombre propio a apellido familiar.</p></div>
+<div class="card"><h3>Primera aparición</h3><p style="margin-top:.6rem">El apellido se encontró por primera vez en <b>Pistoia</b> (Toscana, Italia), cuando un Fioravante integraba el consejo de gobierno de la ciudad.</p>
+<svg viewBox="0 0 400 220" role="img" aria-label="Ilustración de Pistoia, Toscana" style="width:100%;display:block;border-radius:18px;margin-top:1rem"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4cff"/><stop offset=".6" stop-color="#ff4f81"/><stop offset="1" stop-color="#ffb020"/></linearGradient></defs><rect width="400" height="220" fill="url(#sk)"/><circle cx="305" cy="78" r="32" fill="#fff4d6" opacity=".9"/><path d="M0 172Q100 120 200 160T400 148V220H0Z" fill="#3b2a8f" opacity=".5"/><g fill="#1a1530"><rect x="66" y="98" width="30" height="100"/><path d="M66 98h30l-15-24z"/><rect x="150" y="132" width="150" height="66"/><path d="M185 132a40 40 0 0 1 80 0z"/><rect x="221" y="72" width="8" height="20"/><rect y="196" width="400" height="24"/></g><g fill="#ffd78a"><rect x="77" y="112" width="8" height="16" rx="4"/><rect x="77" y="142" width="8" height="16" rx="4"/><path d="M166 196v-22a8 8 0 0 1 16 0v22zM217 196v-26a8 8 0 0 1 16 0v26zM268 196v-22a8 8 0 0 1 16 0v22z"/></g></svg></div></div>
+<p style="margin-top:1rem"><button class="btn g" data-open="mapas" data-mf="Italia">Ver los núcleos del apellido en Italia</button></p></div>
+
+<div class="view" id="v-arbol" hidden><div class="bar"><input type="search" id="q" placeholder="Buscar por nombre o lugar" aria-label="Buscar persona"><button class="chip" data-g="all" aria-pressed="true">Todos</button><button class="chip" data-g="f" aria-pressed="false">Mujeres</button><button class="chip" data-g="m" aria-pressed="false">Varones</button></div>
+<p class="mu" style="margin-bottom:.8rem">Generaciones por año de nacimiento. Abrí un grupo y tocá una persona para ver su ficha.</p><div id="gens"></div></div>
+
+<div class="view" id="v-recuerdos" hidden><div class="bar"><select id="who" aria-label="Filtrar por persona"><option value="">Todas las personas</option></select></div>
+<div id="gal"></div><div class="stories" id="stories"></div><button class="btn b more" id="moreS" hidden>Ver más biografías</button></div>
+
+<div class="view" id="v-mapas" hidden>
+<div class="bar" id="mchips"></div>
+<div class="mapgrid"><div><input type="search" id="mq" placeholder="Buscar ciudad" aria-label="Buscar ciudad" style="width:100%;margin-bottom:.6rem"><div class="clist" id="mlist"></div></div>
+<div><div class="mact" id="mact"></div><iframe id="gm" title="Google Maps" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe><div class="card" id="mpan" style="margin-top:.9rem"></div></div></div></div>
+
+<div class="view" id="v-reportes" hidden><div class="rep" id="rep"></div></div>
+
+<div class="view" id="v-contacto" hidden><p class="mu" style="max-width:60ch;margin-bottom:1rem">Sumá fotos, anécdotas, documentos o datos que todavía no están en la historia familiar.</p>
+<div class="card f"><label>Nombre y apellido<input id="cn" autocomplete="name"></label><label>Ciudad y país<input id="cc"></label><label>Mensaje<textarea id="cm" rows="4"></textarea></label>
+<div><button class="btn wa" id="send">Enviar por WhatsApp</button></div></div></div>
+</div></dialog>
+
+<dialog id="pdlg" aria-label="Ficha de la persona"><div id="pbody"></div><div style="text-align:right;margin-top:1rem"><button class="btn b" id="px">Cerrar</button></div></dialog>
+<dialog id="lb"><figure class="lbf"><img id="lbi" alt=""><figcaption class="lbinfo" id="lbinfo"></figcaption></figure><span id="lbk" class="lbk"></span><button class="lbc" id="lbc2" aria-label="Cerrar">✕</button><button class="lbar l" id="lbp" aria-label="Anterior">‹</button><button class="lbar r" id="lbx2" aria-label="Siguiente">›</button></dialog>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w\s]/g,' ').replace(/\s+/g,' ').trim();
+const okUrl=u=>typeof u==='string'&&/^(https?:|data:image)/i.test(u);
+$('#fl').innerHTML=[0,1].map(r=>[...Array(12)].map((_,i)=>`<path transform="rotate(${i*30+r*15}) scale(${r?.62:1})" d="M0 -30 C60 -90 60 -200 0 -270 C-60 -200 -60 -90 0 -30Z" fill="url(#p${'borg'[(i+r*2)%4]})" stroke="#fff" stroke-opacity=".45" stroke-width="3"/>`).join('')).join('');
+const cfg={apiKey:"AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",authDomain:"familia-genealogia.firebaseapp.com",projectId:"familia-genealogia",storageBucket:"familia-genealogia.firebasestorage.app",messagingSenderId:"923693678578",appId:"1:923693678578:web:bfed5d66d564d00847356b"};
+let people=[],gen='all',term='',stN=6,mf='all',mq='',msel=null,lastQ='',cur=null;const CKEY='fioravante-cache',L={g:[],p:[],h:[]};
+const toD=v=>{if(!v)return null;const d=v.toDate?v.toDate():v.seconds?new Date(v.seconds*1000):new Date(v);return isNaN(d)?null:d};
+const fmt=d=>d?d.toLocaleDateString('es-AR',{timeZone:'UTC',day:'numeric',month:'long',year:'numeric'}):'';
+const full=p=>p.fullName||[p.firstName,p.lastName].filter(Boolean).join(' ').trim()||p.name||'Sin nombre';
+const photos=p=>(Array.isArray(p.photos)?p.photos:[]).filter(okUrl);
+function prep(p){const b=toD(p.birthDate),d=toD(p.deathDate);return{...p,_b:b,_d:d,_y:p.birthYear||(b&&b.getUTCFullYear())||null,_g:/^(f|muj)/i.test(p.gender||'')?'f':/^(m|v|h|masc)/i.test(p.gender||'')?'m':'u'}}
+const av=p=>{const f=photos(p)[0];return `<span class="av ${p._g}">${f?`<img src="${esc(f)}" alt="" loading="lazy" onerror="this.remove()">`:esc(full(p)[0]||'?')}</span>`};
+const empty=t=>`<div class="empty">${t}</div>`;
+const pbtn=p=>`<button class="title" data-person="${esc(p.id)}">${esc(full(p))}</button>`;
+const meta=f=>{const p=people.find(x=>x.id===f.id)||{},y=[p._b?p._b.getUTCFullYear():p._y,p._d&&p._d.getUTCFullYear()].filter(Boolean).join(' – ');return{y,pl:p.birthPlace||'',bio:(p.biography||'').trim()}};
+const card=(f,i,k,c='')=>{const m=meta(f);return`<figure class="pc ${c}"${c?` style="--r:${i%2?1.6:-1.6}deg"`:''}><button data-lb="${k}:${i}" aria-label="Ver foto de ${esc(f.n)}"><img loading="lazy" src="${esc(f.u)}" alt="Recuerdo de ${esc(f.n)}" onerror="this.closest('figure').remove()"></button><figcaption><b>${esc(f.n)}</b><small>${esc([m.y,m.pl].filter(Boolean).join(' · '))}</small>${m.bio?`<p>${esc(m.bio)}</p>`:''}</figcaption></figure>`};
+
+/* datos */
+function setStatus(c,t){const s=$('#status');s.className='status '+c;s.querySelector('span').textContent=t}
+async function load(){
+ try{firebase.initializeApp(cfg);const snap=await firebase.firestore().collection('persons').get();
+  const raw=snap.docs.map(d=>{const x=d.data();return{id:d.id,...x,birthDate:toD(x.birthDate)?.toISOString()||null,deathDate:toD(x.deathDate)?.toISOString()||null}});
+  try{localStorage.setItem(CKEY,JSON.stringify(raw))}catch(e){}
+  people=raw.map(prep);setStatus('ok','Datos en vivo desde Firestore · '+people.length+' personas');
+ }catch(e){console.error(e);let c=null;try{c=JSON.parse(localStorage.getItem(CKEY)||'null')}catch(_){}
+  if(c){people=c.map(prep);setStatus('err','Sin conexión: se muestran los últimos datos guardados')}else setStatus('err','No se pudo leer Firestore. Revisá la conexión y las reglas de lectura.')}
+ render()}
+function render(){home();if(cur)renderView(cur)}
+function home(){const ph=people.reduce((n,p)=>n+photos(p).length,0),pl=new Set(people.flatMap(p=>[p.birthPlace,p.deathPlace]).filter(Boolean).map(norm)).size;
+ const I=d=>`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+ const T=[['arbol','M12 21v-7M12 14c-4 0-6-3-6-6a6 6 0 0 1 12 0c0 3-2 6-6 6zM8 21h8','#0f9d73,#0b6e66','Árbol',people.length?people.length+' personas':'Generaciones'],['recuerdos','M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z','#ff4f81,#c026d3','Recuerdos',ph?ph+' fotos con su historia':'Fotos e historias'],['mapas','M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z','#6b4cff,#3b2db8','Mapas',pl?pl+' lugares':'Lugares en Google Maps'],['origen','M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 3c2 0 3 2 0 6-3-4-2-6 0-6zM12 21c-2 0-3-2 0-6 3 4 2 6 0 6zM3 12c0-2 2-3 6 0-4 3-6 2-6 0zM21 12c0 2-2 3-6 0 4-3 6-2 6 0z','#f97316,#db2777','Origen','El significado del apellido'],['reportes','M5 20V10M12 20V4M19 20v-7','#0ea5e9,#4f46e5','Reportes','Datos y estadísticas']];
+ $('#tiles').innerHTML=T.map(([id,d,c,t,s])=>{const[a,b]=c.split(',');return`<button class="tile" data-open="${id}" style="--a:${a};--b:${b}"><span class="ic">${I(d)}</span><h3>${t}</h3><small>${esc(s)}</small></button>`}).join('');
+ const t=new Date(),n=people.filter(p=>p._b&&p._b.getUTCMonth()===t.getMonth()&&p._b.getUTCDate()===t.getDate()).map(full);
+ $('#bday').innerHTML=n.length?`<div class="bday">🎂 Hoy cumple años: <b>${esc(n.join(', '))}</b></div>`:'';
+ L.h=people.filter(p=>p._g==='m'&&(p._y||0)>=1930&&norm(p.lastName||full(p)).includes('fioravante')).flatMap(p=>photos(p).map(u=>({u,n:full(p),id:p.id})));
+ $('.album').hidden=!L.h.length;if(!L.h.length){$('#strip').innerHTML='';return}
+ let base=L.h.map((_,i)=>i);while(base.length<12)base=base.concat(base);
+ const it=(i,h)=>{const c=card(L.h[i],i,'h','sc');return h?c.replace('<button ','<button tabindex="-1" '):c};
+ $('#strip').innerHTML=`<div class="mtrack" style="--d:${Math.round(base.length*3.2)}s">${base.map(i=>it(i,0)).join('')}<span style="display:contents" aria-hidden="true">${base.map(i=>it(i,1)).join('')}</span></div>`}
+
+/* paneles */
+const V={origen:'El origen del apellido',arbol:'Árbol genealógico',recuerdos:'Recuerdos',mapas:'Mapas de la familia',reportes:'Reportes',contacto:'Contacto'},sheet=$('#sheet');
+function openView(id){if(!V[id])return;cur=id;$$('.view').forEach(v=>v.hidden=v.id!=='v-'+id);$('#st').textContent=V[id];if(!sheet.open)sheet.showModal();$('#sb').scrollTop=0;try{history.replaceState(null,'','#'+id)}catch(e){}renderView(id)}
+function renderView(id){({arbol:tree,recuerdos:memories,mapas:mapView,reportes:reports})[id]?.()}
+sheet.addEventListener('close',()=>{cur=null;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}});
+$('#sx').onclick=()=>sheet.close();
+[sheet,$('#pdlg'),$('#lb')].forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
+$('#px').onclick=()=>$('#pdlg').close();$('#lbc2').onclick=()=>$('#lb').close();
+
+/* ficha de persona */
+function openPerson(id){const p=people.find(x=>x.id===id);if(!p)return;L.p=photos(p).map(u=>({u,n:full(p),id:p.id}));
+ const age=p._b&&p._d?Math.floor((p._d-p._b)/31557600000):null;
+ const pl=(l,k)=>l?`${esc(l)}<br><button class="btn b" style="margin-top:.3rem;padding:.35rem .9rem;font-size:.85rem" data-map="${esc(l)}">Ver en Google Maps</button>`:'';
+ $('#pbody').innerHTML=`<div class="who">${av(p).replace('av ','av ').replace('<span class="av','<span style="width:64px;height:64px;font-size:1.5rem" class="av')}<div><h3 style="font-size:1.6rem">${esc(full(p))}</h3><span class="mu">${p._y||'Sin año de nacimiento'}${age!=null?' · vivió '+age+' años':''}</span></div></div>
+ <dl>${p._b||p.birthPlace?`<dt>Nació</dt><dd>${fmt(p._b)}${p._b&&p.birthPlace?'<br>':''}${pl(p.birthPlace)}</dd>`:''}${p._d||p.deathPlace?`<dt>Falleció</dt><dd>${fmt(p._d)}${p._d&&p.deathPlace?'<br>':''}${pl(p.deathPlace)}</dd>`:''}</dl>
+ <p>${esc(p.biography)||'<span class="mu">Sin biografía registrada.</span>'}</p>
+ <div class="thumbs">${L.p.slice(0,12).map((f,i)=>`<img src="${esc(f.u)}" alt="Foto de ${esc(f.n)}" data-lb="p:${i}" loading="lazy" onerror="this.remove()">`).join('')}</div>`;
+ $('#pdlg').showModal()}
+
+/* lightbox */
+let lbS=null,lbI=0;
+function openLb(k){const[s,i]=k.split(':');lbS=L[s];lbI=+i;showLb();if(!$('#lb').open)$('#lb').showModal()}
+function lbInfo(f){const p=people.find(x=>x.id===f.id);if(!p)return`<h3>${esc(f.n)}</h3>`;
+ const age=p._b&&p._d?Math.floor((p._d-p._b)/31557600000):null,m=l=>l?`<br><button class="btn b mini" data-map="${esc(l)}">Ver en Google Maps</button>`:'';
+ return`<h3>${esc(full(p))}</h3><p class="sm">${p._y||'Sin año de nacimiento'}${age!=null?' · vivió '+age+' años':''}</p>
+ <dl>${p._b||p.birthPlace?`<dt>Nació</dt><dd>${fmt(p._b)}${p._b&&p.birthPlace?', ':''}${esc(p.birthPlace)}${m(p.birthPlace)}</dd>`:''}${p._d||p.deathPlace?`<dt>Falleció</dt><dd>${fmt(p._d)}${p._d&&p.deathPlace?', ':''}${esc(p.deathPlace)}${m(p.deathPlace)}</dd>`:''}${p.gender?`<dt>Género</dt><dd>${esc(p.gender)}</dd>`:''}</dl>
+ <p class="bio">${esc(p.biography)||'<span class="mu">Sin biografía registrada.</span>'}</p>`}
+function showLb(){const f=lbS[lbI];$('#lbi').src=f.u;$('#lbi').alt='Foto de '+f.n;$('#lbinfo').innerHTML=lbInfo(f);$('#lbk').textContent=(lbI+1)+' / '+lbS.length;$('#lb').scrollTop=0}
+const step=d=>{if(lbS){lbI=(lbI+d+lbS.length)%lbS.length;showLb()}};
+$('#lbp').onclick=()=>step(-1);$('#lbx2').onclick=()=>step(1);
+document.addEventListener('keydown',e=>{if($('#lb').open){if(e.key==='ArrowLeft')step(-1);if(e.key==='ArrowRight')step(1)}});
+
+/* árbol */
+function tree(){const box=$('#gens');if(!people.length){box.innerHTML=empty('No hay personas para mostrar.');return}
+ const t=norm(term),list=people.filter(p=>(gen==='all'||p._g===gen)&&(!t||norm(full(p)+' '+p.birthPlace+' '+p.deathPlace).includes(t)));
+ const g={};list.forEach(p=>{const k=p._y?Math.floor(p._y/30)*30:0;(g[k]=g[k]||[]).push(p)});
+ const ks=Object.keys(g).sort((a,b)=>(a==0)-(b==0)||a-b);
+ box.innerHTML=ks.map((k,i)=>`<details class="g" ${t||i===0?'open':''}><summary>${k==0?'Sin fecha':`${k} – ${+k+29}`}<span>${g[k].length} personas</span></summary><div class="nodes">${g[k].sort((a,b)=>(a._y||0)-(b._y||0)).map(p=>`<button class="node" data-person="${esc(p.id)}">${av(p)}<span>${esc(full(p))}<small>${p._y||'s/f'}</small></span></button>`).join('')}</div></details>`).join('')||'<p class="mu">Sin resultados.</p>'}
+$('#q').oninput=e=>{term=e.target.value;tree()};
+$$('[data-g]').forEach(b=>b.onclick=()=>{gen=b.dataset.g;$$('[data-g]').forEach(x=>x.setAttribute('aria-pressed',x===b));tree()});
+
+/* recuerdos */
+function memories(){const s=$('#who'),v=s.value;s.innerHTML='<option value="">Todas las personas</option>'+people.filter(p=>photos(p).length).sort((a,b)=>full(a).localeCompare(full(b))).map(p=>`<option value="${esc(p.id)}">${esc(full(p))}</option>`).join('');s.value=v;
+ L.g=[];people.forEach(p=>{if(!v||p.id===v)photos(p).forEach(u=>L.g.push({u,n:full(p),id:p.id}))});
+ if(!L.g.length){$('#gal').innerHTML=empty('Todavía no hay fotos cargadas.')}else{
+  $('#gal').innerHTML=`<div class="mas">${L.g.map((f,i)=>card(f,i,'g')).join('')}</div>`}
+ const bs=people.filter(p=>(p.biography||'').trim()&&(!v||p.id===v));
+ $('#stories').innerHTML=bs.slice(0,stN).map(p=>`<div class="card">${pbtn(p)}<p>${esc(p.biography)}</p></div>`).join('');
+ $('#moreS').hidden=bs.length<=stN;$('#moreS').textContent=`Ver más biografías (${bs.length-stN})`}
+$('#who').onchange=()=>{stN=6;memories()};$('#moreS').onclick=()=>{stN+=6;memories()};
+
+/* mapas · Google Maps */
+const IT=[['Caserta','Campania','Región con mayor presencia del apellido en el sur.'],['Nápoles','Campania','Punto de intercambio mercantil de familias de zonas rurales cercanas.'],['Salerno','Campania','Núcleo de alta densidad histórica en actas de la costa.'],['Benevento','Campania','Actas civiles con la ortografía en «e».'],['Avellino','Campania','Archivos comunales y eclesiásticos del mundo agrario.'],['Foggia','Apulia','Asentamientos agrícolas y comerciales antiguos.'],['Bari','Apulia','Puerto clave, conectado con Foggia.'],['Roma','Lacio','Foco de migración interna con ramas en registros parroquiales.'],['Treviso','Véneto','Norte de Italia, ligado a topónimos medievales.'],['Vicenza','Véneto','Comparte con Treviso la historia filológica del norte.'],['Pistoia','Toscana','Primera aparición documentada del apellido.']];
+const country=l=>{const n=norm(l);return/argentina/.test(n)?'Argentina':/brasil|brazil/.test(n)?'Brasil':/ital/.test(n)||IT.some(x=>n.startsWith(norm(x[0])))?'Italia':'Otros'};
+function cities(){const m=new Map();
+ people.forEach(p=>[['n',p.birthPlace],['f',p.deathPlace]].forEach(([t,l])=>{if(!l||!l.trim())return;const k=norm(l),e=m.get(k)||{k,name:l.trim(),q:l.trim(),ps:[],c:country(l)};e.ps.push({p,t});m.set(k,e)}));
+ IT.forEach(([n,r,t])=>{const k=norm(n),e=[...m.values()].find(x=>x.k===k||x.k.startsWith(k+' '));if(e){e.note=t;e.region=r}else m.set('it-'+k,{k:'it-'+k,name:n+' ('+r+')',q:`${n}, ${r}, Italia`,ps:[],c:'Italia',note:t,region:r,it:true})});
+ return[...m.values()].sort((a,b)=>b.ps.length-a.ps.length||a.name.localeCompare(b.name))}
+const gq=q=>encodeURIComponent(q);
+function mapView(){const cs=cities(),cnt=c=>cs.filter(x=>c==='all'||x.c===c).length;
+ $('#mchips').innerHTML=['all','Argentina','Brasil','Italia','Otros'].filter(c=>c==='all'||cnt(c)).map(c=>`<button class="chip" data-mf="${c}" aria-pressed="${mf===c}">${c==='all'?'Todos':c} · ${cnt(c)}</button>`).join('');
+ const t=norm(mq),list=cs.filter(x=>(mf==='all'||x.c===mf)&&(!t||norm(x.name).includes(t)));
+ $('#mlist').innerHTML=list.map(c=>`<button data-city="${esc(c.k)}" aria-pressed="${c.k===msel}">${esc(c.name)}<span>${c.ps.length?c.ps.length+' pers.':'apellido'}</span></button>`).join('')||empty('Sin ciudades.');
+ if(!cs.find(x=>x.k===msel)||(list.length&&!list.find(x=>x.k===msel)&&!pendingSel))msel=(list[0]||cs[0])?.k||null;pendingSel=false;pick(msel,cs)}
+let pendingSel=false;
+function pick(k,cs){cs=cs||cities();const c=cs.find(x=>x.k===k);const gm=$('#gm');
+ if(!c){$('#mact').innerHTML='';$('#mpan').innerHTML='<p class="mu">Todavía no hay lugares registrados.</p>';gm.src='https://maps.google.com/maps?q=Misiones,+Argentina&z=6&output=embed&hl=es';return}
+ msel=k;$$('#mlist button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.city===k));
+ if(lastQ!==c.q){lastQ=c.q;gm.src=`https://maps.google.com/maps?q=${gq(c.q)}&z=11&output=embed&hl=es`}
+ $('#mact').innerHTML=`<a class="btn g" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${gq(c.q)}">Abrir en Google Maps</a><a class="btn b" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${gq(c.q)}">Cómo llegar</a>${c.c==='Italia'?`<a class="btn b" target="_blank" rel="noopener" href="https://antenati.cultura.gov.it/?lang=es">Archivos de Italia</a>`:''}`;
+ $('#mpan').innerHTML=`<h3>${esc(c.name)}</h3><span class="mu">${c.c}${c.region&&!c.it?' · '+c.region:''}</span>${c.note?`<p style="margin-top:.5rem">${esc(c.note)}</p>`:''}${c.ps.length?`<div class="rows">${c.ps.sort((a,b)=>(a.p._y||0)-(b.p._y||0)).map(({p,t})=>`<div class="row">${pbtn(p)}<span>${t==='n'?'Nació':'Falleció'}${p._y&&t==='n'?' en '+p._y:''}</span></div>`).join('')}</div>`:'<p class="mu" style="margin-top:.5rem">Sin personas del árbol registradas en este lugar.</p>'}`}
+function openMap(place,filter){mf=filter||'all';mq='';$('#mq').value='';msel=norm(place);pendingSel=true;openView('mapas')}
+$('#mchips').onclick=e=>{const b=e.target.closest('[data-mf]');if(b){mf=b.dataset.mf;mapView()}};
+$('#mlist').onclick=e=>{const b=e.target.closest('[data-city]');if(b)pick(b.dataset.city)};
+$('#mq').oninput=e=>{mq=e.target.value;mapView()};
+
+/* reportes */
+function reports(){const R=$('#rep');if(!people.length){R.innerHTML=empty('Sin datos.');return}
+ const cnt=a=>a.reduce((m,k)=>(k&&(m[k]=(m[k]||0)+1),m),{});
+ const dec=cnt(people.map(p=>p._y&&Math.floor(p._y/10)*10)),dk=Object.keys(dec).sort(),dm=Math.max(...Object.values(dec),1);
+ const pl=Object.entries(cnt(people.map(p=>p.birthPlace&&p.birthPlace.trim()))).sort((a,b)=>b[1]-a[1]).slice(0,8);
+ const life=people.filter(p=>p._b&&p._d).map(p=>({p,a:Math.floor((p._d-p._b)/31557600000)})).filter(x=>x.a>=0&&x.a<125).sort((a,b)=>b.a-a.a);
+ const old=people.filter(p=>p._b).sort((a,b)=>a._b-b._b).slice(0,5);
+ R.innerHTML=`<div class="card"><h3>Resumen</h3><div class="rows">${[['Personas',people.length],['Mujeres',people.filter(p=>p._g==='f').length],['Varones',people.filter(p=>p._g==='m').length],['Fallecidos',people.filter(p=>p._d).length],['Sin foto',people.filter(p=>!photos(p).length).length],['Sin biografía',people.filter(p=>!(p.biography||'').trim()).length]].map(([a,b])=>`<div class="row">${a}<span>${b}</span></div>`).join('')}</div></div>
+ <div class="card"><h3>Nacimientos por década</h3>${dk.map(k=>`<div class="hb"><span>${k}s</span><div style="width:${Math.max(6,dec[k]/dm*100)}%"></div><b>${dec[k]}</b></div>`).join('')||'<p class="mu">Sin años de nacimiento.</p>'}</div>
+ <div class="card"><h3>Lugares de nacimiento</h3><div class="rows">${pl.map(([k,v])=>`<div class="row"><button class="title" data-map="${esc(k)}">${esc(k)}</button><span>${v}</span></div>`).join('')}</div></div>
+ <div class="card"><h3>Registros más antiguos</h3><div class="rows">${old.map(p=>`<div class="row">${pbtn(p)}<span>${p._b.getUTCFullYear()}</span></div>`).join('')}</div></div>
+ <div class="card"><h3>Vidas más largas</h3><div class="rows">${life.slice(0,5).map(x=>`<div class="row">${pbtn(x.p)}<span>${x.a} años</span></div>`).join('')||'<p class="mu">Faltan fechas de fallecimiento.</p>'}</div></div>`}
+
+/* contacto */
+$('#send').onclick=()=>{const t=`Hola, soy ${$('#cn').value||'(sin nombre)'} de ${$('#cc').value||'(sin ciudad)'}.\n${$('#cm').value}`;window.open('https://wa.me/5493764850728?text='+encodeURIComponent(t),'_blank','noopener')};
+
+/* clics globales */
+document.addEventListener('click',e=>{
+ const o=e.target.closest('[data-open]');if(o){if(o.dataset.mf)mf=o.dataset.mf;openView(o.dataset.open);return}
+ const p=e.target.closest('[data-person]');if(p){openPerson(p.dataset.person);return}
+ const m=e.target.closest('[data-map]');if(m){$('#pdlg').close();$('#lb').close();openMap(m.dataset.map);return}
+ const l=e.target.closest('[data-lb]');if(l){openLb(l.dataset.lb);return}});
+const h=location.hash.slice(1);if(V[h])openView(h);
+load();
+</script></body></html>
