@@ -2,9 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0C211D">
     <title>Fioravante · Archivos Genealógicos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230C211D'/%3E%3Cpath d='M9 16c6 0 5-7 14-7M9 16c6 0 5 7 14 7' fill='none' stroke='%236FD6AE' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='9' cy='16' r='3.4' fill='%23F0C27A'/%3E%3Ccircle cx='23' cy='9' r='2.6' fill='%236FD6AE'/%3E%3Ccircle cx='23' cy='23' r='2.6' fill='%236FD6AE'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
@@ -17,29 +21,86 @@
         }
 
         :root {
-            --primary: #2C423F;
-            --accent: #C47D57;
-            --font-main: 'Inter', sans-serif;
-            --bg-soft: #FAF8F5;
-            --alert-red: #b91c1c;
-            --alert-red-dark: #7f1a1a;
-            --gold: #E6B422;
+            --ink-950: #071512;
+            --ink-900: #0C211D;
+            --ink-800: #123029;
+            --ink-700: #1B4439;
+            --leaf: #6FD6AE;
+            --leaf-deep: #1F7A60;
+            --honey: #F0C27A;
+            --honey-soft: #EBD3A4;
+            --paper: #F6F2E8;
+            --mist: #9DB5AB;
+            --text-dark: #10231E;
+            --muted-dark: #5E6E67;
+            --alert-red: #B42318;
+            --alert-red-dark: #8E1B12;
+
+            --font-display: 'Instrument Serif', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+            --font-main: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            --ease-out: cubic-bezier(.22, 1, .36, 1);
+            --dock-h: 68px;
+            --dock-gap: 12px;
         }
 
-        body, html {
+        button, input { font: inherit; color: inherit; }
+        button { -webkit-appearance: none; appearance: none; }
+        button:focus-visible { outline: 2px solid var(--honey); outline-offset: 3px; }
+
+        html, body {
             height: 100%;
             width: 100%;
-            background: var(--bg-soft);
+            background: var(--ink-900);
             font-family: var(--font-main);
+            color: var(--paper);
             overflow: hidden;
             position: fixed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
+        /* ───────── Fondo del escenario ───────── */
+        .stage-bg {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background:
+                radial-gradient(90% 80% at 50% 40%, rgba(27, 68, 57, .8) 0%, transparent 70%),
+                linear-gradient(160deg, #0F2B25 0%, #0A1B18 100%);
+        }
+        .aurora { position: absolute; border-radius: 50%; will-change: transform; }
+        .a1 {
+            width: 70vmax; height: 70vmax;
+            left: -25vmax; top: -30vmax;
+            background: radial-gradient(circle, rgba(47, 160, 125, .24), transparent 65%);
+            animation: drift-a 28s ease-in-out infinite alternate;
+        }
+        .a2 {
+            width: 60vmax; height: 60vmax;
+            right: -20vmax; bottom: -30vmax;
+            background: radial-gradient(circle, rgba(240, 194, 123, .12), transparent 65%);
+            animation: drift-b 34s ease-in-out infinite alternate;
+        }
+        @keyframes drift-a { to { transform: translate(8vmax, 6vmax) scale(1.08); } }
+        @keyframes drift-b { to { transform: translate(-7vmax, -5vmax) scale(1.12); } }
+        .stage-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: .07;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+        }
+
+        /* ───────── Estructura ───────── */
         .app-container {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            width: 100vw;
+            height: 100dvh;
+            width: 100%;
             overflow: hidden;
         }
 
@@ -51,621 +112,804 @@
             justify-content: center;
             overflow-y: auto;
             min-height: 0;
-            padding: 16px;
             width: 100%;
+            padding: clamp(12px, 2.5vw, 28px) clamp(12px, 2.5vw, 28px) 6px;
+            padding-top: calc(clamp(12px, 2.5vw, 28px) + env(safe-area-inset-top, 0px));
             position: relative;
         }
 
-        .image-container {
-            max-width: 95%;
-            width: auto;
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 28px;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-            transition: all 0.2s ease;
-            margin: auto;
-            flex-shrink: 0;
+        @keyframes stage-in {
+            from { opacity: 0; transform: translateY(18px) scale(.985); }
         }
 
-        .family-image {
-            max-width: 100%;
-            max-height: 55vh;
-            width: auto;
-            height: auto;
-            border-radius: 20px;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(196, 125, 87, 0.25);
-            transition: transform 0.25s ease;
-            object-fit: contain;
-        }
-
-        .family-image:active {
-            transform: scale(0.99);
-        }
-
-        /* ----- MODAL DE CUMPLEAÑOS (limpio, centrado, debajo de la imagen) ----- */
-        .birthday-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 90%;
-            max-width: 480px;
-            background: white;
-            border-radius: 32px;
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2), 0 0 0 1000px rgba(0, 0, 0, 0.3);
-            padding: 1.8rem 1.5rem;
-            text-align: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            backdrop-filter: blur(0px);
-            font-family: var(--font-main);
-        }
-
-        .birthday-modal.open {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .birthday-modal .modal-icon {
-            font-size: 3.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .birthday-modal h3 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 0.75rem;
-            letter-spacing: -0.3px;
-        }
-
-        .birthday-modal .birthday-name {
-            font-size: 1.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--gold));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        .birthday-modal p {
-            font-size: 1rem;
-            color: #3A5E54;
-            margin-bottom: 1.8rem;
-            line-height: 1.4;
-        }
-
-        .birthday-modal button {
-            background: var(--primary);
-            border: none;
-            padding: 10px 24px;
-            border-radius: 60px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: var(--font-main);
-        }
-
-        .birthday-modal button:hover {
-            background: #1F312E;
-        }
-
-        @media (max-width: 550px) {
-            .birthday-modal {
-                width: 85%;
-                padding: 1.4rem 1.2rem;
-            }
-            .birthday-modal h3 {
-                font-size: 1.3rem;
-            }
-            .birthday-modal .birthday-name {
-                font-size: 1.2rem;
-            }
-            .birthday-modal .modal-icon {
-                font-size: 2.8rem;
-            }
-        }
-
-        .iframe-container {
+        /* ───────── Portada de texto animado ───────── */
+        .home-hero {
+            position: relative;
             width: 100%;
             flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 1rem 3vh;
+        }
+        /* Foco de luz que sigue al cursor */
+        .home-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(440px circle at var(--mx, 50%) var(--my, 42%), rgba(240, 194, 123, .11), transparent 62%);
+            transition: background-position .3s ease;
+        }
+
+        .hero-title {
+            position: relative;
+            font-family: var(--font-display);
+            font-weight: 400;
+            /* Se adapta al ancho y también al alto (celulares en horizontal) */
+            font-size: clamp(3.6rem, min(15vw, 27vh), 11.5rem);
+            line-height: .92;
+            letter-spacing: -.025em;
+            color: var(--paper);
+            white-space: nowrap;
+        }
+        .hero-title span {
+            display: inline-block;
+            cursor: default;
+            transition: transform .45s var(--ease-out), color .3s ease, text-shadow .3s ease;
+            animation:
+                letter-in 1s var(--ease-out) calc(var(--i) * 75ms + 250ms) backwards,
+                letter-wave 6.5s ease-in-out calc(2.8s + var(--i) * 95ms) infinite;
+        }
+        .hero-title span:hover {
+            color: var(--honey);
+            transform: translateY(-.07em);
+            text-shadow: 0 0 34px rgba(240, 194, 123, .6);
+        }
+        @keyframes letter-in {
+            from { opacity: 0; transform: translateY(.3em) rotate(2deg); filter: blur(14px); }
+        }
+        /* Una onda de luz recorre las letras cada pocos segundos */
+        @keyframes letter-wave {
+            8% { color: #FFE7BD; text-shadow: 0 0 34px rgba(240, 194, 123, .65); }
+            18% { color: var(--paper); text-shadow: 0 0 0 rgba(240, 194, 123, 0); }
+        }
+
+        .hero-subtitle {
+            margin-top: clamp(.6rem, 1.6vw, 1.1rem);
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: clamp(1.4rem, min(4.2vw, 5.6vh), 2.7rem);
+            line-height: 1.15;
+            color: var(--honey-soft);
+            white-space: nowrap;
+        }
+        .hero-subtitle span {
+            display: inline-block;
+            animation:
+                letter-in .9s var(--ease-out) calc(var(--i) * 38ms + 1000ms) backwards,
+                sub-glint 7s ease-in-out calc(3.6s + var(--i) * 70ms) infinite;
+        }
+        /* Un destello más suave recorre la frase, detrás del apellido */
+        @keyframes sub-glint {
+            6% { color: #FFF6E2; text-shadow: 0 0 22px rgba(240, 194, 123, .55); }
+            14% { color: var(--honey-soft); text-shadow: 0 0 0 rgba(240, 194, 123, 0); }
+        }
+
+        /* Frase que va rotando por las secciones */
+        .home-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            margin-top: clamp(1.6rem, 4.5vh, 2.8rem);
+            padding: 9px 18px 9px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--mist);
+            font-size: .95rem;
+            font-weight: 500;
+            animation: hint-in .9s var(--ease-out) 2.3s backwards;
+        }
+        @keyframes hint-in { from { opacity: 0; transform: translateY(12px); } }
+        .hint-dot {
+            width: 8px; height: 8px;
+            flex: none;
+            border-radius: 50%;
+            background: var(--honey);
+            box-shadow: 0 0 0 0 rgba(240, 194, 123, .5);
+            animation: hint-pulse 2.2s ease-out infinite;
+        }
+        @keyframes hint-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(240, 194, 123, .5); }
+            100% { box-shadow: 0 0 0 10px rgba(240, 194, 123, 0); }
+        }
+        .hint-rotor { display: inline-grid; text-align: left; color: var(--paper); }
+        .hint-rotor .r {
+            grid-area: 1 / 1;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(.7em);
+            filter: blur(4px);
+            transition: opacity .55s ease, transform .6s var(--ease-out), filter .55s ease;
+        }
+        .hint-rotor .r.is-on { opacity: 1; transform: none; filter: none; }
+        .hint-rotor .r.is-out { opacity: 0; transform: translateY(-.7em); filter: blur(4px); }
+
+        /* Contenido de las secciones */
+        .iframe-container {
+            width: 100%;
+            max-width: 1400px;
+            flex: 1;
             display: none;
-            background: white;
+            position: relative;
+            min-height: 0;
             border-radius: 24px;
             overflow: hidden;
-            position: relative;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-            min-height: 0;
+            background: var(--paper);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 30px 70px -30px rgba(0, 0, 0, .7);
+            animation: stage-in .6s var(--ease-out) backwards;
         }
-
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        .iframe-container iframe { position: relative; width: 100%; height: 100%; border: none; }
+        .frame-loader {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: none;
+            place-items: center;
+            background: var(--paper);
         }
+        .iframe-container.loading .frame-loader { display: grid; }
+        .frame-loader .spinner { width: 30px; height: 30px; border-width: 3px; }
 
+        .spinner {
+            width: 16px; height: 16px;
+            flex: none;
+            border: 2px solid rgba(31, 122, 96, .25);
+            border-top-color: var(--leaf-deep);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ───────── Dock inferior ───────── */
         .bottom-panel {
-            background-color: var(--primary);
-            padding: 0 1rem;
-            min-height: 75px;
-            height: auto;
+            position: relative;
+            flex-shrink: 0;
+            width: min(100% - 24px, 1120px);
+            min-height: var(--dock-h);
+            margin: 8px auto calc(var(--dock-gap) + env(safe-area-inset-bottom, 0px));
+            padding: 0 10px;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.12);
-            flex-shrink: 0;
-            width: 100%;
+            gap: 10px;
+            border-radius: 26px;
+            background: rgba(12, 33, 29, .72);
+            backdrop-filter: blur(22px) saturate(150%);
+            -webkit-backdrop-filter: blur(22px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, .1);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 20px 50px -18px rgba(0, 0, 0, .7);
+            animation: dock-in .9s var(--ease-out) .2s backwards;
         }
+        @keyframes dock-in { from { opacity: 0; transform: translateY(34px); } }
 
         .menu-wrapper {
             position: relative;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            width: 52px;
+            height: 52px;
+            flex: none;
+            display: grid;
+            place-items: center;
         }
-
-        .menu-creative {
-            width: 50px;
-            height: 50px;
-            background: #FFFFFF;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        }
-
+        /* Anillo luminoso que gira alrededor del botón */
         .menu-light-aura {
             position: absolute;
-            width: 58px;
-            height: 58px;
+            inset: 0;
             border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0%, var(--accent) 50%, transparent 100%);
-            animation: rotateLight 2s linear infinite;
-            filter: blur(5px);
-            opacity: 0.75;
-            z-index: 1;
+            background: conic-gradient(from 0deg, transparent 0 50%, var(--honey) 80%, var(--leaf) 100%);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
+            animation: rotateLight 5s linear infinite;
         }
+        @keyframes rotateLight { to { transform: rotate(360deg); } }
 
-        @keyframes rotateLight {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .lupa-icon {
-            width: 22px;
-            height: 22px;
+        .menu-creative {
             position: relative;
-        }
-
-        .lupa-circle {
-            width: 16px;
-            height: 16px;
-            border: 2.5px solid var(--primary);
+            z-index: 1;
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border: 0;
             border-radius: 50%;
-            position: absolute;
-            top: 0;
-            left: 0;
+            background: var(--paper);
+            color: var(--ink-900);
+            cursor: pointer;
+            box-shadow: 0 8px 18px -6px rgba(0, 0, 0, .55);
+            transition: transform .3s var(--ease-out);
         }
-
-        .lupa-handle {
-            width: 8px;
-            height: 3px;
-            background-color: var(--primary);
-            position: absolute;
-            bottom: 1px;
-            right: -1px;
-            transform: rotate(45deg);
-            border-radius: 4px;
+        .menu-creative:hover { transform: scale(1.06); }
+        .menu-creative:active { transform: scale(.94); }
+        .menu-creative svg {
+            grid-area: 1 / 1;
+            transition: transform .4s var(--ease-out), opacity .25s ease;
         }
+        .menu-creative .ico-close { opacity: 0; transform: rotate(-90deg) scale(.5); }
+        .menu-creative.is-open .ico-close { opacity: 1; transform: none; }
+        .menu-creative.is-open .ico-branch { opacity: 0; transform: rotate(90deg) scale(.5); }
 
         .welcome-area {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex: 0 0 auto;
-            max-width: 60%;
+            gap: 10px;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 46%;
+            padding: 5px 16px 5px 5px;
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .06);
+            color: var(--paper);
+            text-align: left;
             cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 60px;
-            transition: background 0.2s;
-            background: rgba(0,0,0,0.1);
+            transition: background .25s, border-color .25s;
         }
-
-        .welcome-area:active {
-            background: rgba(255, 255, 255, 0.15);
-        }
+        .welcome-area:hover { background: rgba(255, 255, 255, .11); border-color: rgba(255, 255, 255, .18); }
+        .welcome-area:active { background: rgba(255, 255, 255, .15); }
 
         .welcome-avatar {
-            width: 44px;
-            height: 44px;
+            width: 42px; height: 42px;
+            flex: none;
+            display: grid;
+            place-items: center;
             border-radius: 50%;
-            background-color: var(--accent);
+            background: linear-gradient(145deg, var(--honey), #E2A95A);
+            color: var(--ink-900);
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            line-height: 1;
+            text-transform: uppercase;
+            box-shadow: 0 0 0 2px rgba(240, 194, 123, .25);
+        }
+        .welcome-avatar.is-guest {
+            background: rgba(255, 255, 255, .1);
+            color: var(--mist);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+        }
+        .welcome-avatar svg { width: 21px; height: 21px; }
+
+        .welcome-text { display: block; min-width: 0; }
+        .welcome-greeting {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            flex-shrink: 0;
-            text-transform: uppercase;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .welcome-text {
-            font-family: 'Inter', sans-serif;
-            color: #F7F4EF;
+            gap: 8px;
+            font-weight: 600;
+            font-size: clamp(.82rem, 3.6vw, .98rem);
+            letter-spacing: -.005em;
             line-height: 1.2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
-
-        .welcome-greeting {
-            font-weight: 700;
-            font-size: clamp(0.8rem, 4vw, 1rem);
-            letter-spacing: -0.2px;
-        }
-
+        .greet-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .edit-hint {
-            font-size: 0.6rem;
-            opacity: 0.7;
-            margin-left: 5px;
-            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            flex: none;
+            color: var(--mist);
+            font-size: .72rem;
+            font-weight: 500;
+            transition: color .25s;
+        }
+        .edit-hint svg { width: 13px; height: 13px; }
+        .welcome-area:hover .edit-hint { color: var(--honey); }
+        .role-chip {
+            flex: none;
+            padding: 2px 9px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .09);
+            color: var(--mist);
+            font-size: .7rem;
+            font-weight: 500;
         }
 
         .genealogy-title-right {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: clamp(0.65rem, 3vw, 0.9rem);
-            color: #F7F4EF;
-            text-align: right;
-            letter-spacing: 0.2px;
-            white-space: normal;
-            flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 6px 12px;
-            border-radius: 40px;
-            backdrop-filter: blur(2px);
-            line-height: 1.2;
             margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 0 1 auto;
+            min-width: 0;
+            padding: 8px 14px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--mist);
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            line-height: 1.15;
+            cursor: pointer;
+            transition: background .25s, color .25s;
         }
+        .genealogy-title-right svg { width: 18px; height: 18px; flex: none; opacity: .8; }
+        .genealogy-title-right strong { font-weight: 400; font-style: italic; color: var(--honey-soft); }
+        .genealogy-title-right:hover { background: rgba(255, 255, 255, .07); color: var(--paper); }
+        .title-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .btn-exit {
-            background: var(--alert-red);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex: none;
+            height: 44px;
+            padding: 0 17px;
+            border: 1px solid rgba(255, 138, 128, .28);
+            border-radius: 999px;
+            background: rgba(255, 107, 95, .12);
+            color: #FFB4AC;
+            font-weight: 600;
+            font-size: .9rem;
             white-space: nowrap;
+            cursor: pointer;
+            transition: background .25s, border-color .25s, color .25s, transform .2s var(--ease-out);
         }
+        .btn-exit svg { width: 18px; height: 18px; }
+        .btn-exit:hover { background: var(--alert-red); border-color: var(--alert-red); color: #fff; }
+        .btn-exit:active { transform: scale(.96); background: var(--alert-red-dark); }
 
-        .btn-exit:active {
-            transform: scale(0.96);
-            background: var(--alert-red-dark);
-        }
-
+        /* ───────── Menú flotante de secciones ───────── */
         .floating-menu {
             position: fixed;
-            bottom: 90px;
-            left: 15px;
-            right: 15px;
-            max-width: 320px;
-            background: rgba(250, 248, 245, 0.98);
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
-            padding: 0.6rem 0;
-            transform: translateY(20px) scale(0.96);
+            z-index: 200;
+            left: max(12px, calc(50vw - 560px));
+            bottom: calc(var(--dock-h) + var(--dock-gap) + 22px + env(safe-area-inset-bottom, 0px));
+            width: min(320px, calc(100vw - 24px));
+            padding: 8px;
+            border-radius: 26px;
+            background: rgba(251, 249, 243, .97);
+            backdrop-filter: blur(22px) saturate(140%);
+            -webkit-backdrop-filter: blur(22px) saturate(140%);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .7), 0 30px 60px -16px rgba(0, 0, 0, .6);
+            transform-origin: 34px 100%;
+            transform: translateY(14px) scale(.94);
             opacity: 0;
             visibility: hidden;
-            transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.2);
-            border: 1px solid rgba(196, 125, 87, 0.2);
-            z-index: 200;
+            transition: transform .45s var(--ease-out), opacity .25s ease, visibility .25s;
         }
+        .floating-menu.active { opacity: 1; visibility: visible; transform: none; }
+        .floating-menu ul { list-style: none; }
+        .floating-menu :focus-visible { outline-color: var(--leaf-deep); }
 
-        .floating-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-        }
-
-        .floating-menu ul {
-            list-style: none;
-        }
-
-        .floating-menu li {
-            padding: 14px 24px;
-            color: var(--primary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.25s;
-            font-size: 1rem;
-            border-radius: 20px;
-            margin: 2px 8px;
-        }
-
-        .floating-menu li:hover {
-            background: var(--primary);
-            color: white;
-            font-weight: 700;
-            transform: translateX(4px);
-        }
-
-        /* ---- SOLO PARA MÓVIL: mismo sombreado que el escritorio al pulsar (efecto táctil) ---- */
-        @media (hover: none) and (pointer: coarse) {
-            .floating-menu li:active {
-                background: var(--primary);
-                color: white;
-                font-weight: 700;
-                transform: translateX(4px);
-                transition: all 0.08s ease;
-            }
-        }
-
-        .alert-modal-overlay,
-        .edit-name-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .menu-item {
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 17px;
+            background: none;
+            color: var(--text-dark);
+            font-size: .98rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: background .2s, color .2s, transform .25s var(--ease-out);
+        }
+        .mi-ico {
+            width: 34px; height: 34px;
+            flex: none;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: rgba(31, 122, 96, .09);
+            color: var(--leaf-deep);
+            transition: background .2s, color .2s;
+        }
+        .mi-ico svg { width: 19px; height: 19px; }
+        .mi-code { font-size: .7rem; font-weight: 700; letter-spacing: .04em; }
+
+        .menu-item:hover { background: var(--ink-900); color: var(--paper); transform: translateX(3px); }
+        .menu-item:hover .mi-ico { background: rgba(255, 255, 255, .12); color: var(--honey); }
+        .menu-item.is-current { background: rgba(31, 122, 96, .1); }
+        .menu-item.is-current::after {
+            content: '';
+            margin-left: auto;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--leaf-deep);
+            box-shadow: 0 0 0 3px rgba(31, 122, 96, .18);
+        }
+        .menu-item.is-current:hover::after { background: var(--honey); box-shadow: 0 0 0 3px rgba(240, 194, 123, .25); }
+        .menu-sep { height: 1px; margin: 6px 12px; background: #E4DDCC; }
+
+        .floating-menu.active .menu-item {
+            animation: item-in .5s var(--ease-out) backwards;
+            animation-delay: calc(var(--i, 0) * 28ms + 60ms);
+        }
+        @keyframes item-in { from { opacity: 0; transform: translateY(8px); } }
+
+        /* Móvil: mismo efecto al tocar */
+        @media (hover: none) and (pointer: coarse) {
+            .menu-item:active { background: var(--ink-900); color: var(--paper); transform: translateX(3px); transition: all .08s ease; }
+            .menu-item:active .mi-ico { background: rgba(255, 255, 255, .12); color: var(--honey); }
+        }
+
+        /* ───────── Modales (base compartida) ───────── */
+        .alert-modal-overlay,
+        .edit-name-modal-overlay,
+        .birthday-overlay {
+            position: fixed;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 1rem;
+            background: rgba(5, 16, 13, .6);
+            backdrop-filter: blur(12px) saturate(120%);
+            -webkit-backdrop-filter: blur(12px) saturate(120%);
             visibility: hidden;
             opacity: 0;
-            transition: 0.2s;
+            transition: opacity .3s ease, visibility .3s;
         }
-
+        .alert-modal-overlay, .edit-name-modal-overlay { z-index: 1000; }
+        .birthday-overlay { z-index: 2000; }
         .alert-modal-overlay.active,
-        .edit-name-modal-overlay.active {
-            visibility: visible;
-            opacity: 1;
-        }
+        .edit-name-modal-overlay.active,
+        .birthday-overlay.open { visibility: visible; opacity: 1; }
 
-        .alert-modal {
-            background: #fffaf7;
-            width: 85%;
-            max-width: 300px;
-            border-radius: 32px;
-            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            padding: 1.5rem 1.2rem;
-            border-left: 6px solid var(--alert-red);
-            transform: scale(0.92);
-            transition: transform 0.2s;
+        .alert-modal, .edit-name-modal, .birthday-card {
+            width: 100%;
+            background: linear-gradient(180deg, #FBF9F3, #F4EFE3);
+            color: var(--text-dark);
+            border-radius: 28px;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, .6),
+                0 40px 80px -20px rgba(0, 0, 0, .6),
+                0 0 90px -30px rgba(111, 214, 174, .35);
+            transform: translateY(22px) scale(.96);
+            transition: transform .55s var(--ease-out);
         }
-
-        .edit-name-modal {
-            background: #ffffff;
-            width: 85%;
-            max-width: 340px;
-            border-radius: 32px;
-            padding: 1.6rem 1.2rem;
-            text-align: center;
-            transform: scale(0.92);
-            transition: transform 0.2s;
-        }
-
+        .alert-modal :focus-visible, .edit-name-modal :focus-visible, .birthday-card :focus-visible { outline-color: var(--leaf-deep); }
         .alert-modal-overlay.active .alert-modal,
-        .edit-name-modal-overlay.active .edit-name-modal {
-            transform: scale(1);
-        }
+        .edit-name-modal-overlay.active .edit-name-modal,
+        .birthday-overlay.open .birthday-card { transform: none; }
 
-        .alert-title {
-            font-size: 1.3rem;
-            font-weight: 800;
+        .alert-btn, .modal-save-btn, .modal-cancel-btn, .birthday-card button {
+            padding: 13px 20px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: .95rem;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out), background .25s, border-color .25s;
+        }
+        .alert-btn:active, .modal-save-btn:active, .modal-cancel-btn:active, .birthday-card button:active { transform: scale(.98); }
+        .alert-btn-cancel, .modal-cancel-btn { background: transparent; border-color: #D6CEBB; color: var(--text-dark); }
+        .alert-btn-cancel:hover, .modal-cancel-btn:hover { background: rgba(31, 122, 96, .07); border-color: var(--leaf-deep); }
+        .modal-save-btn, .birthday-card button {
+            background: linear-gradient(180deg, #1A4A3F, #0F2F28);
+            color: var(--paper);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 12px 24px -10px rgba(15, 47, 40, .7);
+        }
+        .modal-save-btn:hover, .birthday-card button:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 18px 30px -10px rgba(15, 47, 40, .8); }
+        .modal-save-btn[disabled] { opacity: .7; cursor: progress; transform: none; }
+        .alert-btn-confirm {
+            background: linear-gradient(180deg, #C8352A, var(--alert-red));
+            color: #fff;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 12px 24px -10px rgba(180, 35, 24, .7);
+        }
+        .alert-btn-confirm:hover { transform: translateY(-2px); }
+
+        /* Cerrar sesión */
+        .alert-modal { max-width: 360px; padding: 2rem 1.5rem 1.5rem; text-align: center; }
+        .alert-icon {
+            width: 56px; height: 56px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 1rem;
+            border-radius: 18px;
+            background: rgba(180, 35, 24, .1);
             color: var(--alert-red);
         }
+        .alert-icon svg { width: 26px; height: 26px; }
+        .alert-title { font-family: var(--font-display); font-size: 2rem; line-height: 1.05; letter-spacing: -.01em; }
+        .alert-message { margin: .7rem 0 1.5rem; color: var(--muted-dark); font-size: .95rem; line-height: 1.5; }
+        .alert-actions, .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        .alert-message {
-            font-size: 0.9rem;
-            margin: 12px 0 20px;
-        }
+        /* Editar nombre */
+        .edit-name-modal { max-width: 380px; padding: 2rem 1.5rem 1.5rem; text-align: left; }
+        .edit-name-modal h3 { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1.05; letter-spacing: -.01em; margin-bottom: 1.25rem; }
+        .modal-buttons { margin-top: 1.1rem; }
 
-        .alert-actions,
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .alert-btn,
-        .modal-save-btn,
-        .modal-cancel-btn {
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            border: none;
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-            text-align: left;
-        }
-
+        .input-group { position: relative; margin-bottom: .85rem; text-align: left; }
         .input-group input {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 60px;
-            border: 1px solid #ddd;
-            font-size: 0.9rem;
+            height: 58px;
+            padding: 22px 16px 6px;
+            border: 1.5px solid #DDD6C6;
+            border-radius: 16px;
+            background: #fff;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: border-color .25s, box-shadow .25s;
         }
+        .input-group input:hover { border-color: #C9C1AE; }
+        .input-group input:focus { outline: none; border-color: var(--leaf-deep); box-shadow: 0 0 0 4px rgba(31, 122, 96, .14); }
+        .input-group label {
+            position: absolute;
+            left: 17px; top: 50%;
+            transform: translateY(-50%);
+            color: #7C877F;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: top .2s var(--ease-out), font-size .2s var(--ease-out), color .2s, transform .2s var(--ease-out);
+        }
+        .input-group input:focus + label,
+        .input-group input:not(:placeholder-shown) + label { top: 11px; transform: none; font-size: .72rem; font-weight: 600; }
+        .input-group input:focus + label { color: var(--leaf-deep); }
 
+        /* Cumpleaños */
+        .birthday-card { position: relative; max-width: 440px; padding: 2.6rem 1.75rem 1.75rem; text-align: center; transition-timing-function: cubic-bezier(.34, 1.35, .64, 1); transition-duration: .65s; }
+        .birthday-badge {
+            position: relative;
+            width: 76px; height: 76px;
+            display: grid;
+            place-items: center;
+            margin: calc(-2.6rem - 38px) auto 1.2rem;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 25%, #1E5246, #0C211D);
+            color: var(--honey);
+            box-shadow: 0 0 0 6px #F6F2E8, 0 0 0 7px rgba(16, 35, 30, .08), 0 16px 30px -10px rgba(12, 33, 29, .7), 0 0 40px -6px rgba(240, 194, 123, .55);
+        }
+        .birthday-badge svg { width: 38px; height: 38px; }
+        .birthday-card h3 { font-family: var(--font-display); font-weight: 400; font-size: 2.1rem; line-height: 1.05; letter-spacing: -.01em; }
+        .birthday-card .birthday-name {
+            margin: .55rem 0 .85rem;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.9rem;
+            line-height: 1.1;
+            color: var(--leaf-deep);
+            overflow-wrap: anywhere;
+        }
+        .birthday-card p { color: var(--muted-dark); font-size: 1rem; line-height: 1.5; margin-bottom: 1.6rem; }
+        .confetti-layer { position: absolute; left: 50%; top: 0; width: 0; height: 0; z-index: 3; pointer-events: none; }
+        .confetti { position: absolute; left: -4px; top: -6px; width: 8px; height: 12px; border-radius: 2px; opacity: 0; will-change: transform, opacity; }
+
+        /* ───────── Avisos ───────── */
         .custom-toast {
             position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 60px;
-            font-size: 0.8rem;
+            left: 0; right: 0;
+            margin-inline: auto;
+            width: fit-content;
+            bottom: calc(var(--dock-h) + var(--dock-gap) + 30px + env(safe-area-inset-bottom, 0px));
             z-index: 1500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: min(92vw, 440px);
+            padding: 11px 18px 11px 14px;
+            border-radius: 999px;
+            background: rgba(12, 33, 29, .92);
+            border: 1px solid rgba(255, 255, 255, .12);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .7);
+            color: var(--paper);
+            font-size: .88rem;
             font-weight: 500;
-            backdrop-filter: blur(10px);
-            white-space: nowrap;
-            max-width: 90vw;
-            white-space: normal;
-            text-align: center;
+            line-height: 1.3;
             pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: toast-life 2.3s var(--ease-out) forwards;
+        }
+        .custom-toast.persist { animation: toast-in .5s var(--ease-out) backwards; }
+        .custom-toast svg { width: 18px; height: 18px; flex: none; }
+        .custom-toast.success svg { color: var(--leaf); }
+        .custom-toast.error svg { color: #FF9A90; }
+        .custom-toast.error { border-color: rgba(255, 138, 128, .35); }
+        .custom-toast.info svg { color: var(--honey); }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+        @keyframes toast-life {
+            0%   { opacity: 0; transform: translateY(14px) scale(.96); }
+            8%   { opacity: 1; transform: none; }
+            86%  { opacity: 1; transform: none; }
+            100% { opacity: 0; transform: translateY(6px); }
         }
 
+        /* ───────── Responsive ───────── */
+        @media (max-width: 759px) {
+            .title-text { display: none; }
+            .genealogy-title-right {
+                width: 44px; height: 44px;
+                padding: 0;
+                justify-content: center;
+                border: 1px solid rgba(255, 255, 255, .09);
+                background: rgba(255, 255, 255, .06);
+            }
+            .genealogy-title-right svg { opacity: 1; }
+            .welcome-area { max-width: 62%; }
+        }
         @media (max-width: 640px) {
-            .app-container { height: 100dvh; }
-            .bottom-panel { padding: 0 0.8rem; gap: 0.5rem; min-height: 70px; }
+            :root { --dock-h: 64px; --dock-gap: 10px; }
+            .bottom-panel { gap: 8px; padding: 0 8px; width: calc(100% - 20px); border-radius: 24px; }
             .menu-wrapper { width: 48px; height: 48px; }
-            .menu-creative { width: 44px; height: 44px; }
-            .menu-light-aura { width: 52px; height: 52px; }
-            .welcome-avatar { width: 38px; height: 38px; font-size: 1.1rem; }
-            .welcome-greeting { font-size: 0.75rem; }
-            .welcome-area { max-width: 70%; padding: 4px 8px 4px 2px; margin-left: -0.25rem; }
-            .genealogy-title-right { font-size: 0.6rem; padding: 4px 8px; white-space: normal; line-height: 1.2; max-width: 110px; }
-            .btn-exit { padding: 6px 14px; font-size: 0.75rem; }
-            .floating-menu { left: 10px; right: 10px; bottom: 80px; max-width: none; width: auto; }
-            .floating-menu li { padding: 12px 20px; font-size: 0.9rem; }
-            .image-container { padding: 14px; border-radius: 24px; }
-            .family-image { max-height: 45vh; }
-            .custom-toast { font-size: 0.75rem; padding: 8px 16px; bottom: 90px; }
+            .menu-creative { width: 41px; height: 41px; }
+            .welcome-avatar { width: 38px; height: 38px; font-size: 1.4rem; }
+            .welcome-area { padding-right: 12px; gap: 8px; }
+            .btn-exit { height: 42px; padding: 0 14px; font-size: .85rem; }
+            .genealogy-title-right { width: 42px; height: 42px; }
+            .floating-menu { left: 10px; }
+            .birthday-card h3 { font-size: 1.8rem; }
+            .birthday-card .birthday-name { font-size: 1.6rem; }
+        }
+        @media (max-width: 400px) {
+            .home-hint { max-width: 100%; gap: .45rem; padding: 8px 14px 8px 12px; font-size: .85rem; }
+            .btn-exit span { display: none; }
+            .btn-exit { width: 42px; padding: 0; justify-content: center; }
+            .role-chip { display: none; }
         }
 
-        @media (max-width: 480px) {
-            .welcome-area { gap: 6px; max-width: 75%; }
-            .welcome-avatar { width: 34px; height: 34px; font-size: 1rem; }
-            .genealogy-title-right { display: none; }
-            .bottom-panel { justify-content: space-between; }
-            .btn-exit { padding: 6px 12px; }
-        }
-
-        @media (min-width: 1024px) {
-            .floating-menu { left: 20px; right: auto; bottom: 100px; min-width: 260px; }
-            .genealogy-title-right { display: block; white-space: nowrap; }
-            .bottom-panel { padding: 0 2rem; }
-            .welcome-area { max-width: 50%; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .001ms !important;
+                transition-delay: 0s !important;
+            }
         }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <div class="main-empty">
-        <div class="image-container">
-            <img class="family-image" src="https://github.com/app-fioravante/familiia/blob/main/fioravante.png?raw=true" alt="Archivo Genealógico Fioravante" onerror="this.onerror=null;this.src='https://placehold.co/500x350/2C423F/FFFFFF?text=Fioravante';">
-        </div>
-        <div id="iframeContainer" class="iframe-container">
-            <iframe id="webIframe" title="Contenido externo" src="about:blank"></iframe>
-        </div>
-    </div>
-
-    <div class="bottom-panel">
-        <div class="menu-wrapper">
-            <div class="menu-light-aura"></div>
-            <div class="menu-creative" id="creativeMenuBtn">
-                <div class="lupa-icon">
-                    <div class="lupa-circle"></div>
-                    <div class="lupa-handle"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="welcome-area" id="welcomeArea">
-            <div class="welcome-avatar" id="welcomeAvatar">👤</div>
-            <div class="welcome-text">
-                <div class="welcome-greeting" id="welcomeGreeting">Cargando usuario...</div>
-            </div>
-        </div>
-
-        <div class="genealogy-title-right">
-            Archivo Genealógico <strong>Fioravante</strong> · Argentina
-        </div>
-
-        <button class="btn-exit" id="exitButton">Salir</button>
-    </div>
+<div class="stage-bg" aria-hidden="true">
+    <i class="aurora a1"></i>
+    <i class="aurora a2"></i>
 </div>
 
-<div id="birthdayModal" class="birthday-modal">
-    <div class="modal-icon">🎂</div>
-    <h3>¡Celebramos el cumpleaños!</h3>
-    <div class="birthday-name" id="birthdayPersonName"></div>
-    <p>Hoy es un día especial para la familia.</p>
-    <button id="closeBirthdayModal">Seguir explorando</button>
+<div class="app-container">
+    <main class="main-empty">
+        <section class="home-hero" id="homeView">
+            <h1 class="hero-title" aria-label="Fioravante"><span style="--i:0" aria-hidden="true">F</span><span style="--i:1" aria-hidden="true">i</span><span style="--i:2" aria-hidden="true">o</span><span style="--i:3" aria-hidden="true">r</span><span style="--i:4" aria-hidden="true">a</span><span style="--i:5" aria-hidden="true">v</span><span style="--i:6" aria-hidden="true">a</span><span style="--i:7" aria-hidden="true">n</span><span style="--i:8" aria-hidden="true">t</span><span style="--i:9" aria-hidden="true">e</span></h1>
+            <p class="hero-subtitle" aria-label="Historia de una familia"><span style="--i:0" aria-hidden="true">H</span><span style="--i:1" aria-hidden="true">i</span><span style="--i:2" aria-hidden="true">s</span><span style="--i:3" aria-hidden="true">t</span><span style="--i:4" aria-hidden="true">o</span><span style="--i:5" aria-hidden="true">r</span><span style="--i:6" aria-hidden="true">i</span><span style="--i:7" aria-hidden="true">a</span><span style="--i:8" aria-hidden="true">&nbsp;</span><span style="--i:9" aria-hidden="true">d</span><span style="--i:10" aria-hidden="true">e</span><span style="--i:11" aria-hidden="true">&nbsp;</span><span style="--i:12" aria-hidden="true">u</span><span style="--i:13" aria-hidden="true">n</span><span style="--i:14" aria-hidden="true">a</span><span style="--i:15" aria-hidden="true">&nbsp;</span><span style="--i:16" aria-hidden="true">f</span><span style="--i:17" aria-hidden="true">a</span><span style="--i:18" aria-hidden="true">m</span><span style="--i:19" aria-hidden="true">i</span><span style="--i:20" aria-hidden="true">l</span><span style="--i:21" aria-hidden="true">i</span><span style="--i:22" aria-hidden="true">a</span></p>
+
+            <p class="home-hint">
+                <i class="hint-dot" aria-hidden="true"></i>
+                <span>Explora</span>
+                <span class="hint-rotor" aria-hidden="true">
+                    <span class="r is-on">el árbol completo</span>
+                    <span class="r">el origen del apellido</span>
+                    <span class="r">Argentina, Brasil e Italia</span>
+                    <span class="r">mapas y recuerdos</span>
+                </span>
+            </p>
+        </section>
+        <div id="iframeContainer" class="iframe-container">
+            <div class="frame-loader" aria-hidden="true"><i class="spinner"></i></div>
+            <iframe id="webIframe" title="Contenido externo" src="about:blank"></iframe>
+        </div>
+    </main>
+
+    <nav class="bottom-panel" aria-label="Navegación principal">
+        <div class="menu-wrapper">
+            <div class="menu-light-aura" aria-hidden="true"></div>
+            <button class="menu-creative" id="creativeMenuBtn" type="button" aria-label="Secciones del archivo" aria-haspopup="true" aria-expanded="false" aria-controls="floatingMenu">
+                <svg class="ico-branch" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.3" fill="currentColor"/><circle cx="19" cy="6" r="2.3"/><circle cx="19" cy="18" r="2.3"/><path d="M7.3 12c4 0 4-6 9.4-6M7.3 12c4 0 4 6 9.4 6"/></svg>
+                <svg class="ico-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+        </div>
+
+        <button class="welcome-area" id="welcomeArea" type="button" aria-label="Editar nombre">
+            <span class="welcome-avatar" id="welcomeAvatar"></span>
+            <span class="welcome-text">
+                <span class="welcome-greeting" id="welcomeGreeting">Cargando usuario…</span>
+            </span>
+        </button>
+
+        <button class="genealogy-title-right" id="homeBtn" type="button" aria-label="Ir al inicio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.2L12 4l8.5 7.2"/><path d="M6 9.8V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.8"/></svg>
+            <span class="title-text">Archivo Genealógico <strong>Fioravante</strong> · Argentina</span>
+        </button>
+
+        <button class="btn-exit" id="exitButton" type="button" aria-label="Salir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4.5h4A1.5 1.5 0 0119.5 6v12a1.5 1.5 0 01-1.5 1.5h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
+            <span>Salir</span>
+        </button>
+    </nav>
+</div>
+
+<div id="birthdayModal" class="birthday-overlay" role="dialog" aria-modal="true" aria-labelledby="birthdayTitle">
+    <div class="birthday-card">
+        <div class="confetti-layer" aria-hidden="true"></div>
+        <div class="birthday-badge" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 28h20v-9a2 2 0 00-2-2H8a2 2 0 00-2 2v9z"/><path d="M6 23.5c2.5 2 5 2 7.5 0s5-2 7.5 0c1.7 1.4 3.3 1.4 5 0"/><path d="M16 17v-5"/><path d="M16 4c1.9 2 2.2 3.5 0 5.3-2.2-1.8-1.9-3.3 0-5.3z" fill="currentColor"/></svg>
+        </div>
+        <h3 id="birthdayTitle">¡Celebramos el cumpleaños!</h3>
+        <div class="birthday-name" id="birthdayPersonName"></div>
+        <p>Hoy es un día especial para la familia.</p>
+        <button id="closeBirthdayModal" type="button">Seguir explorando</button>
+    </div>
 </div>
 
 <div class="floating-menu" id="floatingMenu">
     <ul>
-        <li data-section="arbol">Árbol completo</li>
-        <li data-section="origen">Origen del Apellido</li>
-        <li data-section="argentina">Argentina</li>
-        <li data-section="brasil">Brasil</li>
-        <li data-section="italia">Italia</li>
-        <li data-section="mapas">Mapas</li>
-        <li data-section="recuerdos">Recuerdos</li>
-        <li data-section="contacto">Contacto</li>
+        <li style="--i:0"><button type="button" class="menu-item" data-section="arbol"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M7.2 12c4 0 4-6 9.6-6M7.2 12c4 0 4 6 9.6 6"/></svg></span><span class="mi-label">Árbol completo</span></button></li>
+        <li style="--i:1"><button type="button" class="menu-item" data-section="origen"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.500 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.500-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="mi-label">Origen del Apellido</span></button></li>
+        <li class="menu-sep" role="separator"></li>
+        <li style="--i:2"><button type="button" class="menu-item" data-section="argentina"><span class="mi-ico" aria-hidden="true"><span class="mi-code">AR</span></span><span class="mi-label">Argentina</span></button></li>
+        <li style="--i:3"><button type="button" class="menu-item" data-section="brasil"><span class="mi-ico" aria-hidden="true"><span class="mi-code">BR</span></span><span class="mi-label">Brasil</span></button></li>
+        <li style="--i:4"><button type="button" class="menu-item" data-section="italia"><span class="mi-ico" aria-hidden="true"><span class="mi-code">IT</span></span><span class="mi-label">Italia</span></button></li>
+        <li class="menu-sep" role="separator"></li>
+        <li style="--i:5"><button type="button" class="menu-item" data-section="mapas"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14"/></svg></span><span class="mi-label">Mapas</span></button></li>
+        <li style="--i:6"><button type="button" class="menu-item" data-section="recuerdos"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10.5" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></span><span class="mi-label">Recuerdos</span></button></li>
+        <li style="--i:7"><button type="button" class="menu-item" data-section="contacto"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5l8 6 8-6"/></svg></span><span class="mi-label">Contacto</span></button></li>
     </ul>
 </div>
 
-<div id="alertModal" class="alert-modal-overlay">
+<div id="alertModal" class="alert-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="alertTitle">
     <div class="alert-modal">
-        <div class="alert-icon">⚠️</div>
-        <div class="alert-title">Cerrar sesión</div>
+        <div class="alert-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.5h4A1.5 1.5 0 0119.5 6v12a1.5 1.5 0 01-1.5 1.5h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
+        </div>
+        <div class="alert-title" id="alertTitle">Cerrar sesión</div>
         <div class="alert-message">¿Estás seguro? Se finalizará tu acceso a los archivos genealógicos.</div>
         <div class="alert-actions">
-            <button class="alert-btn alert-btn-cancel" id="modalCancelBtn">Cancelar</button>
-            <button class="alert-btn alert-btn-confirm" id="modalConfirmBtn">Sí, salir</button>
+            <button type="button" class="alert-btn alert-btn-cancel" id="modalCancelBtn">Cancelar</button>
+            <button type="button" class="alert-btn alert-btn-confirm" id="modalConfirmBtn">Sí, salir</button>
         </div>
     </div>
 </div>
 
-<div id="editNameModal" class="edit-name-modal-overlay">
+<div id="editNameModal" class="edit-name-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editTitle">
     <div class="edit-name-modal">
-        <h3>Editar nombre completo</h3>
+        <h3 id="editTitle">Editar nombre completo</h3>
         <div class="input-group">
-            <label>Nombre</label>
-            <input type="text" id="editFirstName" placeholder="Ej: Juan" autocomplete="off">
+            <input type="text" id="editFirstName" placeholder=" " autocomplete="off">
+            <label for="editFirstName">Nombre</label>
         </div>
         <div class="input-group">
-            <label>Apellido</label>
-            <input type="text" id="editLastName" placeholder="Ej: Pérez" autocomplete="off">
+            <input type="text" id="editLastName" placeholder=" " autocomplete="off">
+            <label for="editLastName">Apellido</label>
         </div>
         <div class="modal-buttons">
-            <button class="modal-cancel-btn" id="cancelEditBtn">Cancelar</button>
-            <button class="modal-save-btn" id="saveEditBtn">Guardar</button>
+            <button type="button" class="modal-cancel-btn" id="cancelEditBtn">Cancelar</button>
+            <button type="button" class="modal-save-btn" id="saveEditBtn">Guardar</button>
         </div>
     </div>
 </div>
+
+<script>
+    // Efectos de la portada. Van aparte de Firebase: si la conexión falla,
+    // el texto igual se muestra y se anima.
+    (function () {
+        const hero = document.getElementById('homeView');
+        if (!hero) return;
+
+        // El foco de luz sigue al cursor (o al dedo)
+        hero.addEventListener('pointermove', (e) => {
+            const r = hero.getBoundingClientRect();
+            hero.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+            hero.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        });
+
+        // Frase rotativa con las secciones del archivo
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const items = Array.from(hero.querySelectorAll('.hint-rotor .r'));
+        if (items.length < 2) return;
+        let idx = 0;
+        setInterval(() => {
+            if (hero.style.display === 'none') return;
+            const prev = items[idx];
+            prev.classList.remove('is-on');
+            prev.classList.add('is-out');
+            setTimeout(() => prev.classList.remove('is-out'), 700);
+            idx = (idx + 1) % items.length;
+            items[idx].classList.add('is-on');
+        }, 2800);
+    })();
+</script>
 
 <script>
     const firebaseConfig = {
@@ -680,6 +924,9 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+
     const welcomeArea = document.getElementById('welcomeArea');
     const welcomeAvatar = document.getElementById('welcomeAvatar');
     const welcomeGreeting = document.getElementById('welcomeGreeting');
@@ -688,21 +935,22 @@
     const editLastName = document.getElementById('editLastName');
     const saveEditBtn = document.getElementById('saveEditBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
-    const imageContainer = document.querySelector('.image-container');
+    const imageContainer = document.getElementById('homeView');
     const iframeContainer = document.getElementById('iframeContainer');
     const webIframe = document.getElementById('webIframe');
     const birthdayModal = document.getElementById('birthdayModal');
     const birthdayPersonNameSpan = document.getElementById('birthdayPersonName');
+    const birthdayTitle = document.getElementById('birthdayTitle');
     const closeBirthdayBtn = document.getElementById('closeBirthdayModal');
 
-    // --- NUEVO SISTEMA DE AUDIO (Preparado para Móviles y Escritorio) ---
-    const menuHoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'); 
-    menuHoverSound.volume = 0.3; // Volumen sutil
-    menuHoverSound.preload = 'auto'; // Forzar precarga
+    // --- SISTEMA DE AUDIO (Preparado para Móviles y Escritorio) ---
+    const menuHoverSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+    menuHoverSound.volume = 0.3;
+    menuHoverSound.preload = 'auto';
 
     let audioDesbloqueado = false;
 
-    // Función que "engaña" al navegador y desbloquea el sonido en el primer clic/toque de la app
+    // Desbloquea el sonido en el primer clic/toque de la app
     const desbloquearAudio = () => {
         if (audioDesbloqueado) return;
         menuHoverSound.play().then(() => {
@@ -710,42 +958,77 @@
             menuHoverSound.currentTime = 0;
             audioDesbloqueado = true;
         }).catch(() => {});
-        
-        // Quitar los detectores una vez que se desbloqueó
+
         document.removeEventListener('click', desbloquearAudio);
         document.removeEventListener('touchstart', desbloquearAudio);
     };
 
-    // Escuchamos la primera interacción global del usuario
     document.addEventListener('click', desbloquearAudio);
     document.addEventListener('touchstart', desbloquearAudio, { passive: true });
-    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------
+
+    // ───────── Vistas: imagen / sección ─────────
+    const menuBtn = document.getElementById('creativeMenuBtn');
+    const floatingMenu = document.getElementById('floatingMenu');
+    const menuItems = floatingMenu.querySelectorAll('.menu-item');
+    let loaderTimer;
+
+    function setCurrentSection(item) {
+        menuItems.forEach(i => i.classList.toggle('is-current', i === item));
+    }
 
     function showImage() {
         if (imageContainer) imageContainer.style.display = 'flex';
-        if (iframeContainer) iframeContainer.style.display = 'none';
+        if (iframeContainer) {
+            iframeContainer.style.display = 'none';
+            iframeContainer.classList.remove('loading');
+        }
         if (webIframe) webIframe.src = 'about:blank';
+        setCurrentSection(null);
     }
 
     function showIframe(url) {
         if (imageContainer) imageContainer.style.display = 'none';
-        if (iframeContainer) iframeContainer.style.display = 'flex';
+        if (iframeContainer) {
+            iframeContainer.style.display = 'flex';
+            iframeContainer.classList.add('loading');
+            clearTimeout(loaderTimer);
+            loaderTimer = setTimeout(() => iframeContainer.classList.remove('loading'), 10000);
+        }
         if (webIframe) webIframe.src = url;
     }
 
-    function showToast(message, isError = false) {
+    webIframe.addEventListener('load', () => {
+        clearTimeout(loaderTimer);
+        iframeContainer.classList.remove('loading');
+    });
+
+    // ───────── Avisos (toasts) ─────────
+    const TOAST_ICONS = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16 9.5"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.3v.01"/></svg>',
+        info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.7v.01"/></svg>'
+    };
+
+    function showToast(message, kind = 'info', duration = 2300) {
+        document.querySelectorAll('.custom-toast').forEach(t => t.remove());
         const toast = document.createElement('div');
-        toast.className = 'custom-toast';
-        toast.style.background = isError ? '#b91c1c' : 'var(--primary)';
-        toast.innerHTML = message;
+        toast.className = 'custom-toast ' + kind + (duration ? '' : ' persist');
+        toast.setAttribute('role', 'status');
+        toast.innerHTML = TOAST_ICONS[kind] || '';
+        const text = document.createElement('span');
+        text.textContent = message;
+        toast.appendChild(text);
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2300);
+        if (duration) setTimeout(() => toast.remove(), duration);
+        return toast;
     }
 
+    // ───────── Edición de nombre ─────────
     function openEditModal() {
         const user = auth.currentUser;
         if (!user) {
-            showToast("Debes iniciar sesión para editar tu nombre", true);
+            showToast("Debes iniciar sesión para editar tu nombre", 'error');
             return;
         }
         let fullName = user.displayName || "";
@@ -753,6 +1036,7 @@
         editFirstName.value = parts[0] || "";
         editLastName.value = parts.slice(1).join(' ') || "";
         editModal.classList.add('active');
+        if (finePointer) setTimeout(() => editFirstName.focus(), 300);
     }
 
     function closeEditModal() {
@@ -762,90 +1046,148 @@
     async function saveFullName() {
         const user = auth.currentUser;
         if (!user) {
-            showToast("No tienes permisos para editar el nombre", true);
+            showToast("No tienes permisos para editar el nombre", 'error');
             return;
         }
         const firstName = editFirstName.value.trim();
         const lastName = editLastName.value.trim();
         if (firstName === "" && lastName === "") {
-            showToast("Debes ingresar al menos un nombre", true);
+            showToast("Debes ingresar al menos un nombre", 'error');
             return;
         }
         const fullName = `${firstName} ${lastName}`.trim();
+        saveEditBtn.disabled = true;
         try {
             await user.updateProfile({ displayName: fullName });
             actualizarBienvenida(user);
             closeEditModal();
-            showToast(`✅ Nombre actualizado: ${fullName}`);
+            showToast(`Nombre actualizado: ${fullName}`, 'success');
         } catch (error) {
-            showToast("Error al actualizar nombre", true);
+            showToast("Error al actualizar nombre", 'error');
+        } finally {
+            saveEditBtn.disabled = false;
         }
     }
+
+    const ICON_PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.1 2.1 0 00-3-3L5 17v3zM14 7l3 3"/></svg>';
+    const ICON_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>';
 
     function actualizarBienvenida(user) {
+        welcomeGreeting.replaceChildren();
+
         if (!user) {
-            welcomeGreeting.innerHTML = `👋 Invitado · Solo lectura`;
-            welcomeAvatar.textContent = "👤";
+            const name = document.createElement('span');
+            name.className = 'greet-name';
+            name.textContent = 'Invitado';
+            const chip = document.createElement('span');
+            chip.className = 'role-chip';
+            chip.textContent = 'Solo lectura';
+            welcomeGreeting.append(name, chip);
+            welcomeAvatar.innerHTML = ICON_USER;
+            welcomeAvatar.classList.add('is-guest');
             return;
         }
+
         let nombreCompleto = user.displayName;
-        if (!nombreCompleto || nombreCompleto.trim() === "") {
-            nombreCompleto = user.email.split('@')[0];
-            welcomeGreeting.innerHTML = `¡Hola, ${nombreCompleto}! <span class="edit-hint">(editar)</span>`;
-        } else {
-            welcomeGreeting.innerHTML = `¡Hola, ${nombreCompleto}! <span class="edit-hint">✎</span>`;
-        }
-        const inicial = nombreCompleto.charAt(0).toUpperCase();
-        welcomeAvatar.textContent = inicial;
+        const sinNombre = !nombreCompleto || nombreCompleto.trim() === "";
+        if (sinNombre) nombreCompleto = (user.email || '').split('@')[0] || 'Familia';
+
+        const name = document.createElement('span');
+        name.className = 'greet-name';
+        name.textContent = `¡Hola, ${nombreCompleto}!`;
+        const hint = document.createElement('span');
+        hint.className = 'edit-hint';
+        hint.innerHTML = ICON_PENCIL + (sinNombre ? '<span>editar</span>' : '');
+        welcomeGreeting.append(name, hint);
+
+        welcomeAvatar.classList.remove('is-guest');
+        welcomeAvatar.textContent = nombreCompleto.charAt(0).toUpperCase();
     }
 
-    // Verificar cumpleaños y mostrar modal elegante
-    async function checkAndShowBirthdayModal() {
-        try {
-            const snapshot = await db.collection("persons").get();
-            if (snapshot.empty) return;
-            
-            const today = new Date();
-            const todayMonth = today.getMonth();
-            const todayDay = today.getDate();
-            let birthdayPerson = null;
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const birthDateValue = data.birthDate;
-                if (!birthDateValue) return;
-                
-                let birthDateObj;
-                if (birthDateValue && typeof birthDateValue.toDate === 'function') {
-                    birthDateObj = birthDateValue.toDate();
-                } else if (birthDateValue && birthDateValue.seconds) {
-                    birthDateObj = new Date(birthDateValue.seconds * 1000);
-                } else {
-                    return;
-                }
-                
-                if (isNaN(birthDateObj.getTime())) return;
-                
-                const birthMonth = birthDateObj.getMonth();
-                const birthDay = birthDateObj.getDate();
-                
-                if (birthMonth === todayMonth && birthDay === todayDay) {
-                    const firstName = data.firstName || "";
-                    const lastName = data.lastName || "";
-                    const fullName = `${firstName} ${lastName}`.trim();
-                    if (fullName) birthdayPerson = fullName;
-                }
-            });
-            
-            if (birthdayPerson) {
-                birthdayPersonNameSpan.textContent = birthdayPerson;
-                birthdayModal.classList.add('open');
-            }
-        } catch (error) {
-            console.error("Error al consultar cumpleaños:", error);
+    // ───────── Cumpleaños ─────────
+    function formatNames(names) {
+        if (typeof Intl !== 'undefined' && Intl.ListFormat) {
+            return new Intl.ListFormat('es', { style: 'long', type: 'conjunction' }).format(names);
         }
+        return names.join(', ');
     }
-    
+
+    function launchConfetti() {
+        if (prefersReduced) return;
+        const layer = birthdayModal.querySelector('.confetti-layer');
+        layer.replaceChildren();
+        const colors = ['#F0C27A', '#6FD6AE', '#F6F2E8', '#1F7A60', '#EBD3A4'];
+        for (let i = 0; i < 34; i++) {
+            const p = document.createElement('i');
+            p.className = 'confetti';
+            p.style.background = colors[i % colors.length];
+            if (i % 3 === 0) { p.style.borderRadius = '50%'; p.style.width = p.style.height = '7px'; }
+            layer.appendChild(p);
+            const angle = (-90 + (Math.random() - 0.5) * 150) * Math.PI / 180;
+            const dist = 90 + Math.random() * 170;
+            const dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
+            const fall = 160 + Math.random() * 180;
+            const rot = (Math.random() - 0.5) * 900;
+            p.animate([
+                { transform: 'translate(0,0) rotate(0deg) scale(.4)', opacity: 0 },
+                { transform: `translate(${dx * .35}px,${dy * .35}px) rotate(${rot * .2}deg) scale(1)`, opacity: 1, offset: .08 },
+                { transform: `translate(${dx}px,${dy}px) rotate(${rot * .5}deg) scale(1)`, opacity: 1, offset: .45 },
+                { transform: `translate(${dx * 1.15}px,${dy + fall}px) rotate(${rot}deg) scale(.9)`, opacity: 0 }
+            ], { duration: 1700 + Math.random() * 900, delay: 300 + Math.random() * 150, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' });
+        }
+        setTimeout(() => layer.replaceChildren(), 3600);
+    }
+
+    async function loadBirthdayNames() {
+        const snapshot = await db.collection("persons").get();
+        const names = [];
+        if (snapshot.empty) return names;
+
+        const today = new Date();
+        const todayMonth = today.getMonth();
+        const todayDay = today.getDate();
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const birthDateValue = data.birthDate;
+            if (!birthDateValue) return;
+
+            let birthDateObj;
+            if (birthDateValue && typeof birthDateValue.toDate === 'function') {
+                birthDateObj = birthDateValue.toDate();
+            } else if (birthDateValue && birthDateValue.seconds) {
+                birthDateObj = new Date(birthDateValue.seconds * 1000);
+            } else {
+                return;
+            }
+
+            if (isNaN(birthDateObj.getTime())) return;
+
+            if (birthDateObj.getMonth() === todayMonth && birthDateObj.getDate() === todayDay) {
+                const fullName = `${data.firstName || ""} ${data.lastName || ""}`.trim();
+                if (fullName) names.push(fullName);
+            }
+        });
+        return names;
+    }
+
+    // Una sola consulta aunque se invoque varias veces (evita reabrir el aviso)
+    let birthdayPromise = null;
+    function checkAndShowBirthdayModal() {
+        if (birthdayPromise) return birthdayPromise;
+        birthdayPromise = loadBirthdayNames().then(names => {
+            if (!names.length) return;
+            birthdayTitle.textContent = names.length > 1 ? '¡Celebramos los cumpleaños!' : '¡Celebramos el cumpleaños!';
+            birthdayPersonNameSpan.textContent = formatNames(names);
+            birthdayModal.classList.add('open');
+            launchConfetti();
+        }).catch(error => {
+            console.error("Error al consultar cumpleaños:", error);
+            birthdayPromise = null; // permite reintentar cuando cambie la sesión
+        });
+        return birthdayPromise;
+    }
+
     function closeBirthdayModal() {
         birthdayModal.classList.remove('open');
     }
@@ -859,32 +1201,53 @@
     editModal.addEventListener('click', (e) => {
         if (e.target === editModal) closeEditModal();
     });
+    [editFirstName, editLastName].forEach(inp => inp.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); saveFullName(); }
+    }));
     closeBirthdayBtn.addEventListener('click', closeBirthdayModal);
-    
+    birthdayModal.addEventListener('click', (e) => {
+        if (e.target === birthdayModal) closeBirthdayModal();
+    });
+
     auth.onAuthStateChanged((user) => {
         actualizarBienvenida(user);
         checkAndShowBirthdayModal();
     });
 
-    const menuBtn = document.getElementById('creativeMenuBtn');
-    const floatingMenu = document.getElementById('floatingMenu');
+    // ───────── Menú de secciones ─────────
     let isMenuOpen = false;
+
+    function setMenuOpen(open) {
+        isMenuOpen = open;
+        floatingMenu.classList.toggle('active', open);
+        menuBtn.classList.toggle('is-open', open);
+        menuBtn.setAttribute('aria-expanded', String(open));
+    }
 
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        isMenuOpen = !isMenuOpen;
-        floatingMenu.classList.toggle('active', isMenuOpen);
+        setMenuOpen(!isMenuOpen);
     });
 
     document.addEventListener('click', (e) => {
         if (isMenuOpen && !menuBtn.contains(e.target) && !floatingMenu.contains(e.target)) {
-            isMenuOpen = false;
-            floatingMenu.classList.remove('active');
+            setMenuOpen(false);
         }
     });
 
-    floatingMenu.querySelectorAll('li').forEach(item => {
-        // --- FUNCIÓN UNIFICADA DE REPRODUCCIÓN (ESCRITORIO + MÓVIL) ---
+    const SECTION_URLS = {
+        arbol: 'arbol.html',
+        origen: 'https://app-fioravante.github.io/familiia/origen.html',
+        mapas: 'https://app-fioravante.github.io/familiia/mapas.html',
+        argentina: 'https://app-fioravante.github.io/familiia/argentina.html',
+        brasil: 'https://app-fioravante.github.io/familiia/brasil',
+        italia: 'https://app-fioravante.github.io/familiia/italia',
+        recuerdos: 'https://app-fioravante.github.io/familiia/recuerdos',
+        contacto: 'https://app-fioravante.github.io/familiia/contacto'
+    };
+
+    menuItems.forEach(item => {
+        // --- REPRODUCCIÓN UNIFICADA (ESCRITORIO + MÓVIL) ---
         const reproducirSonido = () => {
             if (audioDesbloqueado) {
                 menuHoverSound.currentTime = 0;
@@ -892,39 +1255,25 @@
             }
         };
 
-        // Evento Escritorio (Puntero/Mouse)
         item.addEventListener('mouseenter', reproducirSonido);
-        // Evento Móvil (Toque táctil)
         item.addEventListener('touchstart', reproducirSonido, { passive: true });
 
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            const text = item.innerText;
-            if (text === 'Árbol completo') {
-                showIframe('arbol.html');
-            } else if (text === 'Origen del Apellido') {
-                showIframe('https://app-fioravante.github.io/familiia/origen.html');
-            } else if (text === 'Mapas') {
-                showIframe('https://app-fioravante.github.io/familiia/mapas.html');
-            } else if (text === 'Argentina') {
-                showIframe('https://app-fioravante.github.io/familiia/argentina.html');
-            } else if (text === 'Brasil') {
-                showIframe('https://app-fioravante.github.io/familiia/brasil');
-            } else if (text === 'Italia') {
-                showIframe('https://app-fioravante.github.io/familiia/italia');
-            } else if (text === 'Recuerdos') {
-                showIframe('https://app-fioravante.github.io/familiia/recuerdos');
-            } else if (text === 'Contacto') {
-                showIframe('https://app-fioravante.github.io/familiia/contacto');
+            const url = SECTION_URLS[item.dataset.section];
+            if (url) {
+                showIframe(url);
+                setCurrentSection(item);
             } else {
                 showImage();
-                showToast(`📜 ${text} — Próximamente disponible`);
+                const label = item.querySelector('.mi-label').textContent;
+                showToast(`${label} — Próximamente disponible`, 'info');
             }
-            isMenuOpen = false;
-            floatingMenu.classList.remove('active');
+            setMenuOpen(false);
         });
     });
 
+    // ───────── Cerrar sesión ─────────
     const alertModal = document.getElementById('alertModal');
     const cancelModalBtn = document.getElementById('modalCancelBtn');
     const confirmModalBtn = document.getElementById('modalConfirmBtn');
@@ -941,11 +1290,7 @@
     cancelModalBtn.addEventListener('click', closeAlertModal);
     confirmModalBtn.addEventListener('click', async () => {
         closeAlertModal();
-        const toastExit = document.createElement('div');
-        toastExit.className = 'custom-toast';
-        toastExit.style.background = '#2C423F';
-        toastExit.innerHTML = `🕊️ Cerrando sesión · Hasta pronto, Familia Fioravante`;
-        document.body.appendChild(toastExit);
+        const toastExit = showToast('Cerrando sesión · Hasta pronto, Familia Fioravante', 'info', 0);
         try {
             await auth.signOut();
             setTimeout(() => {
@@ -953,8 +1298,7 @@
                 window.location.href = "index.html";
             }, 1200);
         } catch (error) {
-            toastExit.innerHTML = `❌ Error al cerrar sesión · Intenta nuevamente`;
-            setTimeout(() => toastExit.remove(), 2000);
+            showToast('Error al cerrar sesión · Intenta nuevamente', 'error', 2000);
         }
     });
 
@@ -962,11 +1306,21 @@
         if (e.target === alertModal) closeAlertModal();
     });
 
+    // Tocar el título (o el espacio libre del dock) vuelve al inicio
     const bottomPanel = document.querySelector('.bottom-panel');
     bottomPanel.addEventListener('click', (e) => {
         if (!e.target.closest('.welcome-area') && !e.target.closest('.menu-wrapper') && !e.target.closest('.btn-exit')) {
             showImage();
         }
+    });
+
+    // Escape cierra lo que esté abierto, de arriba hacia abajo
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (birthdayModal.classList.contains('open')) closeBirthdayModal();
+        else if (alertModal.classList.contains('active')) closeAlertModal();
+        else if (editModal.classList.contains('active')) closeEditModal();
+        else if (isMenuOpen) { setMenuOpen(false); menuBtn.focus(); }
     });
 
     showImage();
