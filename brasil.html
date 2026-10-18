@@ -1,740 +1,429 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Familia en Brasil | Ciudades de residencia y fallecimiento</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <style>
-        /* ========== ESTILOS IDÉNTICOS AL ÁRBOL ORIGINAL ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #F5F7F5;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-            background: #F5F7F5;
-        }
-
-        .left-panel {
-            flex: 0.85;
-            background: #FFFFFF;
-            border-right: 5px solid #2A5C4A;
-            padding: 0 1rem 1.5rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            height: 100%;
-        }
-
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            background: #FFFFFF;
-            z-index: 15;
-            padding: 1.2rem 0 0.8rem 0;
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid #E2EBE7;
-        }
-        .title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-        .title-origen {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1C3F32;
-            letter-spacing: -0.3px;
-            border-left: 5px solid #2A5C4A;
-            padding-left: 1rem;
-            line-height: 1.2;
-            margin: 0;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            flex-shrink: 0;
-        }
-        .title-origen:hover {
-            opacity: 0.85;
-        }
-
-        .btn-refresh {
-            background: #F0F5F2;
-            border: 1.5px solid #C2D2CA;
-            color: #1C3F32;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .btn-refresh:hover {
-            background: #E2EBE7;
-            transform: scale(0.97);
-            border-color: #2A5C4A;
-        }
-
-        .city-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.7rem;
-            margin-top: 0.5rem;
-        }
-        .city-card {
-            background: #FCFEFD;
-            border: 1.5px solid #D0E0D8;
-            border-radius: 20px;
-            padding: 0.9rem 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .city-card:hover {
-            background: #EFF5F2;
-            transform: translateX(4px);
-            border-color: #2A5C4A;
-        }
-        .city-card.selected-city {
-            background: #2A5C4A20;
-            border: 2px solid #2A5C4A;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .city-name {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1C3F32;
-        }
-        .city-count {
-            background: #EFF5F2;
-            border-radius: 60px;
-            padding: 0.2rem 0.7rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #2A5C4A;
-        }
-
-        .right-panel {
-            flex: 1.5;
-            background: #F5F7F5;
-            display: flex;
-            flex-direction: column;
-            padding: 2rem 2.2rem 2rem 2.2rem;
-            overflow-y: auto;
-        }
-
-        .details-container {
-            background: #FFFFFF;
-            border-radius: 36px;
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06);
-            padding: 2rem 2.2rem;
-            height: 100%;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            border: 1px solid #E2EBE7;
-        }
-
-        .empty-detail {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            height: 100%;
-            min-height: 300px;
-            color: #2A5C4A;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-        }
-        .empty-detail strong {
-            font-size: 2.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 1rem;
-        }
-        .city-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            border-bottom: 2px solid #E2EBE7;
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .city-header h2 {
-            color: #1C3F32;
-            font-size: 1.8rem;
-        }
-        .ancestors-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.9rem;
-            margin-top: 0.5rem;
-        }
-        .ancestor-item {
-            background: #FCFEFD;
-            border: 1px solid #D0E0D8;
-            border-radius: 24px;
-            padding: 1rem 1.2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            transition: all 0.2s;
-        }
-        .ancestor-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }
-        .ancestor-name {
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: #1C3F32;
-            cursor: pointer;
-            text-decoration: none;
-            transition: color 0.2s;
-            display: inline-block;
-        }
-        .ancestor-name:hover {
-            color: #2A5C4A;
-            text-decoration: underline;
-        }
-        .ancestor-detail {
-            font-size: 0.85rem;
-            color: #4A6A5C;
-        }
-        .status-badge {
-            background: #EFF5F2;
-            padding: 0.3rem 1rem;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .status-alive { color: #1E6F3F; }
-        .status-deceased { color: #B1624B; }
-
-        .city-media {
-            background: #F9FBF9;
-            border-radius: 28px;
-            padding: 1.2rem;
-            margin-top: 0.5rem;
-        }
-        .city-media h4 {
-            color: #1C3F32;
-            margin-bottom: 0.8rem;
-        }
-        .image-input-group {
-            display: flex;
-            gap: 0.6rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-        .image-input-group input {
-            flex: 1;
-            padding: 0.6rem 1rem;
-            border: 1.5px solid #D0E0D8;
-            border-radius: 60px;
-            font-family: 'Inter', sans-serif;
-        }
-        .btn-sm {
-            background: #2A5C4A;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.2rem;
-            border-radius: 60px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .city-img-preview {
-            margin-top: 0.8rem;
-            max-width: 100%;
-            border-radius: 24px;
-            overflow: hidden;
-        }
-        .city-img-preview img {
-            width: 100%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 20px;
-        }
-        .map-link {
-            margin-top: 0.8rem;
-            display: inline-block;
-            font-size: 0.85rem;
-            color: #2A5C4A;
-            font-weight: 500;
-        }
-
-        @media (max-width: 768px) {
-            body { overflow-y: auto; height: auto; }
-            .app-container { flex-direction: column; height: auto; }
-            .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; max-height: 50vh; }
-            .right-panel { flex: 1; padding: 1rem; }
-            .details-container { padding: 1.2rem; }
-            .city-header h2 { font-size: 1.4rem; }
-        }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(8px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-        .ancestors-list, .city-card { animation: fadeSlideUp 0.2s ease; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>Brasil | Genealogía Fioravante</title>
+<meta name="theme-color" content="#0C211D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--ink-900:#0C211D;--leaf:#6FD6AE;--leaf-deep:#1F7A60;--honey:#F0C27A;--honey-soft:#EBD3A4;--honey-deep:#A8731F;--paper:#F6F2E8;--mist:#9DB5AB;--text-dark:#10231E;--muted-dark:#5E6E67;--line-paper:#E4DDCC;--male-ink:#2D6DB5;--female-ink:#B63A72;--ref:#E58BB4;--danger:#B3372B;--font-display:'Instrument Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;--font-main:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--ease-out:cubic-bezier(.22,1,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{-webkit-appearance:none;appearance:none;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--honey);outline-offset:3px}
+html,body{height:100%}
+body{background:var(--ink-900);color:var(--paper);font-family:var(--font-main);font-size:16px;line-height:1.5;overflow:hidden;-webkit-font-smoothing:antialiased}
+.ic{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stage-bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(90% 80% at 50% 40%,rgba(27,68,57,.8),transparent 70%),linear-gradient(160deg,#0F2B25,#0A1B18)}
+.aurora{position:absolute;border-radius:50%;will-change:transform}
+.a1{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(47,160,125,.24),transparent 65%);animation:drift-a 28s ease-in-out infinite alternate}
+.a2{width:60vmax;height:60vmax;right:-20vmax;bottom:-30vmax;background:radial-gradient(circle,rgba(240,194,123,.12),transparent 65%);animation:drift-b 34s ease-in-out infinite alternate}
+@keyframes drift-a{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift-b{to{transform:translate(-7vmax,-5vmax) scale(1.12)}}
+@keyframes sheet-in{from{opacity:0;transform:translateY(16px) scale(.985)}}
+.app{position:relative;z-index:1;display:grid;grid-template-columns:372px minmax(0,1fr);gap:14px;height:100dvh;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+.side{display:flex;flex-direction:column;min-height:0;overflow:hidden;border-radius:28px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:sheet-in .8s var(--ease-out) backwards}
+.side-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;padding:1.3rem 1.3rem .9rem}
+.brand h1{display:flex;align-items:center;gap:.6rem;font-family:var(--font-display);font-weight:400;font-size:2.3rem;line-height:1.05;letter-spacing:-.01em}
+.brand h1 .ic{width:26px;height:26px;color:var(--leaf)}
+.brand p{margin-top:.2rem;font-family:var(--font-display);font-style:italic;font-size:1.15rem;line-height:1.15;color:var(--honey-soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.55rem 1.05rem;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--paper);font-weight:600;font-size:.85rem;white-space:nowrap;transition:background .25s,border-color .25s,color .25s,transform .35s var(--ease-out),box-shadow .35s var(--ease-out)}
+.btn:hover{background:rgba(255,255,255,.13);color:var(--honey);transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn-honey,.btn-honey:hover{border:0;background:linear-gradient(145deg,var(--honey),#E2A95A);color:var(--ink-900)}
+.btn-honey:hover{box-shadow:0 12px 24px -10px rgba(240,194,123,.6)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;padding:0 1.3rem}
+.st{padding:.65rem .8rem .7rem;border-radius:16px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}
+.st b{display:block;font-family:var(--font-display);font-weight:400;font-size:1.9rem;line-height:1;letter-spacing:-.02em}
+.st span{display:block;margin-top:.15rem;color:var(--mist);font-size:.72rem;font-weight:600}
+.tools{display:flex;flex-direction:column;gap:.7rem;padding:1rem 1.3rem .8rem}
+.search{position:relative}
+.search .ic{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--mist);pointer-events:none}
+.search input{width:100%;height:46px;padding:0 16px 0 44px;border-radius:999px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:var(--paper);font-size:.95rem;transition:border-color .25s,box-shadow .25s}
+.search input::placeholder{color:var(--mist)}
+.search input:focus{outline:none;border-color:var(--honey);box-shadow:0 0 0 4px rgba(240,194,123,.14)}
+.note{color:var(--mist);font-size:.76rem;line-height:1.4}
+.seg{display:inline-flex;align-self:flex-start;padding:3px;border-radius:999px;background:rgba(255,255,255,.07)}
+.seg button{padding:.32rem .85rem;border-radius:999px;color:var(--mist);font-size:.78rem;font-weight:600;transition:background .25s,color .25s}
+.seg button[aria-pressed=true]{background:var(--honey);color:var(--ink-900)}
+.list{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem;padding:.2rem 1rem 1.1rem 1.3rem;margin-right:.3rem;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+.city{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.75rem;width:100%;text-align:left;padding:.7rem .95rem 1rem;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);transition:background .25s,border-color .25s}
+.city:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.16)}
+.city.on{background:rgba(240,194,123,.11);border-color:rgba(240,194,123,.5)}
+.city .pin{color:var(--leaf)}
+.city.on .pin{color:var(--honey)}
+.ct strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem;font-weight:600}
+.ct small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mist);font-size:.76rem}
+.num{font-family:var(--font-display);font-size:1.5rem;line-height:1;color:var(--honey-soft)}
+.bar{position:absolute;left:.95rem;right:.95rem;bottom:.45rem;height:3px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar::after{content:'';display:block;height:100%;width:var(--w);border-radius:inherit;background:linear-gradient(90deg,var(--leaf-deep),var(--leaf))}
+.group{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:.6rem;padding:.8rem .2rem .3rem;border-top:1px dashed rgba(255,255,255,.16);font-family:var(--font-display);font-size:1.3rem;color:var(--ref)}
+.group .ic{transition:transform .3s var(--ease-out)}
+.group[aria-expanded=true] .ic{transform:rotate(90deg)}
+.city.ref{padding-bottom:.7rem}
+.city.ref .pin{color:var(--ref)}
+.city.ref .num{font-family:var(--font-main);font-size:.72rem;font-weight:600;color:var(--ref)}
+.city.ref.on{background:rgba(229,139,180,.1);border-color:rgba(229,139,180,.5)}
+.empty{padding:1.6rem 1rem;text-align:center;font-family:var(--font-display);font-style:italic;font-size:1.3rem;color:var(--mist)}
+.stage{position:relative;min-width:0;overflow:hidden;border-radius:28px;box-shadow:0 40px 80px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08),0 0 90px -30px rgba(111,214,174,.35);animation:sheet-in .8s var(--ease-out) .1s backwards}
+#map{position:absolute;left:0;top:0;width:calc(100% - var(--mr,0px));height:calc(100% - var(--mb,0px));border:0;z-index:0;background:#0F1B19}
+.stage.po{--mr:428px}
+.mapbar{position:absolute;z-index:450;top:14px;right:calc(14px + var(--mr,0px));display:flex;gap:.5rem}
+.fab{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;height:44px;padding:0 1.05rem;border-radius:999px;background:rgba(12,33,29,.86);border:1px solid rgba(255,255,255,.14);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--paper);font-weight:600;font-size:.85rem;box-shadow:0 12px 26px -12px rgba(0,0,0,.7);transition:color .25s,border-color .25s,transform .35s var(--ease-out)}
+.fab:hover{color:var(--honey);border-color:rgba(240,194,123,.5);transform:translateY(-2px)}
+.fab.menu{display:none;width:44px;padding:0}
+.fab.spin .ic{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hud{position:absolute;z-index:450;left:14px;bottom:44px;transition:opacity .3s}
+.chip{display:inline-flex;align-items:center;gap:8px;max-width:min(78vw,360px);padding:.4rem .95rem .4rem .8rem;border-radius:999px;background:rgba(12,33,29,.86);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--mist);font-size:.8rem;font-weight:500}
+.chip span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-dot{width:8px;height:8px;flex:none;border-radius:50%;background:var(--leaf)}
+.status-dot.warn{background:var(--honey);animation:hint-pulse 2.2s ease-out infinite}
+.status-dot.err{background:#FF9A90}
+@keyframes hint-pulse{0%{box-shadow:0 0 0 0 rgba(240,194,123,.5)}100%{box-shadow:0 0 0 10px rgba(240,194,123,0)}}
+.panel{position:absolute;z-index:500;top:14px;right:14px;bottom:44px;width:min(400px,calc(100% - 28px));display:flex;flex-direction:column;border-radius:26px;color:var(--text-dark);background:linear-gradient(180deg,#FBF9F3,#F4EFE3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 40px 80px -20px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateX(calc(100% + 24px));transition:transform .55s var(--ease-out),opacity .3s,visibility 0s .55s}
+.panel.on{opacity:1;visibility:visible;transform:none;transition:transform .55s var(--ease-out),opacity .3s}
+.panel :focus-visible{outline-color:var(--leaf-deep)}
+.p-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;padding:1.4rem 1.4rem .9rem}
+.p-head h2{font-family:var(--font-display);font-weight:400;font-size:2rem;line-height:1.05;letter-spacing:-.01em}
+.p-head p{margin-top:.2rem;color:var(--muted-dark);font-size:.88rem}
+.x{flex:none;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;border:1.5px solid #D6CEBB;color:var(--text-dark);transition:background .25s,border-color .25s}
+.x:hover{background:rgba(31,122,96,.07);border-color:var(--leaf-deep)}
+.p-tools{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;padding:0 1.4rem .9rem;border-bottom:1px solid var(--line-paper)}
+.p-tools[hidden]{display:none}
+.p-tools #pMeta{color:var(--muted-dark);font-size:.84rem;font-weight:600}
+.panel .seg{background:#EDE6D5}
+.panel .seg button{color:var(--muted-dark)}
+.panel .seg button[aria-pressed=true]{background:linear-gradient(180deg,#1A4A3F,#0F2F28);color:var(--paper)}
+.p-body{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem;padding:1rem 1.4rem 1.4rem}
+.prow{display:flex;align-items:center;gap:.7rem;width:100%;text-align:left;padding:.6rem .8rem;border-radius:16px;background:#fff;border:1px solid var(--line-paper);transition:border-color .25s,background .25s}
+.prow:hover{border-color:var(--leaf-deep);background:#FDFCF8}
+.av{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:.74rem;font-weight:700;background:rgba(31,122,96,.1);color:var(--leaf-deep)}
+.av.m{background:rgba(45,109,181,.12);color:var(--male-ink)}
+.av.f{background:rgba(182,58,114,.11);color:var(--female-ink)}
+.pn{flex:1;min-width:0;overflow-wrap:anywhere}
+.pn b{display:block;font-weight:600;font-size:.92rem}
+.pn small{display:block;color:var(--muted-dark);font-size:.78rem}
+.bd{flex:none;padding:.15rem .7rem;border-radius:999px;font-size:.78rem;font-weight:600;background:rgba(31,122,96,.12);color:var(--leaf-deep)}
+.bd.d{background:rgba(179,55,43,.1);color:var(--danger)}
+.media{padding:.9rem;border-radius:18px;background:#EDE6D5}
+.media label{display:block;margin-bottom:.5rem;font-size:.84rem;font-weight:600}
+.ig{display:flex;gap:.5rem}
+.ig input{flex:1;min-width:0;height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #D6CEBB;background:#fff;font-size:.88rem}
+.ig input:focus{outline:none;border-color:var(--leaf-deep)}
+.media img{display:block;width:100%;max-height:200px;margin-top:.7rem;border-radius:14px;object-fit:cover}
+.media .err{margin-top:.6rem;color:var(--danger);font-size:.82rem;font-weight:600}
+.gm{display:inline-block;margin-top:.7rem;color:var(--leaf-deep);font-size:.84rem;font-weight:600}
+.gm:hover{text-decoration:underline}
+.info{padding:1rem 1.1rem;border-radius:18px;background:#fff;border:1px solid #EBD3E0;font-size:.95rem;line-height:1.6}
+.info strong{color:var(--female-ink)}
+.scrim{display:none}
+@media (max-width:768px){
+.app{display:block;padding:0}
+.stage{position:fixed;inset:0;border-radius:0;box-shadow:none}
+.side{position:fixed;z-index:700;top:0;bottom:0;left:0;width:min(88vw,380px);border-radius:0 28px 28px 0;background:rgba(10,27,24,.97);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);transform:translateX(-104%);transition:transform .45s var(--ease-out);animation:none}
+.side.open{transform:none}
+.scrim{position:fixed;inset:0;z-index:650;background:rgba(5,16,13,.55);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.scrim.on{display:block}
+.mapbar{top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right))}
+.fab.menu{display:inline-flex}
+.hud{left:max(12px,env(safe-area-inset-left));bottom:calc(44px + env(safe-area-inset-bottom))}
+.stage{--mb:env(safe-area-inset-bottom)}
+.stage.po{--mr:0px;--mb:40dvh}
+.stage.po .hud{opacity:0;pointer-events:none}
+.panel{top:auto;left:10px;right:10px;bottom:calc(34px + env(safe-area-inset-bottom));width:auto;height:auto;max-height:62dvh;border-radius:26px;transform:translateY(130%)}
+.p-head{padding:1.2rem 1.2rem .8rem}
+.p-head h2{font-size:1.7rem}
+.p-tools{padding:0 1.2rem .8rem}
+.p-body{padding:.9rem 1.2rem 1.2rem}
+}
+@media (max-width:520px){.fab span{display:none}.fab{width:44px;padding:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}
+</style>
 </head>
 <body>
-<div class="app-container">
-    <div class="left-panel">
-        <div class="sticky-header">
-            <div class="title-row">
-                <h1 class="title-origen">Familia en Brasil</h1>
-                <button class="btn-refresh" id="refreshCitiesBtn">⟳ Actualizar</button>
-            </div>
-            <p style="font-size:0.85rem; color:#5C7A6A; margin-top: 0.2rem;">
-                🇧🇷 Vivos: ciudad de nacimiento (residencia actual)<br>
-                🇧🇷 Fallecidos: ciudad de fallecimiento
-            </p>
-        </div>
-        
-        <div id="citiesContainer" class="city-list" style="margin-bottom: 1.5rem;">Cargando...</div>
-        
-        <div class="surname-section" style="border-top: 2px dashed #C2D2CA; padding-top: 1.2rem; margin-top: 0.5rem;">
-            <h3 id="toggleOtrasReferencias" style="font-size: 1.1rem; color: #1C3F32; font-weight: 700; margin-bottom: 0.6rem; border-left: 5px solid #7A2A56; padding-left: 1rem; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center;">
-                <span>📋 Otras referencias</span>
-                <span id="menuArrow" style="transition: transform 0.2s; font-size: 0.8rem; color: #7A2A56;">▶</span>
-            </h3>
-            <div class="city-list" id="surnameCitiesContainer" style="display: none; transition: all 0.3s ease;">
-                </div>
-        </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-tree" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.3"/><circle cx="19" cy="6" r="2.3"/><circle cx="19" cy="18" r="2.3"/><path d="M7.3 12c4 0 4-6 9.4-6M7.3 12c4 0 4 6 9.4 6"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M10 6l-6 6 6 6M4 12h16"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 11-2.6-5.9"/><path d="M20 4v4.5h-4.5"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 10-13 0C5.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8 4.5-8 4.5-8-4.5L12 4z"/><path d="M4 12.5l8 4.5 8-4.5M4 16.5l8 4.5 8-4.5"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+</defs></svg>
+<div class="stage-bg" aria-hidden="true"><i class="aurora a1"></i><i class="aurora a2"></i></div>
+
+<div class="app">
+  <aside class="side" id="side" aria-label="Ciudades de Brasil">
+    <header class="side-head">
+      <div class="brand">
+        <h1><svg class="ic" aria-hidden="true"><use href="#i-tree"/></svg>Brasil</h1>
+        <p>Dónde vive y descansa la familia</p>
+      </div>
+      <a class="btn btn-honey" href="arbol.html" title="Volver al árbol"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg><span>Árbol</span></a>
+    </header>
+    <div class="stats">
+      <div class="st"><b id="stCities">—</b><span>Ciudades</span></div>
+      <div class="st"><b id="stPeople">—</b><span>Personas</span></div>
     </div>
-    <div class="right-panel">
-        <div id="rightDetails" class="details-container">
-            <div class="empty-detail">
-                <strong>🌆 Ancestros por ciudad</strong>
-                <span>Seleccioná una ciudad para ver sus historias o desplegá "Otras referencias".</span>
-            </div>
-        </div>
+    <div class="tools">
+      <div class="search"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="q" placeholder="Buscar ciudad" autocomplete="off" aria-label="Buscar ciudad"></div>
+      <div class="seg" role="group" aria-label="Ordenar ciudades" id="segCity"><button type="button" data-s="name" aria-pressed="true">A–Z</button><button type="button" data-s="count" aria-pressed="false">Más personas</button></div>
+      <p class="note">Las personas vivas se ubican por su ciudad de nacimiento; las fallecidas, por su ciudad de fallecimiento.</p>
     </div>
+    <div class="list" id="list"><p class="empty">Cargando ciudades…</p></div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <iframe id="map" title="Mapa de Google" referrerpolicy="no-referrer-when-downgrade" allow="fullscreen"></iframe>
+    <div class="mapbar">
+      <button class="fab menu" id="menuBtn" type="button" aria-label="Abrir lista de ciudades"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <button class="fab" id="refreshBtn" type="button" title="Volver a cargar los datos"><svg class="ic" aria-hidden="true"><use href="#i-refresh"/></svg><span>Actualizar</span></button>
+      <button class="fab" id="resetBtn" type="button" title="Volver a la vista general"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><span>Vista general</span></button>
+      <button class="fab" id="tilesBtn" type="button" aria-label="Cambiar estilo del mapa"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg><span id="tilesLbl">Satélite</span></button>
+    </div>
+    <div class="hud"><div class="chip" role="status"><i class="status-dot warn" id="dot"></i><span id="statusText">Iniciando…</span></div></div>
+    <section class="panel" id="panel" aria-label="Detalle de la ciudad" aria-hidden="true">
+      <div class="p-head">
+        <div><h2 id="pTitle">Ciudad</h2><p id="pSub"></p></div>
+        <button class="x" id="pClose" type="button" aria-label="Cerrar"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="p-tools" id="pTools"><span id="pMeta"></span><div class="seg" role="group" aria-label="Ordenar personas" id="segPeople"><button type="button" data-s="name" aria-pressed="true">Nombre</button><button type="button" data-s="year" aria-pressed="false">Año</button></div></div>
+      <div class="p-body" id="pBody"></div>
+    </section>
+  </main>
+  <div class="scrim" id="scrim"></div>
 </div>
 
 <script>
-    // ==================== CONFIGURACIÓN FIREBASE ====================
-    const firebaseConfig = {
-        apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
-        authDomain: "familia-genealogia.firebaseapp.com",
-        projectId: "familia-genealogia",
-        storageBucket: "familia-genealogia.firebasestorage.app",
-        messagingSenderId: "923693678578",
-        appId: "1:923693678578:web:bfed5d66d564d00847356b"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+firebase.initializeApp({
+  apiKey: "AIzaSyALUNOTt8Ex9j_eeDUtaPqWHmIk_j-VF08",
+  authDomain: "familia-genealogia.firebaseapp.com",
+  projectId: "familia-genealogia",
+  storageBucket: "familia-genealogia.firebasestorage.app",
+  messagingSenderId: "923693678578",
+  appId: "1:923693678578:web:bfed5d66d564d00847356b"
+});
+const db = firebase.firestore();
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
+const clean = s => String(s ?? '').trim().replace(/\s+/g, ' ');
+const norm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+const ini = n => n.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+const plural = (n, a, b) => `${n} ${n === 1 ? a : b}`;
+const byName = (a, b) => a.name.localeCompare(b.name, 'es');
+const store = { get: k => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }, set: (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch (e) {} } };
 
-    // ==================== VARIABLES GLOBALES ====================
-    let allPersons = [];      // { id, person, cityKey }
-    let currentCity = null;
+let cities = [], maxCount = 1, sel = null, cur = null, sortCity = 'name', sortPeople = 'name', refOpen = false;
+let mapType = store.get('fio_maptype') === 'h' ? 'h' : 'm';
 
-    const citiesContainer = document.getElementById('citiesContainer');
-    const rightDetailsDiv = document.getElementById('rightDetails');
-    const refreshBtn = document.getElementById('refreshCitiesBtn');
+/* Otras referencias: apellido Fioravante en Brasil */
+const REFS = [
+  { name: "São Paulo (SP)", query: "São Paulo, Brasil", info: "<strong>Fioravante Moretti</strong>: Destacado pionero de la ola inmigratoria de origen italiano. Existen registros históricos de comercios familiares e industrias textiles fundadas bajo el apellido exacto Fioravante a mediados del siglo XX en los tradicionales barrios de Brás, Bixiga y Mooca." },
+  { name: "Jundiaí (SP)", query: "Complexo Esportivo Fioravante Di Piero, Jundiaí, Brasil", info: "<strong>Complexo Esportivo Fioravante Di Piero</strong>: Emblemático centro polideportivo municipal dedicado a este célebre personaje de la comunidad. El apellido cuenta con una densa presencia histórica vinculada al desarrollo agrícola y vitivinícola del histórico barrio rural de Caxambu." },
+  { name: "Caxias do Sul (RS)", query: "Caxias do Sul, Brasil", info: "<strong>Vitivinicultura de la Serra Gaúcha</strong>: Núcleo de familias de origen véneto asentadas de forma temprana en la región. Se registran múltiples miembros del linaje integrados en el desarrollo de las primeras cooperativas vinícolas y bodegas de producción artesanal de la zona." },
+  { name: "Campinas (SP)", query: "Campinas, Brasil", info: "<strong>Expansión Agrícola y Ferroviaria</strong>: Presencia documentada en los libros de registro de inmigrantes asignados a las grandes plantaciones de café coloniales de finales del siglo XIX. Con las décadas, descendientes Fioravante se consolidaron en el comercio del casco céntrico." },
+  { name: "Curitiba (PR)", query: "Santa Felicidade, Curitiba, Brasil", info: "<strong>Barrio Italiano de Santa Felicidade</strong>: Inmigrantes asentados en el núcleo histórico de la comunidad italo-paranaense. Su presencia actual se ve reflejada de forma directa en reconocidos emprendimientos gastronómicos tradicionales, sector servicios y profesionales independientes." },
+  { name: "Ribeirão Preto (SP)", query: "Ribeirão Preto, Brasil", info: "<strong>Productores del Ciclo del Café</strong>: El apellido figura de manera exacta en el Archivo Histórico Municipal, asociado estrechamente a constructores, maestros de obra y contratistas viales que impulsaron el crecimiento de la infraestructura urbana a inicios del siglo XX." },
+  { name: "Bento Gonçalves (RS)", query: "Bento Gonçalves, Brasil", info: "<strong>Tradición Vitícola de la Región Nordeste</strong>: Fuerte arraigo parroquial del apellido Fioravante en los libros bautismales del siglo XIX. Varias líneas familiares continúan ligadas de forma activa a la producción de vinos finos y turismo enológico." },
+  { name: "Porto Alegre (RS)", query: "Porto Alegre, Brasil", info: "<strong>Fioravante Vignoli</strong>: Reconocido industrial y personalidad de renombre regional cuyo legado incluye aportes significativos al desarrollo manufactuorero y urbanístico de Río Grande del Sur. Existen calles y pasajes asociados históricamente a estas ramas familiares." },
+  { name: "Guarulhos (SP)", query: "Teatro Padre Fioravante Quaglia, Guarulhos, Brasil", info: "<strong>Teatro Padre Fioravante Quaglia</strong>: Espacio artístico e histórico cultural icónico de la región que rinde memoria a este influyente clérigo. El apellido destaca localmente por su participación histórica en el asociacionismo católico y obras benéficas." },
+  { name: "Sorocaba (SP)", query: "Sorocaba, Brasil", info: "<strong>Fioravante Vicente</strong>: Líder obrero metalúrgico y referente comunitario de mediados del siglo XX. El apellido cuenta con una amplia tradición laboral firmemente ligada al auge de las históricas industrias textiles y de fundición sorocabanas." }
+].map((r, i) => ({ ...r, id: 'ref' + i, title: r.name, ref: true }));
 
-    // ==================== DATOS EXTRAÍDOS: 10 CIUDADES CON PRESENCIA FIORAVANTE ====================
-    const fioravanteCitiesData = [
-        { name: "São Paulo (SP)", query: "São Paulo, Brasil", info: "<strong>Fioravante Moretti</strong>: Destacado pionero de la ola inmigratoria de origen italiano. Existen registros históricos de comercios familiares e industrias textiles fundadas bajo el apellido exacto Fioravante a mediados del siglo XX en los tradicionales barrios de Brás, Bixiga y Mooca." },
-        { name: "Jundiaí (SP)", query: "Complexo Esportivo Fioravante Di Piero, Jundiaí, Brasil", info: "<strong>Complexo Esportivo Fioravante Di Piero</strong>: Emblemático centro polideportivo municipal dedicado a este célebre personaje de la comunidad. El apellido cuenta con una densa presencia histórica vinculada al desarrollo agrícola y vitivinícola del histórico barrio rural de Caxambu." },
-        { name: "Caxias do Sul (RS)", query: "Caxias do Sul, Brasil", info: "<strong>Vitivinicultura de la Serra Gaúcha</strong>: Núcleo de familias de origen véneto asentadas de forma temprana en la región. Se registran múltiples miembros del linaje integrados en el desarrollo de las primeras cooperativas vinícolas y bodegas de producción artesanal de la zona." },
-        { name: "Campinas (SP)", query: "Campinas, Brasil", info: "<strong>Expansión Agrícola y Ferroviaria</strong>: Presencia documentada en los libros de registro de inmigrantes asignados a las grandes plantaciones de café coloniales de finales del siglo XIX. Con las décadas, descendientes Fioravante se consolidaron en el comercio del casco céntrico." },
-        { name: "Curitiba (PR)", query: "Santa Felicidade, Curitiba, Brasil", info: "<strong>Barrio Italiano de Santa Felicidade</strong>: Inmigrantes asentados en el núcleo histórico de la comunidad italo-paranaense. Su presencia actual se ve reflejada de forma directa en reconocidos emprendimientos gastronómicos tradicionales, sector servicios y profesionales independientes." },
-        { name: "Ribeirão Preto (SP)", query: "Ribeirão Preto, Brasil", info: "<strong>Productores del Ciclo del Café</strong>: El apellido figura de manera exacta en el Archivo Histórico Municipal, asociado estrechamente a constructores, maestros de obra y contratistas viales que impulsaron el crecimiento de la infraestructura urbana a inicios del siglo XX." },
-        { name: "Bento Gonçalves (RS)", query: "Bento Gonçalves, Brasil", info: "<strong>Tradición Vitícola de la Región Nordeste</strong>: Fuerte arraigo parroquial del apellido Fioravante en los libros bautismales del siglo XIX. Varias líneas familiares continúan ligadas de forma activa a la producción de vinos finos y turismo enológico." },
-        { name: "Porto Alegre (RS)", query: "Porto Alegre, Brasil", info: "<strong>Fioravante Vignoli</strong>: Reconocido industrial y personalidad de renombre regional cuyo legado incluye aportes significativos al desarrollo manufactuorero y urbanístico de Río Grande del Sur. Existen calles y pasajes asociados históricamente a estas ramas familiares." },
-        { name: "Guarulhos (SP)", query: "Teatro Padre Fioravante Quaglia, Guarulhos, Brasil", info: "<strong>Teatro Padre Fioravante Quaglia</strong>: Espacio artístico e histórico cultural icónico de la región que rinde memoria a este influyente clérigo. El apellido destaca localmente por su participación histórica en el asociacionismo católico y obras benéficas." },
-        { name: "Sorocaba (SP)", query: "Sorocaba, Brasil", info: "<strong>Fioravante Vicente</strong>: Líder obrero metalúrgico y referente comunitario de mediados del siglo XX. El apellido cuenta con una amplia tradición laboral firmemente ligada al auge de las históricas industrias textiles y de fundición sorocabanas." }
-    ];
+function setStatus(t, type){ $('statusText').textContent = t; $('dot').className = 'status-dot' + (type ? ' ' + type : ''); }
 
-    // ==================== FUNCIONES AUXILIARES ====================
-    function parseDateToUTC(dateValue) {
-        if (!dateValue) return null;
-        let d;
-        if (typeof dateValue === 'object' && dateValue !== null && 'seconds' in dateValue) {
-            d = new Date(dateValue.seconds * 1000);
-        } else if (typeof dateValue === 'string') {
-            d = new Date(dateValue);
-            if (isNaN(d.getTime())) return null;
-        } else if (typeof dateValue === 'number') {
-            d = new Date(dateValue);
-        } else {
-            return null;
-        }
-        return isNaN(d.getTime()) ? null : d;
-    }
-
-    function calculateAgeNumber(birthDate, deathDate) {
-        const birthDateObj = parseDateToUTC(birthDate);
-        if (!birthDateObj) return null;
-        const today = new Date();
-        let endDate = null;
-        if (deathDate) {
-            const deathObj = parseDateToUTC(deathDate);
-            if (deathObj && !isNaN(deathObj.getTime())) endDate = deathObj;
-        }
-        const referenceDate = endDate || today;
-        let age = referenceDate.getUTCFullYear() - birthDateObj.getUTCFullYear();
-        const monthDiff = referenceDate.getUTCMonth() - birthDateObj.getUTCMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && referenceDate.getUTCDate() < birthDateObj.getUTCDate())) age--;
-        return age >= 0 ? age : 0;
-    }
-
-    function getAgeStatus(person) {
-        const age = calculateAgeNumber(person.birthDate, person.deathDate);
-        if (age === null) return { text: "Edad desconocida", class: "", state: "desconocido" };
-        const hasDeath = person.deathDate && parseDateToUTC(person.deathDate);
-        if (hasDeath) {
-            return { text: `Falleció a los ${age} años`, class: "status-deceased", state: "fallecido" };
-        } else {
-            return { text: `Vivo, ${age} años`, class: "status-alive", state: "vivo" };
-        }
-    }
-
-    function isInBrazil(place) {
-        if (!place) return false;
-        const p = place.toLowerCase();
-        return p.includes("brasil") || p.includes("brazil");
-    }
-
-    function cleanCityName(rawPlace) {
-        if (!rawPlace) return null;
-        let city = rawPlace.split(',')[0].trim();
-        city = city.replace(/^(Provincia de|Partido de|Ciudad de|Ciudad Autónoma de|Departamento de|Municipio de|Estado de)\s*/i, '');
-        return city || null;
-    }
-
-    function getCityForPerson(person) {
-        const hasDeath = person.deathDate && parseDateToUTC(person.deathDate);
-        if (hasDeath) {
-            if (person.deathPlace && isInBrazil(person.deathPlace)) {
-                return cleanCityName(person.deathPlace);
-            }
-        } else {
-            if (person.birthPlace && isInBrazil(person.birthPlace)) {
-                return cleanCityName(person.birthPlace);
-            }
-        }
-        return null;
-    }
-
-    function getCitiesFromPersons(personsArray) {
-        const cityMap = new Map();
-        for (let item of personsArray) {
-            const city = item.cityKey;
-            if (city) {
-                cityMap.set(city, (cityMap.get(city) || 0) + 1);
-            }
-        }
-        return Array.from(cityMap.entries()).map(([name, count]) => ({ name, count })).sort((a,b) => a.name.localeCompare(b.name));
-    }
-
-    function getAncestorsByCity(cityName) {
-        return allPersons.filter(item => item.cityKey === cityName);
-    }
-
-    // ==================== RENDER PANEL IZQUIERDO ====================
-    function renderCities(cities) {
-        if (!cities.length) {
-            citiesContainer.innerHTML = `<div style="padding:1rem; text-align:center; color:#6B8A6A;">No hay ciudades en Brasil asignadas en el árbol.</div>`;
-            return;
-        }
-        let html = '';
-        for (let city of cities) {
-            const selectedClass = (currentCity === city.name) ? 'selected-city' : '';
-            html += `
-                <div class="city-card native-city-card ${selectedClass}" data-city="${escapeHtml(city.name)}">
-                    <span class="city-name">${escapeHtml(city.name)}</span>
-                    <span class="city-count">${city.count} ancestro${city.count !== 1 ? 's' : ''}</span>
-                </div>
-            `;
-        }
-        citiesContainer.innerHTML = html;
-        document.querySelectorAll('.native-city-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const cityName = card.getAttribute('data-city');
-                if (cityName) selectCity(cityName);
-            });
-        });
-    }
-
-    // ==================== RENDER PANEL DERECHO ====================
-    function renderCityDetails(cityName) {
-        const ancestors = getAncestorsByCity(cityName);
-        if (!ancestors.length) {
-            rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🏙️ ${escapeHtml(cityName)}</strong><span>No hay ancestros vinculados a esta ciudad.</span></div>`;
-            return;
-        }
-
-        const savedImage = localStorage.getItem(`city_img_${cityName}`) || '';
-        let html = `
-            <div class="city-header">
-                <h2>${escapeHtml(cityName)}</h2>
-                <span class="city-count" style="background:#2A5C4A20;">${ancestors.length} personas</span>
-            </div>
-            
-            <div class="city-media">
-                <h4>📷 Fotos de la ciudad / Mapas</h4>
-                <div class="image-input-group">
-                    <input type="text" id="cityImageUrl" placeholder="Pegá URL de una imagen" value="${escapeHtml(savedImage)}">
-                    <button class="btn-sm" id="saveCityImageBtn">Mostrar / Guardar</button>
-                </div>
-                <div id="cityImagePreview" class="city-img-preview">
-                    ${savedImage ? `<img src="${escapeHtml(savedImage)}" alt="Imagen de ${escapeHtml(cityName)}" onerror="this.onerror=null;this.parentElement.innerHTML='<span style=\'color:#B1624B;\'>❌ Error de carga.</span>';">` : ''}
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName + ', Brasil')}" target="_blank" class="map-link">🗺️ Ver en Google Maps (Externo)</a>
-            </div>
-            
-            <h3 style="margin-top:0.5rem;">🌳 Ancestros vinculados</h3>
-            <div class="ancestors-list">
-        `;
-        
-        for (let item of ancestors) {
-            const person = item.person;
-            const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim() || "Anónimo";
-            const ageInfo = getAgeStatus(person);
-            const statusText = ageInfo.text;
-            const statusClass = ageInfo.class;
-            const treeUrl = `arbol.html?selectedId=${encodeURIComponent(item.id)}`;
-            html += `
-                <div class="ancestor-item">
-                    <div class="ancestor-info">
-                        <span class="ancestor-name" data-url="${treeUrl}">${escapeHtml(fullName)}</span>
-                        <div class="ancestor-detail">${escapeHtml(statusText)}</div>
-                    </div>
-                    <div class="status-badge ${statusClass}">${ageInfo.state === 'vivo' ? 'Vivo' : (ageInfo.state === 'fallecido' ? 'Fallecido' : '—')}</div>
-                </div>
-            `;
-        }
-        
-        html += `</div>`;
-        rightDetailsDiv.innerHTML = html;
-        
-        document.querySelectorAll('.ancestor-name').forEach(elem => {
-            elem.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const url = elem.getAttribute('data-url');
-                if (url && window.parent && typeof window.parent.showIframe === 'function') {
-                    window.parent.showIframe(url);
-                } else {
-                    window.open(url, '_blank');
-                }
-            });
-        });
-        
-        const saveBtn = document.getElementById('saveCityImageBtn');
-        const imageInput = document.getElementById('cityImageUrl');
-        const previewDiv = document.getElementById('cityImagePreview');
-        
-        if (saveBtn && imageInput) {
-            saveBtn.addEventListener('click', () => {
-                const newUrl = imageInput.value.trim();
-                if (newUrl) {
-                    localStorage.setItem(`city_img_${cityName}`, newUrl);
-                    previewDiv.innerHTML = `<img src="${escapeHtml(newUrl)}" alt="Imagen de ${escapeHtml(cityName)}" onerror="this.onerror=null;this.parentElement.innerHTML='<span style=\'color:#B1624B;\'>❌ Error</span>';">`;
-                } else {
-                    localStorage.removeItem(`city_img_${cityName}`);
-                    previewDiv.innerHTML = '';
-                }
-            });
-        }
-    }
-    
-    function selectCity(cityName) {
-        currentCity = cityName;
-        // Limpiar selección visual de la sección Fioravante si se hace clic en ciudades nativas
-        document.querySelectorAll('.surname-city-card').forEach(c => {
-            c.style.background = '#FCFEFD';
-            c.style.borderColor = '#D3C4CD';
-        });
-        renderCities(getCitiesFromPersons(allPersons));
-        renderCityDetails(cityName);
-    }
-    
-    // ==================== CARGA DESDE FIRESTORE ====================
-    async function loadPersonsAndCities() {
-        try {
-            citiesContainer.innerHTML = "Cargando ancestros en Brasil...";
-            const snapshot = await db.collection("persons").get();
-            if (snapshot.empty) {
-                allPersons = [];
-                citiesContainer.innerHTML = "No hay registros en el árbol.";
-                return;
-            }
-            
-            const personsArray = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const person = {
-                    firstName: data.firstName || "",
-                    lastName: data.lastName || "",
-                    birthDate: data.birthDate || null,
-                    birthYear: data.birthYear,
-                    birthPlace: data.birthPlace || "",
-                    deathDate: data.deathDate || null,
-                    deathPlace: data.deathPlace || "",
-                    biography: data.biography || "",
-                    gender: data.gender || "",
-                    photos: data.photos || []
-                };
-                
-                const cityKey = getCityForPerson(person);
-                if (cityKey) {
-                    personsArray.push({
-                        id: doc.id,
-                        person: person,
-                        cityKey: cityKey
-                    });
-                }
-            });
-            
-            allPersons = personsArray;
-            const cities = getCitiesFromPersons(allPersons);
-            renderCities(cities);
-        } catch (error) {
-            console.error(error);
-            citiesContainer.innerHTML = `Error al cargar: ${error.message}`;
-        }
-    }
-    
-    function refreshAll() {
-        currentCity = null;
-        loadPersonsAndCities();
-    }
-    
-    refreshBtn.addEventListener('click', refreshAll);
-    document.querySelector('.title-origen')?.addEventListener('click', () => {
-        currentCity = null;
-        renderCities(getCitiesFromPersons(allPersons));
-        rightDetailsDiv.innerHTML = `<div class="empty-detail"><strong>🌆 Ancestros por ciudad</strong><span>Seleccioná una ciudad para ver sus historias.</span></div>`;
+/* Datos */
+const toDate = v => {
+  if (!v) return null;
+  const d = typeof v.toDate === 'function' ? v.toDate() : v.seconds != null ? new Date(v.seconds * 1000) : new Date(v);
+  return isNaN(d) ? null : d;
+};
+function ageOf(birth, death){
+  const b = toDate(birth); if (!b) return null;
+  const e = toDate(death) || new Date();
+  let a = e.getUTCFullYear() - b.getUTCFullYear();
+  const m = e.getUTCMonth() - b.getUTCMonth();
+  if (m < 0 || (m === 0 && e.getUTCDate() < b.getUTCDate())) a--;
+  return Math.max(a, 0);
+}
+function build(snap){
+  const m = new Map();
+  snap.forEach(doc => {
+    const x = doc.data(), dead = !!toDate(x.deathDate);
+    const place = clean(dead ? x.deathPlace : x.birthPlace);
+    if (!/\b(brasil|brazil)\b/.test(norm(place))) return;
+    const parts = place.split(',').map(s => s.trim()).filter(Boolean);
+    const title = parts[0].replace(/^(ciudad aut[oó]noma|provincia|estado|partido|ciudad|departamento|municipio) de\s+/i, '') || parts[0];
+    const k = norm(title);
+    if (!m.has(k)) m.set(k, { id: k, title, query: place, sub: parts.slice(1).filter(s => !/^(brasil|brazil)$/.test(norm(s))).join(', ') || 'Brasil', count: 0, persons: [] });
+    const c = m.get(k); c.count++;
+    const b = toDate(x.birthDate);
+    c.persons.push({
+      id: doc.id, dead,
+      name: clean(x.fullName) || clean([x.firstName, x.lastName].filter(Boolean).join(' ')) || clean(x.name) || 'Anónimo',
+      year: Number.isFinite(x.birthYear) ? x.birthYear : b ? b.getUTCFullYear() : null,
+      age: ageOf(x.birthDate, x.deathDate),
+      g: String(x.gender || '').toLowerCase()
     });
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => ({ '&':'&', '<':'<', '>':'>' }[m] || m));
-    }
-    
-    loadPersonsAndCities();
+  });
+  return [...m.values()];
+}
 
-    // ==================== LÓGICA AGREGADA: MENÚ DESPLEGABLE "OTRAS REFERENCIAS" ====================
-    const toggleHeader = document.getElementById('toggleOtrasReferencias');
-    const surnameContainer = document.getElementById('surnameCitiesContainer');
-    const menuArrow = document.getElementById('menuArrow');
+/* Mapa: Google Maps incrustado, sin API ni claves */
+const frame = $('map'), TLBL = { m: 'Satélite', h: 'Mapa' };
+function setType(t){ mapType = t; $('tilesLbl').textContent = TLBL[t]; store.set('fio_maptype', t); }
+function loadMap(){
+  const base = 'https://www.google.com/maps?';
+  const src = cur ? `${base}q=${encodeURIComponent(cur.query)}&t=${mapType}&hl=es&output=embed` : `${base}ll=-14.2,-51.9&z=4&t=${mapType}&hl=es&output=embed`;
+  if (src === frame.dataset.src) return;
+  frame.dataset.src = src;
+  setStatus(cur ? `Buscando ${cur.title}…` : 'Cargando mapa…', 'warn');
+  frame.src = src;
+}
+frame.addEventListener('load', () => setStatus(cur ? cur.title : 'Brasil'));
 
-    toggleHeader.addEventListener('click', () => {
-        const isHidden = surnameContainer.style.display === 'none';
-        if (isHidden) {
-            surnameContainer.style.display = 'flex';
-            menuArrow.style.transform = 'rotate(90deg)';
-        } else {
-            surnameContainer.style.display = 'none';
-            menuArrow.style.transform = 'rotate(0deg)';
-        }
-    });
+/* Lista */
+function renderList(){
+  const q = norm($('q').value);
+  const hit = c => !q || norm(c.title).includes(q);
+  const arr = cities.filter(hit).sort(sortCity === 'count' ? (a, b) => b.count - a.count || a.title.localeCompare(b.title, 'es') : (a, b) => a.title.localeCompare(b.title, 'es'));
+  const refs = REFS.filter(hit), open = refOpen || (q && refs.length);
+  let h = arr.map(c => `<button type="button" class="city${c.id === sel ? ' on' : ''}" data-id="${esc(c.id)}" style="--w:${Math.round(c.count / maxCount * 100)}%"><svg class="ic pin" aria-hidden="true"><use href="#i-pin"/></svg><span class="ct"><strong>${esc(c.title)}</strong><small>${esc(c.sub)}</small></span><span class="num" title="${plural(c.count, 'persona', 'personas')}">${c.count}</span><i class="bar"></i></button>`).join('');
+  if (!arr.length) h = `<p class="empty">${cities.length ? 'Ninguna ciudad coincide con la búsqueda.' : 'Aún no hay personas con lugar en Brasil.'}</p>`;
+  if (refs.length) {
+    h += `<button type="button" class="group" id="refToggle" aria-expanded="${!!open}"><span>Otras referencias</span><svg class="ic" aria-hidden="true"><use href="#i-chev"/></svg></button>`;
+    if (open) h += refs.map(r => `<button type="button" class="city ref${r.id === sel ? ' on' : ''}" data-id="${r.id}"><svg class="ic pin" aria-hidden="true"><use href="#i-pin"/></svg><span class="ct"><strong>${esc(r.title)}</strong><small>Referencia del apellido</small></span><span class="num">Fioravante</span></button>`).join('');
+  }
+  $('list').innerHTML = h;
+}
+function stats(){
+  $('stCities').textContent = cities.length.toLocaleString('es-AR');
+  $('stPeople').textContent = cities.reduce((a, c) => a + c.count, 0).toLocaleString('es-AR');
+}
 
-    function renderSurnameReferences() {
-        let html = '';
-        fioravanteCitiesData.forEach((city, index) => {
-            html += `
-                <div class="city-card surname-city-card" data-index="${index}" style="border-color: #D3C4CD;">
-                    <span class="city-name" style="color: #4A1C35;">📍 ${escapeHtml(city.name)}</span>
-                    <span class="city-count" style="background: #F7EFF3; color: #7A2A56; border-radius:60px;">Fioravante</span>
-                </div>
-            `;
-        });
-        surnameContainer.innerHTML = html;
+/* Selección y ficha */
+function select(id){
+  const c = cities.find(x => x.id === id) || REFS.find(x => x.id === id); if (!c) return;
+  sel = id; cur = c;
+  document.querySelectorAll('.city').forEach(b => b.classList.toggle('on', b.dataset.id === id));
+  $('pTitle').textContent = c.title;
+  $('pSub').textContent = c.ref ? 'Referencia del apellido Fioravante' : c.sub;
+  $('pTools').hidden = !!c.ref;
+  c.ref ? renderRef() : renderPeople();
+  $('panel').classList.add('on'); $('panel').setAttribute('aria-hidden', 'false');
+  $('stage').classList.add('po');
+  loadMap(); closeDrawer();
+}
+function closePanel(){
+  $('panel').classList.remove('on'); $('panel').setAttribute('aria-hidden', 'true');
+  $('stage').classList.remove('po');
+  sel = null;
+  document.querySelectorAll('.city.on').forEach(b => b.classList.remove('on'));
+}
+const gmLink = q => `<a class="gm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">Abrir en Google Maps</a>`;
+function renderRef(){
+  $('pBody').innerHTML = `<div class="info">${cur.info}</div>${gmLink(cur.query)}`;
+  $('pBody').scrollTop = 0;
+}
+function personRow(p){
+  const detail = p.dead ? (p.age != null ? `Falleció a los ${p.age} años` : 'Fecha de nacimiento desconocida') : (p.age != null ? `Vivo, ${p.age} años` : 'Edad desconocida');
+  return `<button type="button" class="prow" data-id="${esc(p.id)}" title="Ver en el árbol"><i class="av ${p.g === 'male' ? 'm' : p.g === 'female' ? 'f' : ''}" aria-hidden="true">${esc(ini(p.name))}</i><span class="pn"><b>${esc(p.name)}</b><small>${detail}</small></span><span class="bd${p.dead ? ' d' : ''}">${p.dead ? 'Fallecido' : 'Vivo'}</span></button>`;
+}
+function renderPeople(){
+  const c = cur; if (!c || c.ref) return;
+  const dead = c.persons.filter(p => p.dead).length, alive = c.count - dead;
+  $('pMeta').textContent = `${plural(c.count, 'persona', 'personas')}: ${plural(alive, 'viva', 'vivas')}, ${plural(dead, 'fallecida', 'fallecidas')}`;
+  const arr = [...c.persons].sort(sortPeople === 'year' ? (a, b) => (a.year ?? 9999) - (b.year ?? 9999) || byName(a, b) : byName);
+  $('pBody').innerHTML = `<div class="media"><label for="imgUrl">Foto o mapa de la ciudad</label><div class="ig"><input id="imgUrl" type="url" placeholder="Pegá la URL de una imagen" value="${esc(store.get('city_img_' + c.title))}"><button type="button" class="btn btn-honey" id="imgSave">Guardar</button></div><div id="imgPrev"></div>${gmLink(c.query)}</div>` + arr.map(personRow).join('');
+  showImage(store.get('city_img_' + c.title));
+  $('pBody').scrollTop = 0;
+}
+function showImage(url){
+  const box = $('imgPrev'); if (!box) return;
+  box.textContent = '';
+  if (!url) return;
+  const img = new Image();
+  img.alt = 'Imagen de ' + cur.title;
+  img.onerror = () => { box.innerHTML = '<p class="err">No se pudo cargar la imagen. Revisá la URL.</p>'; };
+  img.src = url; box.appendChild(img);
+}
+function saveImage(){
+  const v = clean($('imgUrl').value);
+  if (v && !/^https?:\/\//i.test(v)) { $('imgPrev').innerHTML = '<p class="err">La URL debe empezar con http:// o https://</p>'; return; }
+  store.set('city_img_' + cur.title, v); showImage(v);
+}
+function openTree(id){
+  const url = 'arbol.html?selectedId=' + encodeURIComponent(id);
+  try { if (window.parent !== window && typeof window.parent.showIframe === 'function') return window.parent.showIframe(url); } catch (e) {}
+  window.open(url, '_blank', 'noopener');
+}
 
-        document.querySelectorAll('.surname-city-card').forEach(card => {
-            card.addEventListener('click', () => {
-                // Quitar selección activa de las ciudades nativas superiores
-                document.querySelectorAll('.native-city-card').forEach(c => c.classList.remove('selected-city'));
-                
-                // Marcar tarjeta de apellido activa
-                document.querySelectorAll('.surname-city-card').forEach(c => {
-                    c.style.background = '#FCFEFD';
-                    c.style.borderColor = '#D3C4CD';
-                });
-                card.style.background = '#7A2A5615';
-                card.style.borderColor = '#7A2A56';
-                
-                const idx = card.getAttribute('data-index');
-                displaySurnameDetails(idx);
-            });
-        });
-    }
+/* Cajón móvil y vista general */
+const closeDrawer = () => { $('side').classList.remove('open'); $('scrim').classList.remove('on'); };
+const openDrawer = () => { $('side').classList.add('open'); $('scrim').classList.add('on'); };
+function resetView(){ $('q').value = ''; renderList(); closePanel(); closeDrawer(); cur = null; loadMap(); }
+function segBind(id, cb){
+  $(id).addEventListener('click', e => {
+    const b = e.target.closest('button[data-s]'); if (!b) return;
+    $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    cb(b.dataset.s);
+  });
+}
 
-    function displaySurnameDetails(index) {
-        const data = fioravanteCitiesData[index];
-        if (!data) return;
+/* Eventos */
+let deb;
+$('q').addEventListener('input', () => { clearTimeout(deb); deb = setTimeout(renderList, 220); });
+segBind('segCity', s => { sortCity = s; renderList(); });
+segBind('segPeople', s => { sortPeople = s; renderPeople(); });
+$('list').addEventListener('click', e => {
+  if (e.target.closest('#refToggle')) { refOpen = !refOpen; renderList(); return; }
+  const b = e.target.closest('.city'); if (b) select(b.dataset.id);
+});
+$('pBody').addEventListener('click', e => {
+  if (e.target.closest('#imgSave')) return saveImage();
+  const r = e.target.closest('.prow'); if (r) openTree(r.dataset.id);
+});
+$('pBody').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'imgUrl') saveImage(); });
+$('resetBtn').addEventListener('click', resetView);
+$('refreshBtn').addEventListener('click', load);
+$('tilesBtn').addEventListener('click', () => { setType(mapType === 'm' ? 'h' : 'm'); loadMap(); });
+$('pClose').addEventListener('click', closePanel);
+$('menuBtn').addEventListener('click', () => $('side').classList.contains('open') ? closeDrawer() : openDrawer());
+$('scrim').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if ($('side').classList.contains('open')) closeDrawer(); else if ($('panel').classList.contains('on')) closePanel();
+});
 
-        let html = `
-            <div class="city-header" style="border-bottom-color: #EBE2E7;">
-                <h2 style="color: #4A1C35;">${escapeHtml(data.name)}</h2>
-                <span class="city-count" style="background:#7A2A5620; color: #7A2A56;">Apellido Fioravante</span>
-            </div>
-            
-            <div class="city-media" style="background: #FAF9FA; border: 1px solid #EBE2E7;">
-                <h4 style="color: #4A1C35;">🗺️ Ubicación Geográfica Comercial / Histórica</h4>
-                <div style="width:100%; border-radius:24px; overflow:hidden; margin-top:0.8rem; border: 1.5px solid #E5D0DC;">
-                    <iframe 
-                        src="https://maps.google.com/maps?q=${encodeURIComponent(data.query)}&t=&z=12&ie=UTF8&iwloc=&output=embed" 
-                        width="100%" 
-                        height="320" 
-                        style="border:0; display:block;" 
-                        allowfullscreen="" 
-                        loading="lazy">
-                    </iframe>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.query)}" target="_blank" class="map-link" style="color: #7A2A56;">🗺️ Ver mapa completo en Google Maps (Externo)</a>
-            </div>
-            
-            <h3 style="margin-top:0.5rem; color: #4A1C35;">👥 Personajes, Empresas y Registros del Lugar</h3>
-            <div class="ancestors-list">
-                <div class="ancestor-item" style="border-color: #E5D0DC; background: #FEFCFD; padding: 1.2rem;">
-                    <div class="ancestor-info">
-                        <p style="font-size: 0.95rem; color: #2E1F27; line-height: 1.6; font-weight: 400;">${data.info}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-        rightDetailsDiv.innerHTML = html;
-    }
-
-    renderSurnameReferences();
+/* Carga */
+let loading = false;
+async function load(){
+  if (loading) return;
+  loading = true; $('refreshBtn').classList.add('spin');
+  setType(mapType); loadMap();
+  try { cities = build(await db.collection('persons').get()); }
+  catch (err) {
+    console.error(err);
+    setStatus('Error: ' + (err.message || err), 'err');
+    $('list').innerHTML = '<p class="empty">No se pudieron cargar los datos.</p>';
+    loading = false; $('refreshBtn').classList.remove('spin');
+    return;
+  }
+  maxCount = Math.max(1, ...cities.map(c => c.count));
+  stats(); renderList();
+  if (sel && !sel.startsWith('ref')) { cities.some(c => c.id === sel) ? select(sel) : closePanel(); }
+  loading = false; $('refreshBtn').classList.remove('spin');
+}
+load();
 </script>
 </body>
 </html>
