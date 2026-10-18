@@ -1,557 +1,210 @@
+<!-- origen.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Fioravante · Origen del Apellido</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Fioravante | Origen del Apellido</title>
+<meta name="theme-color" content="#0C211D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink-900:#0C211D;--leaf:#6FD6AE;--leaf-deep:#1F7A60;--honey:#F0C27A;--honey-soft:#EBD3A4;--paper:#F6F2E8;--mist:#9DB5AB;--text-dark:#10231E;--muted-dark:#5E6E67;--font-display:'Instrument Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;--font-main:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--ease-out:cubic-bezier(.22,1,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;background:none;border:0;cursor:pointer;text-align:inherit}
+:focus-visible{outline:2px solid var(--honey);outline-offset:3px}
+body{background:var(--ink-900);color:var(--paper);font-family:var(--font-main);font-size:16px;line-height:1.5;height:100vh;height:100dvh;width:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+.stage-bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(90% 80% at 50% 40%,rgba(27,68,57,.8),transparent 70%),linear-gradient(160deg,#0F2B25,#0A1B18)}
+.aurora{position:absolute;border-radius:50%;will-change:transform}
+.a1{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(47,160,125,.24),transparent 65%);animation:drift-a 28s ease-in-out infinite alternate}
+.a2{width:60vmax;height:60vmax;right:-20vmax;bottom:-30vmax;background:radial-gradient(circle,rgba(240,194,123,.12),transparent 65%);animation:drift-b 34s ease-in-out infinite alternate}
+@keyframes drift-a{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift-b{to{transform:translate(-7vmax,-5vmax) scale(1.12)}}
+.stage-bg::after{content:'';position:absolute;inset:0;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.app-container{position:relative;z-index:1;display:flex;height:100%;width:100%}
 
-        body {
-            background-color: #F5F7F5;
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
+/* Panel de lectura */
+.left-panel{flex:1.2;min-width:0;height:100%;display:flex;flex-direction:column;padding:clamp(1.4rem,3vw,2.6rem);background:rgba(7,21,18,.38);border-right:1px solid rgba(255,255,255,.08);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);animation:panel-in .9s var(--ease-out) backwards}
+@keyframes panel-in{from{opacity:0;transform:translateX(-18px)}}
+.title-origen{display:flex;align-items:center;gap:.8rem;margin-bottom:1.4rem;font-family:var(--font-display);font-weight:400;font-size:clamp(2.3rem,3.6vw,3.2rem);line-height:1.02;letter-spacing:-.015em;transition:color .25s}
+.title-origen svg{width:32px;height:32px;flex:none;color:var(--leaf);transition:transform .8s var(--ease-out)}
+.title-origen:hover{color:var(--honey-soft)}
+.title-origen:hover svg{transform:rotate(72deg)}
+.info-text{flex:1;min-height:0;overflow-y:auto;padding:0 .8rem 1.6rem 0;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent)}
+.info-text .enter{max-width:64ch;animation:sheet-in .7s var(--ease-out) backwards}
+@keyframes sheet-in{from{opacity:0;transform:translateY(14px)}}
+.info-text h2{margin-bottom:.9rem;font-family:var(--font-display);font-weight:400;font-size:clamp(1.9rem,2.6vw,2.4rem);line-height:1.05;color:var(--honey-soft)}
+.info-text h3{margin:1.6rem 0 .5rem;font-family:var(--font-display);font-weight:400;font-size:1.5rem;line-height:1.15;color:var(--honey-soft)}
+.info-text p{margin-bottom:1.1rem;color:rgba(246,242,232,.88);font-size:1.05rem;line-height:1.7}
+.info-text strong{color:var(--paper);font-weight:700}
+.info-text em{font-family:var(--font-display);font-size:1.15em}
+.quote{margin:1.6rem 0;padding:.3rem 0 .3rem 1.3rem;border-left:2px solid var(--honey);font-family:var(--font-display);font-style:italic;font-size:clamp(1.4rem,2vw,1.75rem);line-height:1.25;color:var(--honey-soft)}
+.quote strong{color:var(--paper);font-weight:400}
+.first{margin-top:1.8rem;padding-top:1.3rem;border-top:1px solid rgba(255,255,255,.12)}
+.lines,.defs{list-style:none;margin-bottom:1.2rem}
+.lines li{padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.08);color:rgba(246,242,232,.88);line-height:1.55}
+.defs>div{display:grid;grid-template-columns:minmax(7.5rem,11rem) 1fr;gap:.2rem 1.2rem;padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.defs dt{font-family:var(--font-display);font-size:1.3rem;line-height:1.2;color:var(--honey-soft)}
+.defs dd{color:rgba(246,242,232,.88)}
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-            width: 100%;
-            background: #F5F7F5;
-        }
+/* Temas */
+.cards-modules{display:flex;gap:.6rem;margin-top:1rem;padding-top:1.2rem;border-top:1px solid rgba(255,255,255,.1)}
+.card-module{flex:1;min-width:0;padding:.95rem .8rem;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);font-family:var(--font-display);font-size:1.25rem;line-height:1.1;text-align:center;color:var(--paper);transition:background .25s,border-color .25s,color .25s,opacity .3s,box-shadow .4s var(--ease-out),transform .4s var(--ease-out)}
+.card-module:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);transform:translateY(-2px)}
+.card-module.selected-card{background:linear-gradient(180deg,#FBF9F3,#F4EFE3);border-color:transparent;color:var(--text-dark);box-shadow:0 18px 34px -14px rgba(0,0,0,.65),0 0 0 3px rgba(240,194,123,.35);transform:translateY(-3px)}
+.card-module.dimmed-card{opacity:.55}
+.card-module.dimmed-card:hover{opacity:.95}
 
-        /* PANEL IZQUIERDO (texto + tarjetas) */
-        .left-panel {
-            flex: 1.2;
-            background: #FFFFFF;
-            border-right: 5px solid #2A5C4A;
-            padding: 3rem 2.5rem;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.02);
-            height: 100%;
-        }
+/* Imagen */
+.right-panel{flex:.9;min-width:0;height:100%;display:grid;place-items:center;padding:clamp(1rem,2.4vw,2rem)}
+.frame{display:flex;flex-direction:column;align-items:center;gap:.7rem;max-width:100%;max-height:100%;padding:12px 12px .9rem;border-radius:28px;color:var(--text-dark);background:linear-gradient(180deg,#FBF9F3,#F4EFE3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 40px 80px -20px rgba(0,0,0,.6),0 0 90px -30px rgba(111,214,174,.35);animation:sheet-in .9s var(--ease-out) .25s backwards}
+.frame img{display:block;max-width:100%;max-height:calc(100dvh - 11rem);object-fit:contain;border-radius:18px;opacity:0;transform:scale(1.03);transition:opacity .7s var(--ease-out),transform 1.1s var(--ease-out)}
+.frame img.in{opacity:1;transform:none}
+.frame figcaption{font-family:var(--font-display);font-style:italic;font-size:1.3rem;line-height:1.1;color:var(--muted-dark);text-align:center}
 
-        .title-origen {
-            font-family: 'Inter', sans-serif;
-            font-size: 2.6rem;
-            font-weight: 700;
-            color: #1C3F32;
-            margin-bottom: 2rem;
-            letter-spacing: -0.5px;
-            border-left: 5px solid #2A5C4A;
-            padding-left: 1.2rem;
-            line-height: 1.2;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            flex-shrink: 0;
-        }
-        .title-origen:hover {
-            opacity: 0.8;
-        }
-
-        /* Contenedor del texto dinámico: scrollable */
-        .info-text {
-            font-family: 'Inter', sans-serif;
-            color: #1E2E28;
-            line-height: 1.65;
-            font-size: 1.05rem;
-            font-weight: 400;
-            overflow-y: auto;
-            flex: 1;
-            padding-right: 6px;
-            scrollbar-width: thin;
-        }
-
-        .info-text p {
-            margin-bottom: 1.5rem;
-        }
-
-        .info-text strong {
-            color: #246148;
-            font-weight: 700;
-        }
-
-        .highlight-quote {
-            background: #EEF4F1;
-            border-left: 4px solid #2A5C4A;
-            padding: 1.2rem 1.5rem;
-            margin: 1.8rem 0;
-            border-radius: 12px;
-            font-style: normal;
-            font-weight: 500;
-            color: #1A3C2F;
-        }
-
-        .primer-aparicion {
-            margin-top: 2rem;
-            padding-top: 0.8rem;
-            border-top: 2px dashed #CBDCD4;
-        }
-
-        /* TARJETAS (siempre visibles abajo) */
-        .cards-modules {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            gap: 1.5rem;
-            margin-top: 1.8rem;
-            padding-top: 1rem;
-            width: 100%;
-            flex-shrink: 0;
-            background: #FFFFFF;
-            z-index: 2;
-            border-top: 1px solid #E2EBE7;
-        }
-
-        .card-module {
-            background: #FCFEFD;
-            border-radius: 24px;
-            padding: 1.2rem 0.8rem;
-            flex: 1;
-            text-align: center;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            letter-spacing: -0.2px;
-            color: #1C3F32;
-            border: 1.5px solid #D0E0D8;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
-            background: linear-gradient(135deg, #FFFFFF, #F6FAF8);
-            min-width: 0;
-            cursor: pointer;
-        }
-
-        .card-module:hover {
-            transform: translateY(-6px);
-            border-color: #2A5C4A;
-            box-shadow: 0 16px 28px rgba(42, 92, 74, 0.15);
-            background: #FFFFFF;
-        }
-
-        /* Estados visuales: seleccionada y atenuadas */
-        .card-module.selected-card {
-            border: 2px solid #132A21;
-            background: #FFFFFF;
-            background-image: none;
-            box-shadow: 0 14px 24px rgba(0, 0, 0, 0.12);
-            color: #1C3F32;
-            transform: translateY(-2px);
-        }
-
-        .card-module.selected-card:hover {
-            transform: translateY(-4px);
-            border-color: #0D261D;
-        }
-
-        .card-module.dimmed-card {
-            background: #E7EFEB;
-            border-color: #C2D2CA;
-            color: #7B9689;
-            box-shadow: none;
-            background-image: none;
-            opacity: 0.85;
-            filter: saturate(0.92);
-        }
-
-        .card-module.dimmed-card:hover {
-            transform: translateY(-3px);
-            background: #DFE9E4;
-            border-color: #B0C6BC;
-            opacity: 0.95;
-            filter: saturate(1);
-            color: #2C5A48;
-        }
-
-        /* PANEL DERECHO: IMÁGENES OCUPAN EL MÁXIMO ESPACIO POSIBLE */
-        .center-panel {
-            flex: 0.9;
-            background: #F5F7F5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 1rem;          /* espacio reducido para maximizar el área de la imagen */
-            overflow: hidden;
-        }
-
-        .image-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(42, 92, 74, 0.04);
-            border-radius: 28px;
-            transition: all 0.2s ease;
-        }
-
-        .dynamic-image {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;    /* la imagen se ajusta completamente, sin recortes, respetando proporciones */
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-            background: #FFFFFF;
-            padding: 4px;
-        }
-
-        /* Scroll suave para el texto */
-        .info-text::-webkit-scrollbar {
-            width: 5px;
-        }
-        .info-text::-webkit-scrollbar-track {
-            background: #E2EBE7;
-            border-radius: 10px;
-        }
-        .info-text::-webkit-scrollbar-thumb {
-            background: #2A5C4A;
-            border-radius: 10px;
-        }
-
-        /* RESPONSIVE: pantallas pequeñas */
-        @media (max-width: 780px) {
-            .app-container {
-                flex-direction: column;
-                overflow-y: auto;
-                height: auto;
-            }
-            body {
-                overflow-y: auto;
-                height: auto;
-            }
-            .left-panel {
-                flex: auto;
-                border-right: none;
-                border-bottom: 5px solid #2A5C4A;
-                padding: 1.8rem 1.5rem;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-                height: auto;
-                max-height: 60vh;
-            }
-            .title-origen {
-                font-size: 2rem;
-                padding-left: 1rem;
-                margin-bottom: 1.2rem;
-            }
-            .info-text {
-                flex: 1;
-                overflow-y: auto;
-            }
-            .cards-modules {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                gap: 0.8rem;
-                padding-bottom: 0.5rem;
-                margin-top: 1.2rem;
-            }
-            .card-module {
-                flex: 0 0 auto;
-                min-width: 140px;
-                font-size: 0.85rem;
-                padding: 0.9rem 0.5rem;
-            }
-            .center-panel {
-                padding: 0.75rem;
-                min-height: 260px;
-                flex: 0 0 auto;
-            }
-            .dynamic-image {
-                max-height: 240px;
-                border-radius: 16px;
-            }
-        }
-
-        /* Animación sutil de entrada */
-        .left-panel, .center-panel {
-            animation: fadeSlideUp 0.45s ease-out;
-        }
-        @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+@media (max-width:780px){body{height:auto;overflow-y:auto}.app-container{flex-direction:column;height:auto;min-height:100dvh}.left-panel{flex:none;height:auto;padding:1.4rem 1.1rem;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}.info-text{flex:none;max-height:52vh}.cards-modules{overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none}.card-module{flex:0 0 auto;min-width:9.5rem;scroll-snap-align:start}.right-panel{height:auto;padding:1rem}.frame img{max-height:60vh}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}
+</style>
 </head>
 <body>
+<div class="stage-bg" aria-hidden="true"><i class="aurora a1"></i><i class="aurora a2"></i></div>
 <div class="app-container">
-    <div class="left-panel">
-        <h1 class="title-origen">Origen del Apellido</h1>
-        <div class="info-text" id="dynamicContent">
-            <p>
-                <strong>El apellido Fioravante es absolutamente cautivador.</strong><br>
-                Proviene del encantador nombre "Fiore", que se deriva del latín 
-                <em>flos, floris</em>, ¡lo que significa <strong>"flor de flor"</strong>!<br>
-                Un legado lleno de belleza y significado impresionante.
-            </p>
-            <div class="highlight-quote">
-                “Andrea da Barberino interpreta a Fioravante en el sentido de  
-                <strong>«deja que esta flor avance»</strong>”
-            </div>
-            <div class="primer-aparicion">
-                <p><strong>Primera aparición del apellido</strong></p>
-                <p>
-                    El apellido Fioravante se encontró por primera vez en 
-                    <strong>Pistoia (Toscana - Italia)</strong>, cuando un Fioravante era miembro 
-                    del consejo de gobierno de la ciudad.
-                </p>
-            </div>
-        </div>
-        <div class="cards-modules">
-            <div class="card-module" data-action="historico">Referencias Históricas</div>
-            <div class="card-module" data-action="similares">Otros apellidos similares</div>
-            <div class="card-module" data-action="heraldica">Heráldica</div>
-            <div class="card-module" data-action="personajes">Personajes ilustres</div>
-        </div>
-    </div>
-    <div class="center-panel" id="rightPanel">
-        <div class="image-container">
-            <img id="rightImage" class="dynamic-image" src="https://github.com/rfioravante73-ar/familiia/blob/main/catedral-neri%20fioravante.png?raw=true" alt="Catedral Neri Fioravante - imagen representativa">
-        </div>
-    </div>
+    <main class="left-panel">
+        <h1><button class="title-origen" id="homeBtn" type="button" title="Volver al inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="6.2" rx="2.6" ry="4"/><ellipse cx="12" cy="6.2" rx="2.6" ry="4" transform="rotate(72 12 12)"/><ellipse cx="12" cy="6.2" rx="2.6" ry="4" transform="rotate(144 12 12)"/><ellipse cx="12" cy="6.2" rx="2.6" ry="4" transform="rotate(216 12 12)"/><ellipse cx="12" cy="6.2" rx="2.6" ry="4" transform="rotate(288 12 12)"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>Origen del Apellido</button></h1>
+        <div class="info-text" id="dynamicContent" aria-live="polite"></div>
+        <div class="cards-modules" id="cards" role="group" aria-label="Temas"></div>
+    </main>
+    <aside class="right-panel">
+        <figure class="frame"><img id="rightImage" alt=""><figcaption id="imageCaption"></figcaption></figure>
+    </aside>
 </div>
 
 <script>
-    (function() {
-        // Elementos DOM
-        const dynamicContainer = document.getElementById('dynamicContent');
-        const rightImage = document.getElementById('rightImage');
+(() => {
+    const $ = id => document.getElementById(id);
+    const content = $('dynamicContent'), nav = $('cards'), img = $('rightImage'), caption = $('imageCaption');
+    const IMG = f => `https://github.com/rfioravante73-ar/familiia/blob/main/${f}?raw=true`;
+    const list = items => `<ul class="lines">${items.map(t => `<li>${t}</li>`).join('')}</ul>`;
+    const defs = items => `<dl class="defs">${items.map(([t, d]) => `<div><dt>${t}</dt><dd>${d}</dd></div>`).join('')}</dl>`;
 
-        // ----- TEXTOS COMPLETOS (histórico, personajes, heráldica, similares) -----
-        const textoOriginal = `
-            <p>
-                <strong>El apellido Fioravante es absolutamente cautivador.</strong><br>
-                Proviene del encantador nombre "Fiore", que se deriva del latín 
-                <em>flos, floris</em>, ¡lo que significa <strong>"flor de flor"</strong>!<br>
-                Un legado lleno de belleza y significado impresionante.
-            </p>
-            <div class="highlight-quote">
-                “Andrea da Barberino interpreta a Fioravante en el sentido de  
-                <strong>«deja que esta flor avance»</strong>”
-            </div>
-            <div class="primer-aparicion">
-                <p><strong>Primera aparición del apellido</strong></p>
-                <p>
-                    El apellido Fioravante se encontró por primera vez en 
-                    <strong>Pistoia (Toscana - Italia)</strong>, cuando un Fioravante era miembro 
-                    del consejo de gobierno de la ciudad.
-                </p>
-            </div>
-        `;
-
-        const textoReferencias = `
-            <p>Han surgido una variedad de nombres distinguidos y notables de la hermosa e histórica región italiana de la Toscana, incluido el notable apellido Fioravante.</p>
-            <p>Durante la Edad Media, a medida que las poblaciones crecían y los viajes entre regiones se volvían más frecuentes, la gente de la Toscana, que originalmente se conocía solo por un solo nombre, descubrió que era necesario adoptar un segundo nombre para identificarse a sí mismos y a sus familias.</p>
-            <p>Este proceso de adopción de apellidos hereditarios fijos en Italia comenzó en los siglos X y XI, pero no se completó hasta la era moderna. El desarrollo de los apellidos hereditarios italianos siguió principios generales y se caracterizó por derivados del nombre de pila.</p>
-            <p>El patronímico, el apellido, que se deriva del nombre de pila del padre, era uno de los tipos de nombre más comunes que se encuentran en la región de la Toscana.</p>
-            <p>Este sistema de creación de nombres fue ampliamente utilizado porque se vinculó bien con el sistema feudal existente y durante la era cristiana, muchas personas nombraron a sus hijos en honor a los santos y las figuras bíblicas.</p>
-        `;
-
-        const textoPersonajes = `
-            <p><strong>Familia Fioravanti/e, de la aristocracia en Pistoia (Toscana)</strong></p>
-            <p>Fioravanti d’Accorso en 1267 era miembro del consejo de la ciudad de Florencia.<br>
-            Fioravanti Ranieri (hijo del anterior) en 1310 era alcalde de la Pistoia.<br>
-            Simone di Ranieri Fioravanti en 1319 era miembro de los mayores de la ciudad.<br>
-            Giovanni di Puccio di Ranieri Fioravanti entre 1305 y 1314 era un banquero activo en la corte del papa Clemente V en Aviñón (Francia).<br>
-            Andrea di Simone di Baldo Fioravanti el 17 de junio de 1354 fue elegido capitán de la Montaña Superior.<br>
-            Francesco di Rinieri Fioravanti en 1385 y 1389 fue gonfaloniero de la República Florentina.<br>
-            Neri di Rinieri Fioravanti (hijo del anterior) en 1428 fue gonfaloniero de la República Florentina.<br>
-            Fioravanti di Piero en 1510 fue capitán de caballería en Flandes (Países Bajos) y más tarde fue comisionado por el papa Alejandro VI al asedio de la ciudad de Faenza.<br>
-            Vincenzo di Cipriano, en 1576, fue uno de los primeros en ser nombrado caballero de San Esteban, poco después del establecimiento de esta orden militar; más tarde fue canciller de la orden.<br>
-            Fabio of Cipriano fue capitán de caballería en los Países Bajos.<br>
-            Alberto di Fioravanti en 1590 fue nombrado caballero de Malta, y comendador en 1610.<br>
-            Niccolao di Fioravanti en 1636 luchó como capitán en la guerra del emperador Fernando II contra el rey de Suecia, y en 1643 en Toscana en la guerra del Gran Duque contra los Barberini.<br>
-            Neri di Fioravanti (f. 1374), arquitecto italiano.<br>
-            Fieravante Fioravanti (1390-1430), arquitecto italiano, padre de Aristóteles.<br>
-            Aristóteles Fioravanti (1415-1486), arquitecto italiano, hijo de Fieravante.<br>
-            Leonardo Fioravanti (1518-1588), médico italiano de Boloña.<br>
-            Valentino Fioravanti (1764-1837), compositor italiano de óperas bufas, padre de Giuseppe.<br>
-            Giuseppe Fioravanti (1790-1850), cantante lírico bajo de ópera, italiano, hijo de Valentino.<br>
-            Vincenzo Fioravanti (1799-1877), compositor italiano de óperas bufas, hijo de Valentino.<br>
-            Valentino Fioravanti (bajo) (1827-1879), cantante italiano lírico bajo de ópera, nieto de Valentino.<br>
-            Luigi Fioravanti (1829-1887), cantante italiano lírico bajo de ópera, nieto de Valentino.<br>
-            Marcos Christino Fioravanti (1775-1862), cirujano italiano.<br>
-        `;
-
-        const textoHeraldica = `
-            <p>Las fuentes heráldicas toscanas registran dos formas principales del escudo de armas asociado con la familia Fioravanti. La forma más común y ampliamente atestiguada presenta una cruz de San Andrés a cuadros. También está documentada una segunda forma, que difiere en la disposición del campo. Sobreviven representaciones adicionales en contextos arquitectónicos de Toscana y reflejan una interpretación estilística local más que concesiones heráldicas distintas.</p>
-        `;
-
-        const textoSimilares = `
-            <p>El apellido Fioravante es una variante del nombre medieval italiano Fiore (flor) y comparte raíz con una amplia gama de apellidos derivados de este concepto o con sonoridades similares.</p>
-            <p><strong>Apellidos de la misma familia etimológica (Raíz Fiore)</strong><br>
-            Estos apellidos comparten el origen italiano derivado del latín flos, floris, que se usaba con un sentido de prosperidad o crecimiento.</p>
-            <p>Fioravanti: Es la variante más directa y común, muy frecuente en diversas regiones de Italia.<br>
-            Fiore: La forma base de la que derivan el resto de las variantes.<br>
-            Fiorini / Fiorino: Diminutivos comunes en el centro y norte de Italia.<br>
-            Fiorelli / Fiorello: Otra variante diminutiva popular.<br>
-            Fiorillo: Variante común en el sur de Italia, especialmente en Campania.<br>
-            Fiorucci: Apellido frecuente en regiones como Umbría.</p>
-            <p><strong>Apellidos con sonoridad o terminación similar</strong><br>
-            Existen otros apellidos que, aunque no siempre comparten el mismo origen "floral", suenan parecido debido a su estructura o terminación en italiano o español.</p>
-            <p>Fioramante: Una variante ortográfica muy cercana.<br>
-            Morgante: Comparte la estructura de tres sílabas con terminación fuerte.<br>
-            Mirante: Similar en ritmo y terminación.<br>
-            Bramante: Comparte la terminación "-ante".<br>
-            Ferrante: Otro apellido italiano común con una estructura fonética parecida.<br>
-            Bustamante: De origen español, pero con una cadencia final similar.<br>
-            Tramonte: Similar en sonoridad a la segunda mitad del apellido.</p>
-        `;
-
-        // Mapeo de textos por acción
-        const contentMap = {
-            'historico': textoReferencias,
-            'similares': textoSimilares,
-            'heraldica': textoHeraldica,
-            'personajes': textoPersonajes
-        };
-
-        // Mapeo de imágenes por acción (incluye 'default' para la pantalla inicial)
-        const imageMap = {
-            'default': 'https://github.com/rfioravante73-ar/familiia/blob/main/catedral-neri%20fioravante.png?raw=true',
-            'historico': 'https://github.com/rfioravante73-ar/familiia/blob/main/pistoia-reloj.png?raw=true',
-            'heraldica': 'https://github.com/rfioravante73-ar/familiia/blob/main/escudo%20fioravante2.jpg?raw=true',
-            'personajes': 'https://github.com/rfioravante73-ar/familiia/blob/main/escudo%20fioravante.png?raw=true',
-            'similares': 'https://github.com/rfioravante73-ar/familiia/blob/main/apellido-italia.png?raw=true'
-        };
-
-        // Función para actualizar la imagen del panel derecho
-        function updateRightImage(actionKey) {
-            if (!rightImage) return;
-            let imgUrl = imageMap[actionKey];
-            if (!imgUrl) {
-                imgUrl = imageMap['default'];
-            }
-            // Cambio de imagen con pequeño efecto visual
-            rightImage.style.opacity = '0.85';
-            rightImage.src = imgUrl;
-            rightImage.alt = `Imagen representativa - ${actionKey || 'origen'}`;
-            rightImage.onload = () => {
-                rightImage.style.opacity = '1';
-            };
-            rightImage.onerror = () => {
-                rightImage.style.opacity = '1';
-                rightImage.alt = 'Imagen no disponible temporalmente';
-            };
+    // Contenido y recursos de cada tema (única fuente de verdad)
+    const SECTIONS = {
+        inicio: {
+            label: 'Significado', img: IMG('catedral-neri%20fioravante.png'), cap: 'Catedral Neri Fioravante',
+            html: `
+                <p><strong>El apellido Fioravante es absolutamente cautivador.</strong><br>
+                Proviene del encantador nombre "Fiore", que se deriva del latín <em>flos, floris</em>, ¡lo que significa <strong>"flor de flor"</strong>!<br>
+                Un legado lleno de belleza y significado impresionante.</p>
+                <blockquote class="quote">“Andrea da Barberino interpreta a Fioravante en el sentido de <strong>«deja que esta flor avance»</strong>”</blockquote>
+                <div class="first"><h3>Primera aparición del apellido</h3>
+                <p>El apellido Fioravante se encontró por primera vez en <strong>Pistoia (Toscana - Italia)</strong>, cuando un Fioravante era miembro del consejo de gobierno de la ciudad.</p></div>`
+        },
+        historico: {
+            label: 'Referencias históricas', img: IMG('pistoia-reloj.png'), cap: 'Reloj de Pistoia',
+            html: `<h2>Referencias históricas</h2>
+                <p>Han surgido una variedad de nombres distinguidos y notables de la hermosa e histórica región italiana de la Toscana, incluido el notable apellido Fioravante.</p>
+                <p>Durante la Edad Media, a medida que las poblaciones crecían y los viajes entre regiones se volvían más frecuentes, la gente de la Toscana, que originalmente se conocía solo por un solo nombre, descubrió que era necesario adoptar un segundo nombre para identificarse a sí mismos y a sus familias.</p>
+                <p>Este proceso de adopción de apellidos hereditarios fijos en Italia comenzó en los siglos X y XI, pero no se completó hasta la era moderna. El desarrollo de los apellidos hereditarios italianos siguió principios generales y se caracterizó por derivados del nombre de pila.</p>
+                <p>El patronímico, el apellido, que se deriva del nombre de pila del padre, era uno de los tipos de nombre más comunes que se encuentran en la región de la Toscana.</p>
+                <p>Este sistema de creación de nombres fue ampliamente utilizado porque se vinculó bien con el sistema feudal existente y durante la era cristiana, muchas personas nombraron a sus hijos en honor a los santos y las figuras bíblicas.</p>`
+        },
+        similares: {
+            label: 'Otros apellidos similares', img: IMG('apellido-italia.png'), cap: 'Apellidos de Italia',
+            html: `<h2>Otros apellidos similares</h2>
+                <p>El apellido Fioravante es una variante del nombre medieval italiano Fiore (flor) y comparte raíz con una amplia gama de apellidos derivados de este concepto o con sonoridades similares.</p>
+                <h3>Apellidos de la misma familia etimológica (Raíz Fiore)</h3>
+                <p>Estos apellidos comparten el origen italiano derivado del latín flos, floris, que se usaba con un sentido de prosperidad o crecimiento.</p>
+                ${defs([
+                    ['Fioravanti', 'Es la variante más directa y común, muy frecuente en diversas regiones de Italia.'],
+                    ['Fiore', 'La forma base de la que derivan el resto de las variantes.'],
+                    ['Fiorini / Fiorino', 'Diminutivos comunes en el centro y norte de Italia.'],
+                    ['Fiorelli / Fiorello', 'Otra variante diminutiva popular.'],
+                    ['Fiorillo', 'Variante común en el sur de Italia, especialmente en Campania.'],
+                    ['Fiorucci', 'Apellido frecuente en regiones como Umbría.']])}
+                <h3>Apellidos con sonoridad o terminación similar</h3>
+                <p>Existen otros apellidos que, aunque no siempre comparten el mismo origen "floral", suenan parecido debido a su estructura o terminación en italiano o español.</p>
+                ${defs([
+                    ['Fioramante', 'Una variante ortográfica muy cercana.'],
+                    ['Morgante', 'Comparte la estructura de tres sílabas con terminación fuerte.'],
+                    ['Mirante', 'Similar en ritmo y terminación.'],
+                    ['Bramante', 'Comparte la terminación "-ante".'],
+                    ['Ferrante', 'Otro apellido italiano común con una estructura fonética parecida.'],
+                    ['Bustamante', 'De origen español, pero con una cadencia final similar.'],
+                    ['Tramonte', 'Similar en sonoridad a la segunda mitad del apellido.']])}`
+        },
+        heraldica: {
+            label: 'Heráldica', img: IMG('escudo%20fioravante2.jpg'), cap: 'Escudo de armas Fioravante',
+            html: `<h2>Heráldica</h2>
+                <p>Las fuentes heráldicas toscanas registran dos formas principales del escudo de armas asociado con la familia Fioravanti. La forma más común y ampliamente atestiguada presenta una cruz de San Andrés a cuadros. También está documentada una segunda forma, que difiere en la disposición del campo. Sobreviven representaciones adicionales en contextos arquitectónicos de Toscana y reflejan una interpretación estilística local más que concesiones heráldicas distintas.</p>`
+        },
+        personajes: {
+            label: 'Personajes ilustres', img: IMG('escudo%20fioravante.png'), cap: 'Escudo Fioravante',
+            html: `<h2>Personajes ilustres</h2>
+                <p><strong>Familia Fioravanti/e, de la aristocracia en Pistoia (Toscana)</strong></p>
+                ${list([
+                    'Fioravanti d’Accorso en 1267 era miembro del consejo de la ciudad de Florencia.',
+                    'Fioravanti Ranieri (hijo del anterior) en 1310 era alcalde de la Pistoia.',
+                    'Simone di Ranieri Fioravanti en 1319 era miembro de los mayores de la ciudad.',
+                    'Giovanni di Puccio di Ranieri Fioravanti entre 1305 y 1314 era un banquero activo en la corte del papa Clemente V en Aviñón (Francia).',
+                    'Andrea di Simone di Baldo Fioravanti el 17 de junio de 1354 fue elegido capitán de la Montaña Superior.',
+                    'Francesco di Rinieri Fioravanti en 1385 y 1389 fue gonfaloniero de la República Florentina.',
+                    'Neri di Rinieri Fioravanti (hijo del anterior) en 1428 fue gonfaloniero de la República Florentina.',
+                    'Fioravanti di Piero en 1510 fue capitán de caballería en Flandes (Países Bajos) y más tarde fue comisionado por el papa Alejandro VI al asedio de la ciudad de Faenza.',
+                    'Vincenzo di Cipriano, en 1576, fue uno de los primeros en ser nombrado caballero de San Esteban, poco después del establecimiento de esta orden militar; más tarde fue canciller de la orden.',
+                    'Fabio of Cipriano fue capitán de caballería en los Países Bajos.',
+                    'Alberto di Fioravanti en 1590 fue nombrado caballero de Malta, y comendador en 1610.',
+                    'Niccolao di Fioravanti en 1636 luchó como capitán en la guerra del emperador Fernando II contra el rey de Suecia, y en 1643 en Toscana en la guerra del Gran Duque contra los Barberini.',
+                    'Neri di Fioravanti (f. 1374), arquitecto italiano.',
+                    'Fieravante Fioravanti (1390-1430), arquitecto italiano, padre de Aristóteles.',
+                    'Aristóteles Fioravanti (1415-1486), arquitecto italiano, hijo de Fieravante.',
+                    'Leonardo Fioravanti (1518-1588), médico italiano de Boloña.',
+                    'Valentino Fioravanti (1764-1837), compositor italiano de óperas bufas, padre de Giuseppe.',
+                    'Giuseppe Fioravanti (1790-1850), cantante lírico bajo de ópera, italiano, hijo de Valentino.',
+                    'Vincenzo Fioravanti (1799-1877), compositor italiano de óperas bufas, hijo de Valentino.',
+                    'Valentino Fioravanti (bajo) (1827-1879), cantante italiano lírico bajo de ópera, nieto de Valentino.',
+                    'Luigi Fioravanti (1829-1887), cantante italiano lírico bajo de ópera, nieto de Valentino.',
+                    'Marcos Christino Fioravanti (1775-1862), cirujano italiano.'])}`
         }
+    };
+    const ORDER = ['historico', 'similares', 'heraldica', 'personajes'];
+    let current = null;
 
-        // Gestión visual de las tarjetas (seleccionada y atenuadas)
-        function applyCardSelection(selectedAction) {
-            const allCards = document.querySelectorAll('.card-module');
-            allCards.forEach(card => {
-                card.classList.remove('selected-card', 'dimmed-card');
-            });
-            if (!selectedAction) return;
-            let targetCard = null;
-            allCards.forEach(card => {
-                if (card.getAttribute('data-action') === selectedAction) {
-                    targetCard = card;
-                }
-            });
-            if (targetCard) {
-                targetCard.classList.add('selected-card');
-                allCards.forEach(card => {
-                    if (card !== targetCard) {
-                        card.classList.add('dimmed-card');
-                    }
-                });
-            }
-        }
+    nav.innerHTML = ORDER.map(k => `<button class="card-module" type="button" data-key="${k}" aria-pressed="false">${SECTIONS[k].label}</button>`).join('');
 
-        // Cambiar contenido de texto e imagen según la acción
-        function setContentAndSelect(action, htmlContent, imageActionKey) {
-            if (dynamicContainer) dynamicContainer.innerHTML = htmlContent;
-            updateRightImage(imageActionKey);
-            applyCardSelection(action);
-        }
+    function setImage(s) {
+        caption.textContent = s.cap;
+        if (img.getAttribute('src') === s.img) return;
+        img.classList.remove('in');
+        img.alt = s.cap;
+        img.onload = img.onerror = () => img.classList.add('in');
+        img.src = s.img;
+    }
 
-        // Restaurar estado original (texto raíz + imagen catedral)
-        function restoreOriginalContent() {
-            if (dynamicContainer) dynamicContainer.innerHTML = textoOriginal;
-            updateRightImage('default');
-            applyCardSelection(null);
-        }
-
-        // ---- EVENTOS DE LAS TARJETAS ----
-        const cards = document.querySelectorAll('.card-module');
-        cards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const action = card.getAttribute('data-action');
-                if (action && contentMap[action]) {
-                    setContentAndSelect(action, contentMap[action], action);
-                } else {
-                    // Mensaje de fallback (muy poco probable)
-                    const toast = document.createElement('div');
-                    toast.textContent = '🔍 Información en preparación · Pronto más datos.';
-                    toast.style.position = 'fixed';
-                    toast.style.bottom = '20px';
-                    toast.style.left = '20px';
-                    toast.style.backgroundColor = '#2A5C4A';
-                    toast.style.color = 'white';
-                    toast.style.padding = '8px 18px';
-                    toast.style.borderRadius = '40px';
-                    toast.style.fontSize = '0.8rem';
-                    toast.style.fontFamily = 'Inter, sans-serif';
-                    toast.style.zIndex = '9999';
-                    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                    document.body.appendChild(toast);
-                    setTimeout(() => toast.remove(), 2000);
-                }
-            });
+    // Muestra un tema; sin clave vuelve al inicio
+    function show(key) {
+        current = key;
+        const s = SECTIONS[key || 'inicio'];
+        content.innerHTML = `<div class="enter">${s.html}</div>`;
+        content.scrollTop = 0;
+        setImage(s);
+        nav.querySelectorAll('.card-module').forEach(b => {
+            const on = b.dataset.key === key;
+            b.classList.toggle('selected-card', on);
+            b.classList.toggle('dimmed-card', !!key && !on);
+            b.setAttribute('aria-pressed', on);
         });
+    }
 
-        // Restaurar al hacer clic en el título "Origen del Apellido"
-        const titleElement = document.querySelector('.title-origen');
-        if (titleElement) {
-            titleElement.addEventListener('click', (e) => {
-                e.stopPropagation();
-                restoreOriginalContent();
-            });
-        }
+    nav.addEventListener('click', e => {
+        const b = e.target.closest('.card-module');
+        if (b) show(current === b.dataset.key ? null : b.dataset.key);
+    });
+    $('homeBtn').addEventListener('click', () => show(null));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && current) show(null); });
 
-        // También si se hace clic en el panel izquierdo (fondo) se restaura, pero sin interferir en clicks de tarjetas o título
-        const leftPanel = document.querySelector('.left-panel');
-        if (leftPanel) {
-            leftPanel.addEventListener('click', (e) => {
-                // Solo si el clic es directamente en el panel o en el contenedor del texto (sin ser tarjeta)
-                if (e.target === leftPanel || e.target.classList?.contains('info-text') || e.target.id === 'dynamicContent') {
-                    restoreOriginalContent();
-                }
-            });
-        }
-
-        // Inicialización: garantizar imagen por defecto y sin selección.
-        if (rightImage && rightImage.getAttribute('src') !== imageMap['default']) {
-            rightImage.src = imageMap['default'];
-        }
-        applyCardSelection(null);
-        // Prevenir posibles errores de carga de imagen en red
-        if (rightImage) {
-            rightImage.onerror = function() {
-                this.style.opacity = '0.7';
-                this.alt = 'Imagen no disponible';
-            };
-        }
-    })();
+    show(null);
+})();
 </script>
 </body>
 </html>
