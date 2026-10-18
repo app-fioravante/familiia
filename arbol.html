@@ -5,174 +5,267 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Árbol Genealógico | Género y legado</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#0C211D">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <!-- Firebase SDK (app + firestore + auth) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
-        /* ========== ESTILOS ORIGINALES (sin cambios) ========== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #F5F7F5; font-family: 'Inter', sans-serif; font-size: 16px; line-height: 1.5; height: 100vh; width: 100vw; overflow: hidden; }
-        .app-container { display: flex; height: 100vh; width: 100%; background: #F5F7F5; }
-        .left-panel { flex: 0.85; background: #FFFFFF; border-right: 5px solid #2A5C4A; padding: 0 1rem 1.5rem 1.2rem; display: flex; flex-direction: column; overflow-y: auto; height: 100%; }
-        .sticky-header { position: sticky; top: 0; background: #FFFFFF; z-index: 15; padding: 1.2rem 0 0.8rem 0; margin-bottom: 0.8rem; border-bottom: 1px solid #E2EBE7; }
-        .title-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .title-origen { font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 700; color: #1C3F32; letter-spacing: -0.3px; border-left: 5px solid #2A5C4A; padding-left: 1rem; line-height: 1.2; margin: 0; cursor: pointer; transition: opacity 0.2s; flex-shrink: 0; }
-        .title-origen:hover { opacity: 0.85; }
-        .btn-reset-list, .btn-new-person { background: #F0F5F2; border: 1.5px solid #C2D2CA; color: #1C3F32; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
-        .btn-reset-list:hover, .btn-new-person:hover { background: #E2EBE7; transform: scale(0.97); border-color: #2A5C4A; }
-        .btn-new-person { background: #2A5C4A; color: white; border-color: #2A5C4A; }
-        .btn-new-person:hover { background: #1C3F32; border-color: #1C3F32; color: white; }
-        .auth-status { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; background: #EFF5F2; padding: 0.3rem 1rem; border-radius: 40px; }
-        .login-link { color: #2A5C4A; font-weight: 700; text-decoration: none; cursor: pointer; }
-        .login-link:hover { text-decoration: underline; }
-        .search-container { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.4rem; margin-bottom: 0.2rem; width: 100%; }
-        .search-input-wrapper { flex: 1; position: relative; }
-        .search-input { width: 100%; padding: 0.7rem 1rem 0.7rem 2.6rem; font-size: 0.9rem; font-family: 'Inter', sans-serif; border: 1.5px solid #D0E0D8; border-radius: 60px; background: #FFFFFF url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%237B9689" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>') no-repeat 12px center; background-size: 1.1rem; transition: all 0.2s ease; }
-        .search-input:focus { outline: none; border-color: #2A5C4A; box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.1); }
-        .btn-clear-search { background: #F0F5F2; border: 1.5px solid #C2D2CA; border-radius: 60px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 600; cursor: pointer; color: #2A5C4A; transition: all 0.2s; flex-shrink: 0; }
-        .btn-clear-search:hover { background: #E2EBE7; border-color: #2A5C4A; transform: scale(0.96); }
-        .year-group { margin-bottom: 2rem; animation: fadeSlideUp 0.3s ease; }
-        .group-title { font-size: 1.4rem; font-weight: 800; color: #10261E; background: #EFF5F2; display: inline-block; padding: 0.3rem 1.1rem; border-radius: 60px; margin-bottom: 1rem; letter-spacing: -0.3px; border-left: 4px solid #2A5C4A; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-        .group-cards { display: flex; flex-direction: column; gap: 0.85rem; }
-        .card-module { position: relative; border-radius: 20px; padding: 0.9rem 1rem 0.9rem 1rem; text-align: center; font-weight: 600; font-size: 0.9rem; color: #1C3F32; border: 1.5px solid #D0E0D8; transition: all 0.2s ease; cursor: pointer; min-height: 85px; }
-        .card-module.card-male { background: #C7E9FF; border-color: #9AC9E8; }
-        .card-module.card-female { background: #FFD6E8; border-color: #F6C1DA; }
-        .card-module.card-default { background: #FCFEFD; border-color: #D0E0D8; }
-        .card-module.selected-card { border: 3px solid #132A21; box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12); transform: scale(1.01); }
-        .card-module.dimmed-card { opacity: 0.7; filter: grayscale(0.15); border-color: #C2D2CA; }
-        .birth-year-badge { position: absolute; top: 8px; left: 12px; font-size: 0.9rem; font-weight: 800; background: rgba(42, 92, 74, 0.2); padding: 0.2rem 0.7rem; border-radius: 40px; color: #174432; }
-        .full-name-card { font-weight: 700; font-size: 0.95rem; color: #10261E; margin-top: 0.3rem; }
-        .right-panel { flex: 1.5; background: #F5F7F5; display: flex; flex-direction: column; padding: 2rem 2.2rem 2rem 2.2rem; overflow-y: auto; }
-        .details-container { background: #FFFFFF; border-radius: 36px; box-shadow: 0 16px 32px rgba(0, 0, 0, 0.06); padding: 2rem 2.2rem; height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 1.2rem; border: 1px solid #E2EBE7; }
-        .empty-detail { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; min-height: 300px; color: #2A5C4A; font-family: 'Inter', sans-serif; font-weight: 500; letter-spacing: -0.02em; margin: 0; padding: 1rem; }
-        .empty-detail strong { font-size: 2.6rem; font-weight: 700; background: linear-gradient(135deg, #1C3F32 0%, #2A5C4A 100%); background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 1rem; letter-spacing: -0.02em; line-height: 1.2; }
-        .empty-detail .sub-message { font-size: 1.2rem; font-weight: 400; color: #5C7A6A; max-width: 80%; margin-top: 0.5rem; border-top: 2px solid #E2EBE7; padding-top: 1.2rem; display: inline-block; }
-        .empty-detail .familysearch-link { font-size: 1rem; font-weight: 400; color: #3A6B58; margin-top: 1rem; max-width: 80%; }
-        .empty-detail .familysearch-link a { color: #1C4F3A; text-decoration: underline; font-weight: 500; }
-        .empty-detail .familysearch-link a:hover { color: #0D2E21; }
-        .action-buttons { display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem; }
-        .btn { font-family: 'Inter', sans-serif; font-weight: 600; padding: 0.6rem 1.2rem; border-radius: 40px; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
-        .btn-edit { background: #2A5C4A; color: white; }
-        .btn-edit:hover { background: #1C3F32; transform: scale(0.98); }
-        .btn-print { background: #EFF5F2; color: #1C3F32; border: 1px solid #C2D2CA; }
-        .btn-print:hover { background: #DFE9E4; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; border-radius: 32px; padding: 2rem; width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
-        .modal-content h3 { margin-bottom: 1.2rem; color: #1C3F32; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 0.4rem; color: #1C3F32; font-size: 0.9rem; }
-        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 0.8rem; border: 1px solid #D0E0D8; border-radius: 20px; font-family: 'Inter', sans-serif; font-size: 0.95rem; }
-        .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
-        .photos-section { margin-top: 0.5rem; border-top: 1px solid #E2EBE7; padding-top: 1rem; }
-        .photos-section h4 { margin-bottom: 0.8rem; color: #246148; }
-        .readonly-warning { background: #FFF3E0; border-left: 4px solid #C47D57; padding: 0.5rem 1rem; border-radius: 12px; font-size: 0.8rem; margin-bottom: 0.8rem; text-align: center; }
-        
-        /* ========== NUEVOS ESTILOS: imágenes en cuadrícula mediana (sin desbordar) ========== */
-        .photos-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            justify-content: flex-start;
-            align-items: center;
-        }
-        .photo-item {
-            flex: 1 1 200px;
-            max-width: 240px;
-            border-radius: 20px;
-            overflow: hidden;
-            background: #F5F7F5;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .photo-item img {
-            width: 100%;
-            height: auto;
-            max-height: 220px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.2s ease;
-        }
-        .photo-item:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-        /* Ajuste para móvil: imágenes medianas sin desbordar, anulando estilos previos */
-        @media (max-width: 768px) {
-            .photo-item {
-                width: auto;               /* anula el width:105px anterior */
-                flex-basis: 140px;
-                max-width: 160px;
-            }
-            .photo-item img {
-                width: 100%;
-                height: auto;
-                max-height: 140px;        /* anula height:105px anterior */
-            }
-        }
-        
-        @media print { .left-panel, .action-buttons, .modal, .sticky-header, .btn-reset-list, .btn-new-person, .search-container, .auth-status { display: none !important; } .right-panel { flex: 1; padding: 0; margin: 0; } .details-container { box-shadow: none; border: none; padding: 0; } .photo-item { break-inside: avoid; } }
-        @media (max-width: 768px) { body { overflow-y: auto; height: auto; } .app-container { flex-direction: column; height: auto; min-height: 100vh; } .left-panel { flex: none; width: 100%; border-right: none; border-bottom: 5px solid #2A5C4A; padding: 0 0.9rem 1.2rem 0.9rem; max-height: 60vh; overflow-y: auto; } .right-panel { flex: 1; width: 100%; padding: 1.2rem 1rem 1.5rem 1rem; overflow-y: auto; } .title-row { gap: 0.7rem; } .title-origen { font-size: 1.4rem; } .btn-reset-list, .btn-new-person { padding: 0.4rem 1rem; font-size: 0.75rem; } .auth-status { font-size: 0.7rem; padding: 0.2rem 0.8rem; } .details-container { padding: 1.2rem; } }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
-    </style>
+:root{--ink-950:#071512;--ink-900:#0C211D;--ink-800:#123029;--ink-700:#1B4439;--leaf:#6FD6AE;--leaf-deep:#1F7A60;--honey:#F0C27A;--honey-soft:#EBD3A4;--honey-deep:#A8731F;--paper:#F6F2E8;--mist:#9DB5AB;--text-dark:#10231E;--muted-dark:#5E6E67;--line-paper:#E4DDCC;--male:#86B9F2;--female:#F4A3C6;--male-ink:#2D6DB5;--female-ink:#B63A72;--font-display:'Instrument Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;--font-main:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--ease-out:cubic-bezier(.22,1,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{-webkit-appearance:none;appearance:none}
+button:focus-visible,.card-module:focus-visible{outline:2px solid var(--honey);outline-offset:3px}
+body{background:var(--ink-900);color:var(--paper);font-family:var(--font-main);font-size:16px;line-height:1.5;height:100vh;height:100dvh;width:100%;overflow:hidden;-webkit-font-smoothing:antialiased}
+.stage-bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(90% 80% at 50% 40%,rgba(27,68,57,.8),transparent 70%),linear-gradient(160deg,#0F2B25,#0A1B18)}
+.aurora{position:absolute;border-radius:50%;will-change:transform}
+.a1{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(47,160,125,.24),transparent 65%);animation:drift-a 28s ease-in-out infinite alternate}
+.a2{width:60vmax;height:60vmax;right:-20vmax;bottom:-30vmax;background:radial-gradient(circle,rgba(240,194,123,.12),transparent 65%);animation:drift-b 34s ease-in-out infinite alternate}
+@keyframes drift-a{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift-b{to{transform:translate(-7vmax,-5vmax) scale(1.12)}}
+.stage-bg::after{content:'';position:absolute;inset:0;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.app-container{position:relative;z-index:1;display:flex;height:100%;width:100%}
+
+/* Panel izquierdo */
+.left-panel{flex:.85;min-width:0;height:100%;display:flex;flex-direction:column;overflow-y:auto;padding:0 1rem 1.5rem 1.2rem;background:rgba(7,21,18,.38);border-right:1px solid rgba(255,255,255,.08);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;animation:panel-in .9s var(--ease-out) backwards}
+@keyframes panel-in{from{opacity:0;transform:translateX(-18px)}}
+.sticky-header{position:sticky;top:0;z-index:15;margin:0 -1rem .6rem -1.2rem;padding:1.3rem 1rem 1.2rem 1.2rem;background:linear-gradient(180deg,rgba(10,27,24,.97) 80%,rgba(10,27,24,0))}
+.title-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:.9rem}
+.title-origen{display:flex;align-items:center;gap:.65rem;font-family:var(--font-display);font-weight:400;font-size:2.1rem;line-height:1.05;letter-spacing:-.01em;cursor:pointer;transition:color .25s}
+.title-origen svg{width:26px;height:26px;flex:none;color:var(--leaf)}
+.title-origen:hover{color:var(--honey-soft)}
+.btn-reset-list,.btn-clear-search{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--mist);cursor:pointer;transition:background .25s,color .25s,border-color .25s,opacity .25s,transform .35s var(--ease-out)}
+.btn-reset-list svg,.btn-clear-search svg{width:17px;height:17px;transition:transform .5s var(--ease-out)}
+.btn-reset-list:hover,.btn-clear-search:hover{background:rgba(255,255,255,.13);color:var(--honey);border-color:rgba(255,255,255,.2)}
+.btn-reset-list:hover svg{transform:rotate(180deg)}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}
+.auth-status{display:flex;align-items:center;gap:8px;min-width:0;padding:.35rem .9rem .35rem .75rem;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--mist);font-size:.8rem;font-weight:500}
+.auth-status span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-dot{width:8px;height:8px;flex:none;border-radius:50%;background:var(--honey)}
+.status-dot.on{background:var(--leaf);animation:hint-pulse 2.2s ease-out infinite}
+.login-link{color:var(--honey);font-weight:700;text-decoration:none;cursor:pointer;white-space:nowrap}
+.login-link:hover{text-decoration:underline}
+.btn-new-person{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border:0;border-radius:999px;background:linear-gradient(145deg,var(--honey),#E2A95A);color:var(--ink-900);font-weight:700;font-size:.85rem;cursor:pointer;transition:transform .3s var(--ease-out),box-shadow .3s var(--ease-out)}
+.btn-new-person:hover{transform:translateY(-2px);box-shadow:0 12px 24px -10px rgba(240,194,123,.6)}
+.btn-new-person:active{transform:scale(.97)}
+.search-container{display:flex;align-items:center;gap:.5rem}
+.search-input-wrapper{flex:1;position:relative}
+.search-input{width:100%;height:46px;padding:0 1rem 0 2.8rem;border-radius:999px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239DB5AB' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='M20 20l-4.8-4.8'/%3E%3C/svg%3E") no-repeat 16px center/18px;color:var(--paper);font-size:.95rem;transition:border-color .25s,box-shadow .25s,background-color .25s}
+.search-input::placeholder{color:var(--mist);opacity:.8}
+.search-input:hover{background-color:rgba(255,255,255,.09)}
+.search-input:focus{outline:none;border-color:rgba(240,194,123,.6);box-shadow:0 0 0 4px rgba(240,194,123,.12)}
+.btn-clear-search{opacity:0;pointer-events:none;transform:scale(.8)}
+.btn-clear-search.show{opacity:1;pointer-events:auto;transform:none}
+.results-meta{margin:.6rem 0 0 .4rem;min-height:1.2em;color:var(--mist);font-size:.78rem}
+
+/* Lista */
+.year-group{margin-bottom:1.8rem}
+.group-title{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;font-family:var(--font-display);font-weight:400;font-size:1.85rem;line-height:1;letter-spacing:-.01em;color:var(--honey-soft)}
+.group-title::after{content:'';order:1;flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.2),transparent)}
+.group-count{order:2;padding:2px 9px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--mist);font-family:var(--font-main);font-size:.72rem;font-weight:600}
+.group-cards{display:flex;flex-direction:column;gap:.5rem}
+.card-module{--tint:var(--mist);--tint-bg:rgba(255,255,255,.09);position:relative;display:flex;align-items:center;gap:.8rem;padding:.6rem .95rem .6rem .6rem;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .25s,border-color .25s,opacity .3s,box-shadow .4s var(--ease-out),transform .4s var(--ease-out)}
+.card-male{--tint:var(--male);--tint-bg:rgba(134,185,242,.16)}
+.card-female{--tint:var(--female);--tint-bg:rgba(244,163,198,.16)}
+.card-module:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);transform:translateY(-1px)}
+.card-avatar{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:50%;background:var(--tint-bg);color:var(--tint);font-family:var(--font-display);font-size:1.6rem;line-height:1;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tint) 35%,transparent)}
+.card-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.full-name-card{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--paper);font-weight:600;font-size:.97rem;line-height:1.3}
+.card-place{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mist);font-size:.78rem}
+.card-year{flex:none;font-family:var(--font-display);font-size:1.45rem;line-height:1;color:var(--honey-soft)}
+.card-module.selected-card{--tint:var(--leaf-deep);--tint-bg:rgba(31,122,96,.12);background:linear-gradient(180deg,#FBF9F3,#F4EFE3);border-color:transparent;box-shadow:0 18px 34px -14px rgba(0,0,0,.65),0 0 0 3px rgba(240,194,123,.35);transform:translateX(4px)}
+.card-male.selected-card{--tint:var(--male-ink);--tint-bg:rgba(45,109,181,.12)}
+.card-female.selected-card{--tint:var(--female-ink);--tint-bg:rgba(182,58,114,.12)}
+.selected-card .full-name-card{color:var(--text-dark)}
+.selected-card .card-place{color:var(--muted-dark)}
+.selected-card .card-year{color:var(--leaf-deep)}
+.card-module.dimmed-card{opacity:.55}
+.card-module.dimmed-card:hover{opacity:.95}
+.list-intro .card-module{animation:card-in .7s var(--ease-out) calc(var(--ci) * 35ms + 250ms) backwards}
+@keyframes card-in{from{opacity:0;transform:translateX(-14px)}}
+.list-message{padding:1.6rem 1rem;text-align:center;color:var(--mist)}
+
+/* Panel derecho */
+.right-panel{flex:1.5;min-width:0;height:100%;display:flex;flex-direction:column;padding:clamp(1rem,2.4vw,2rem)}
+.details-container{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;gap:1.3rem;overflow-y:auto;scrollbar-width:thin}
+.details-container.is-empty{justify-content:center;align-items:center;text-align:center}
+.details-container.is-empty::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(440px circle at var(--mx,50%) var(--my,42%),rgba(240,194,123,.11),transparent 62%)}
+.details-container.has-person{padding:clamp(1.4rem,3vw,2.6rem);border-radius:28px;color:var(--text-dark);background:linear-gradient(180deg,#FBF9F3,#F4EFE3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 40px 80px -20px rgba(0,0,0,.6),0 0 90px -30px rgba(111,214,174,.35);scrollbar-color:#C9C1AE transparent}
+.details-container.enter{animation:sheet-in .7s var(--ease-out) backwards}
+@keyframes sheet-in{from{opacity:0;transform:translateY(18px) scale(.985)}}
+.empty-detail{position:relative;display:flex;flex-direction:column;align-items:center;padding:1rem}
+.hero-title{font-family:var(--font-display);font-weight:400;font-size:clamp(3.2rem,min(8.5vw,16vh),7.5rem);line-height:.95;letter-spacing:-.025em;color:var(--paper)}
+.hero-title .w{display:inline-block;white-space:nowrap}
+.hero-title .w span{display:inline-block;cursor:default;transition:transform .45s var(--ease-out),color .3s,text-shadow .3s;animation:letter-in 1s var(--ease-out) calc(var(--i) * 70ms + 250ms) backwards,letter-wave 6.5s ease-in-out calc(2.8s + var(--i) * 95ms) infinite}
+.hero-title .w span:hover{color:var(--honey);transform:translateY(-.07em);text-shadow:0 0 34px rgba(240,194,123,.6)}
+@keyframes letter-in{from{opacity:0;transform:translateY(.3em) rotate(2deg);filter:blur(14px)}}
+@keyframes letter-wave{8%{color:#FFE7BD;text-shadow:0 0 34px rgba(240,194,123,.65)}18%{color:var(--paper);text-shadow:0 0 0 rgba(240,194,123,0)}}
+.sub-message{margin-top:1rem;font-family:var(--font-display);font-style:italic;font-size:clamp(1.3rem,2.4vw,1.9rem);line-height:1.15;color:var(--honey-soft);animation:hint-in .9s var(--ease-out) 1.2s backwards}
+.familysearch-link{display:inline-flex;align-items:center;gap:.6rem;margin-top:clamp(1.4rem,4vh,2.2rem);padding:9px 18px 9px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--mist);font-size:.92rem;font-weight:500;animation:hint-in .9s var(--ease-out) 1.6s backwards}
+.familysearch-link a{color:var(--paper);text-decoration:underline;text-decoration-color:rgba(240,194,123,.6);text-underline-offset:3px}
+.familysearch-link a:hover{color:var(--honey)}
+@keyframes hint-in{from{opacity:0;transform:translateY(12px)}}
+.hint-dot{width:8px;height:8px;flex:none;border-radius:50%;background:var(--honey);animation:hint-pulse 2.2s ease-out infinite}
+@keyframes hint-pulse{0%{box-shadow:0 0 0 0 rgba(240,194,123,.5)}100%{box-shadow:0 0 0 10px rgba(240,194,123,0)}}
+
+/* Ficha */
+.detail-top{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+.gender-chip{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .85rem .3rem .65rem;border-radius:999px;background:rgba(31,122,96,.1);color:var(--leaf-deep);font-size:.82rem;font-weight:600}
+.gender-chip::before{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}
+.g-male{background:rgba(45,109,181,.11);color:var(--male-ink)}
+.g-female{background:rgba(182,58,114,.1);color:var(--female-ink)}
+.action-buttons{display:flex;gap:.6rem}
+.btn{padding:.6rem 1.15rem;border-radius:14px;border:1.5px solid transparent;font-weight:600;font-size:.9rem;cursor:pointer;transition:transform .3s var(--ease-out),box-shadow .3s var(--ease-out),background .25s,border-color .25s}
+.btn:active{transform:scale(.98)}
+.btn-print{background:transparent;border-color:#D6CEBB;color:var(--text-dark)}
+.btn-print:hover{background:rgba(31,122,96,.07);border-color:var(--leaf-deep)}
+.btn-edit{background:linear-gradient(180deg,#1A4A3F,#0F2F28);color:var(--paper);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 12px 24px -10px rgba(15,47,40,.7)}
+.btn-edit:hover{transform:translateY(-2px)}
+.detail-text{display:flex;flex-direction:column}
+.person-name{margin:.2rem 0 1.4rem;font-family:var(--font-display);font-weight:400;font-size:clamp(2.6rem,5.2vw,4.2rem);line-height:.98;letter-spacing:-.02em;overflow-wrap:anywhere}
+.lifeline{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.4rem 1rem;margin-bottom:1.8rem}
+.ll-year{font-family:var(--font-display);font-size:clamp(1.8rem,3vw,2.4rem);line-height:1;color:var(--leaf-deep)}
+.ll-year-end{color:var(--honey-deep)}
+.ll-track{display:flex;align-items:center;min-width:0}
+.ll-line{flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--leaf-deep),var(--honey));transform-origin:left}
+.ll-dot{width:11px;height:11px;flex:none;border-radius:50%;background:var(--leaf-deep)}
+.ll-dot.ll-end{background:var(--honey);box-shadow:0 0 0 4px rgba(240,194,123,.25)}
+.is-alive .ll-end{animation:hint-pulse 2.2s ease-out infinite 1.6s}
+.ll-caption{grid-column:1/-1;text-align:center;color:var(--muted-dark);font-size:.92rem;font-weight:500}
+.enter .ll-line{animation:draw 1.1s var(--ease-out) .25s backwards}
+.enter .ll-dot.ll-end{animation:pop .5s var(--ease-out) 1.1s backwards}
+@keyframes draw{from{transform:scaleX(0)}}
+@keyframes pop{from{opacity:0;transform:scale(.3)}}
+.facts{display:grid;grid-template-columns:1fr 1fr;margin-bottom:1.6rem;border-top:1px solid var(--line-paper);border-bottom:1px solid var(--line-paper)}
+.fact{display:flex;flex-direction:column;gap:.15rem;min-width:0;padding:1.1rem 1.2rem 1.1rem 0}
+.fact+.fact{padding-left:1.4rem;border-left:1px solid var(--line-paper)}
+.fact-label{color:var(--muted-dark);font-size:.82rem;font-weight:600}
+.fact-date{font-family:var(--font-display);font-size:1.7rem;line-height:1.1}
+.fact-place{font-size:.95rem;overflow-wrap:anywhere}
+.is-unknown{color:#8E9A93;font-style:italic}
+.detail-highlight{margin-bottom:1.6rem;padding:1.3rem 1.5rem;border-radius:22px;background:rgba(31,122,96,.07)}
+.detail-highlight h3{margin-bottom:.6rem;font-family:var(--font-display);font-weight:400;font-size:1.7rem;line-height:1.1}
+.detail-highlight p{max-width:68ch;font-size:1.02rem;line-height:1.7;white-space:pre-line}
+.detail-highlight.is-placeholder p{font-family:var(--font-display);font-style:italic;font-size:1.35rem;line-height:1.35;color:var(--muted-dark);white-space:normal}
+.photos-container{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.9rem}
+.photo-item{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:18px;background:#E9E3D2;box-shadow:0 10px 24px -12px rgba(12,33,29,.45);transition:transform .45s var(--ease-out),box-shadow .45s var(--ease-out)}
+.photo-item img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .8s var(--ease-out)}
+.photo-item:hover{transform:translateY(-3px);box-shadow:0 20px 34px -14px rgba(12,33,29,.55)}
+.photo-item:hover img{transform:scale(1.06)}
+.enter .photo-item{animation:sheet-in .7s var(--ease-out) calc(var(--pi) * 90ms + 500ms) backwards}
+.photos-empty{grid-column:1/-1;padding:1.2rem;border:1.5px dashed #D6CEBB;border-radius:18px;text-align:center;color:var(--muted-dark);font-style:italic}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(5,16,13,.6);-webkit-backdrop-filter:blur(12px) saturate(120%);backdrop-filter:blur(12px) saturate(120%);visibility:hidden;opacity:0;transition:opacity .3s,visibility .3s}
+.modal.active{visibility:visible;opacity:1}
+.modal-content{width:100%;max-width:700px;max-height:90vh;max-height:90dvh;overflow-y:auto;padding:2rem 1.75rem 0;border-radius:28px;color:var(--text-dark);background:linear-gradient(180deg,#FBF9F3,#F4EFE3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 40px 80px -20px rgba(0,0,0,.6),0 0 90px -30px rgba(111,214,174,.35);transform:translateY(22px) scale(.96);transition:transform .55s var(--ease-out)}
+.modal.active .modal-content{transform:none}
+.modal-content :focus-visible{outline-color:var(--leaf-deep)}
+.modal-content h3{margin-bottom:1.2rem;font-family:var(--font-display);font-weight:400;font-size:2.1rem;line-height:1.05;letter-spacing:-.01em}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.input-group{position:relative}
+.input-group.full{grid-column:1/-1}
+.input-group input,.input-group select,.input-group textarea{width:100%;height:58px;padding:22px 16px 6px;border:1.5px solid #DDD6C6;border-radius:16px;background:#fff;color:var(--text-dark);font-size:1rem;transition:border-color .25s,box-shadow .25s}
+.input-group textarea{height:auto;min-height:112px;padding-top:28px;resize:vertical;line-height:1.5}
+.input-group select{-webkit-appearance:none;appearance:none;padding-right:40px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E6E67' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/18px}
+.input-group input:hover,.input-group select:hover,.input-group textarea:hover{border-color:#C9C1AE}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{outline:none;border-color:var(--leaf-deep);box-shadow:0 0 0 4px rgba(31,122,96,.14)}
+.input-group label{position:absolute;left:17px;top:50%;transform:translateY(-50%);color:#7C877F;font-size:1rem;pointer-events:none;transition:top .2s var(--ease-out),font-size .2s var(--ease-out),color .2s,transform .2s var(--ease-out)}
+.input-group.is-area label{top:24px;transform:none}
+.input-group.is-static label,.input-group input:focus+label,.input-group input:not(:placeholder-shown)+label,.input-group textarea:focus+label,.input-group textarea:not(:placeholder-shown)+label{top:11px;transform:none;font-size:.72rem;font-weight:600}
+.input-group input:focus+label,.input-group textarea:focus+label,.input-group select:focus+label{color:var(--leaf-deep)}
+.photos-section{margin-top:1.2rem;padding-top:1.1rem;border-top:1px solid var(--line-paper)}
+.photos-section h4{font-family:var(--font-display);font-weight:400;font-size:1.5rem;line-height:1.1}
+.photos-section .hint{margin:.2rem 0 .9rem;color:var(--muted-dark);font-size:.88rem}
+.modal-buttons{position:sticky;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:1.2rem -1.75rem 0;padding:1.2rem 1.75rem 1.5rem;background:linear-gradient(180deg,rgba(244,239,227,0),#F4EFE3 40%)}
+.modal-buttons .btn{padding:.8rem 1rem;border-radius:16px;font-size:.95rem}
+
+/* Avisos */
+.custom-toast{position:fixed;left:0;right:0;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));z-index:1500;display:flex;align-items:center;gap:10px;width:fit-content;max-width:min(92vw,440px);margin-inline:auto;padding:11px 18px 11px 14px;border-radius:999px;background:rgba(12,33,29,.94);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 18px 40px -14px rgba(0,0,0,.7);color:var(--paper);font-size:.88rem;font-weight:500;line-height:1.3;pointer-events:none;animation:toast-life 2.6s var(--ease-out) forwards}
+.custom-toast svg{width:18px;height:18px;flex:none}
+.custom-toast.success svg{color:var(--leaf)}
+.custom-toast.error svg{color:#FF9A90}
+.custom-toast.error{border-color:rgba(255,138,128,.35)}
+@keyframes toast-life{0%{opacity:0;transform:translateY(14px) scale(.96)}8%,86%{opacity:1;transform:none}100%{opacity:0;transform:translateY(6px)}}
+
+@media print{body{background:#fff;color:#000;height:auto;overflow:visible}.stage-bg,.left-panel,.action-buttons,.modal,.custom-toast{display:none!important}.app-container{display:block}.right-panel{height:auto;padding:0}.details-container{overflow:visible;padding:0!important;background:#fff!important;box-shadow:none!important}.photo-item{break-inside:avoid;box-shadow:none}.enter,.enter *{animation:none!important}}
+@media (max-width:768px){body{height:auto;overflow-y:auto}.app-container{flex-direction:column;height:auto;min-height:100dvh}.left-panel{flex:none;width:100%;height:auto;max-height:62vh;padding:0 .9rem 1.2rem;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}.sticky-header{margin:0 -.9rem .6rem;padding:1rem .9rem 1.1rem}.title-origen{font-size:1.75rem}.right-panel{height:auto;min-height:70vh;padding:1rem}.details-container{min-height:60vh}.facts{grid-template-columns:1fr}.fact+.fact{padding-left:0;border-left:0;border-top:1px solid var(--line-paper)}.form-grid{grid-template-columns:1fr}.hero-title{font-size:clamp(3rem,16vw,4.6rem)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}
+</style>
 </head>
 <body>
+<div class="stage-bg" aria-hidden="true"><i class="aurora a1"></i><i class="aurora a2"></i></div>
 <div class="app-container">
     <div class="left-panel">
         <div class="sticky-header">
             <div class="title-row">
-                <h1 class="title-origen">Árbol Genealógico</h1>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                    <div id="authStatusContainer" class="auth-status"></div>
-                    <button class="btn-new-person" id="newPersonBtn" style="display: none;">＋ Nuevo</button>
-                    <button class="btn-reset-list" id="resetListBtn">⟳ Reiniciar listado</button>
-                </div>
+                <h1 class="title-origen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="2.3" fill="currentColor"/><circle cx="19" cy="6" r="2.3"/><circle cx="19" cy="18" r="2.3"/><path d="M7.3 12c4 0 4-6 9.4-6M7.3 12c4 0 4 6 9.4 6"/></svg>Árbol Genealógico</h1>
+                <button class="btn-reset-list" id="resetListBtn" type="button" title="Reiniciar listado" aria-label="Reiniciar listado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 11-2.6-5.9"/><path d="M20 4v4.5h-4.5"/></svg></button>
+            </div>
+            <div class="status-row">
+                <div id="authStatusContainer" class="auth-status"></div>
+                <button class="btn-new-person" id="newPersonBtn" type="button" style="display: none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nuevo</button>
             </div>
             <div class="search-container">
-                <div class="search-input-wrapper">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, lugar, biografía, edad, año...">
-                </div>
-                <button id="clearSearchBtn" class="btn-clear-search" title="Limpiar búsqueda">✖</button>
+                <div class="search-input-wrapper"><input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, lugar, biografía, edad, año..." autocomplete="off"></div>
+                <button id="clearSearchBtn" class="btn-clear-search" type="button" title="Limpiar búsqueda" aria-label="Limpiar búsqueda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
             </div>
+            <div class="results-meta" id="resultsMeta" aria-live="polite"></div>
         </div>
-        <div id="groupsContainer" class="groups-list">Cargando ancestros...</div>
+        <div id="groupsContainer" class="groups-list"><div class="list-message">Cargando ancestros…</div></div>
     </div>
     <div class="right-panel">
-        <div id="rightDetails" class="details-container">
+        <div id="rightDetails" class="details-container is-empty">
             <div class="empty-detail">
-                <strong>Legado familiar</strong>
-                <span class="sub-message">Selecciona un ancestro para ver sus datos.</span>
-                <div class="familysearch-link">
-                    Recopilación de registros utilizando la base 
-                    <a href="https://www.familysearch.org/es/global" target="_blank" rel="noopener noreferrer">FamilySearch</a>.
-                </div>
+                <h2 class="hero-title" aria-label="Legado familiar"><span class="w"><span style="--i:0" aria-hidden="true">L</span><span style="--i:1" aria-hidden="true">e</span><span style="--i:2" aria-hidden="true">g</span><span style="--i:3" aria-hidden="true">a</span><span style="--i:4" aria-hidden="true">d</span><span style="--i:5" aria-hidden="true">o</span></span> <span class="w"><span style="--i:6" aria-hidden="true">f</span><span style="--i:7" aria-hidden="true">a</span><span style="--i:8" aria-hidden="true">m</span><span style="--i:9" aria-hidden="true">i</span><span style="--i:10" aria-hidden="true">l</span><span style="--i:11" aria-hidden="true">i</span><span style="--i:12" aria-hidden="true">a</span><span style="--i:13" aria-hidden="true">r</span></span></h2>
+                <p class="sub-message">Selecciona un ancestro para ver sus datos.</p>
+                <p class="familysearch-link"><i class="hint-dot" aria-hidden="true"></i><span>Registros recopilados con la base <a href="https://www.familysearch.org/es/global" target="_blank" rel="noopener noreferrer">FamilySearch</a></span></p>
             </div>
         </div>
     </div>
 </div>
 
-<div id="editModal" class="modal">
+<div id="editModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
         <h3 id="modalTitle">Editar ancestro</h3>
-        <div class="form-group"><label>Nombre</label><input type="text" id="editFirstName" placeholder="Nombre"></div>
-        <div class="form-group"><label>Apellido</label><input type="text" id="editLastName" placeholder="Apellido"></div>
-        <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="editBirthDate"></div>
-        <div class="form-group"><label>Lugar de nacimiento</label><input type="text" id="editBirthPlace" placeholder="Ciudad, País"></div>
-        <div class="form-group"><label>Fecha de fallecimiento</label><input type="date" id="editDeathDate"></div>
-        <div class="form-group"><label>Lugar de fallecimiento</label><input type="text" id="editDeathPlace" placeholder="Ciudad, País"></div>
-        <div class="form-group"><label>Género</label><select id="editGender"><option value="">Seleccionar género</option><option value="male">Hombre</option><option value="female">Mujer</option></select></div>
-        <div class="form-group"><label>Biografía</label><textarea id="editBiography" rows="4" placeholder="Escribe aquí su historia..."></textarea></div>
-        <div class="photos-section"><h4>Fotos (hasta 4 imágenes, pega URL directa)</h4>
-            <div class="form-group"><label>Foto 1</label><input type="url" id="editPhoto1" placeholder="https://ejemplo.com/foto1.jpg"></div>
-            <div class="form-group"><label>Foto 2</label><input type="url" id="editPhoto2" placeholder="https://ejemplo.com/foto2.jpg"></div>
-            <div class="form-group"><label>Foto 3</label><input type="url" id="editPhoto3" placeholder="https://ejemplo.com/foto3.jpg"></div>
-            <div class="form-group"><label>Foto 4</label><input type="url" id="editPhoto4" placeholder="https://ejemplo.com/foto4.jpg"></div>
+        <div class="form-grid">
+            <div class="input-group"><input type="text" id="editFirstName" placeholder=" " autocomplete="off"><label for="editFirstName">Nombre</label></div>
+            <div class="input-group"><input type="text" id="editLastName" placeholder=" " autocomplete="off"><label for="editLastName">Apellido</label></div>
+            <div class="input-group is-static"><input type="date" id="editBirthDate" placeholder=" " autocomplete="off"><label for="editBirthDate">Fecha de nacimiento</label></div>
+            <div class="input-group"><input type="text" id="editBirthPlace" placeholder=" " autocomplete="off"><label for="editBirthPlace">Lugar de nacimiento</label></div>
+            <div class="input-group is-static"><input type="date" id="editDeathDate" placeholder=" " autocomplete="off"><label for="editDeathDate">Fecha de fallecimiento</label></div>
+            <div class="input-group"><input type="text" id="editDeathPlace" placeholder=" " autocomplete="off"><label for="editDeathPlace">Lugar de fallecimiento</label></div>
+            <div class="input-group is-static full"><select id="editGender"><option value="">Sin especificar</option><option value="male">Hombre</option><option value="female">Mujer</option></select><label for="editGender">Género</label></div>
+            <div class="input-group is-area full"><textarea id="editBiography" rows="4" placeholder=" "></textarea><label for="editBiography">Biografía</label></div>
         </div>
-        <div class="modal-buttons"><button class="btn btn-print" id="modalCancel">Cancelar</button><button class="btn btn-edit" id="modalSave">Guardar cambios</button></div>
+        <div class="photos-section">
+            <h4>Fotografías</h4>
+            <p class="hint">Hasta 4 imágenes. Pega la URL directa de cada una.</p>
+            <div class="form-grid">
+                <div class="input-group"><input type="url" id="editPhoto1" placeholder=" " autocomplete="off"><label for="editPhoto1">Foto 1</label></div>
+                <div class="input-group"><input type="url" id="editPhoto2" placeholder=" " autocomplete="off"><label for="editPhoto2">Foto 2</label></div>
+                <div class="input-group"><input type="url" id="editPhoto3" placeholder=" " autocomplete="off"><label for="editPhoto3">Foto 3</label></div>
+                <div class="input-group"><input type="url" id="editPhoto4" placeholder=" " autocomplete="off"><label for="editPhoto4">Foto 4</label></div>
+            </div>
+        </div>
+        <div class="modal-buttons"><button class="btn btn-print" id="modalCancel" type="button">Cancelar</button><button class="btn btn-edit" id="modalSave" type="button">Guardar cambios</button></div>
     </div>
 </div>
+
+<script>
+    // El foco de luz de la portada sigue al cursor (va aparte de Firebase)
+    (function () {
+        const el = document.getElementById('rightDetails');
+        el.addEventListener('pointermove', (e) => {
+            const r = el.getBoundingClientRect();
+            el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+            el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        });
+    })();
+</script>
 
 <script>
     const firebaseConfig = {
@@ -192,6 +285,8 @@
     let currentPersonData = null;
     let currentSearchTerm = "";
     let isEditingAllowed = false; // control de permisos
+    let lastDetailId = null;
+    let introPlayed = false;
 
     const groupsContainer = document.getElementById('groupsContainer');
     const rightDetailsDiv = document.getElementById('rightDetails');
@@ -202,10 +297,10 @@
     const authStatusContainer = document.getElementById('authStatusContainer');
 
     const YEAR_RANGES = [
-        { label: "1740 — 1800", min: 1740, max: 1800 },
-        { label: "1801 — 1900", min: 1801, max: 1900 },
-        { label: "1901 — 2000", min: 1901, max: 2000 },
-        { label: "2001 — Actualidad", min: 2001, max: 3000 }
+        { label: "1740 – 1800", min: 1740, max: 1800 },
+        { label: "1801 – 1900", min: 1801, max: 1900 },
+        { label: "1901 – 2000", min: 1901, max: 2000 },
+        { label: "2001 – Actualidad", min: 2001, max: 3000 }
     ];
 
     function extractYear(birthDate) {
@@ -344,82 +439,78 @@
         return firebase.firestore.Timestamp.fromDate(date);
     }
 
+    const TOAST_ICONS = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16 9.5"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.3v.01"/></svg>'
+    };
+    function showToast(message, kind = 'success', duration = 2600) {
+        document.querySelectorAll('.custom-toast').forEach(t => t.remove());
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast ' + kind;
+        toast.setAttribute('role', 'status');
+        toast.innerHTML = TOAST_ICONS[kind] || '';
+        const text = document.createElement('span');
+        text.textContent = message;
+        toast.appendChild(text);
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), duration);
+    }
+
+    function lettersHtml(text) {
+        let n = 0;
+        return text.split(' ').map(w => '<span class="w">' + [...w].map(c => `<span style="--i:${n++}" aria-hidden="true">${escapeHtml(c)}</span>`).join('') + '</span>').join(' ');
+    }
+
+    function welcomeHtml() {
+        return `<div class="empty-detail">
+            <h2 class="hero-title" aria-label="Legado familiar">${lettersHtml('Legado familiar')}</h2>
+            <p class="sub-message">Selecciona un ancestro para ver sus datos.</p>
+            <p class="familysearch-link"><i class="hint-dot" aria-hidden="true"></i><span>Registros recopilados con la base <a href="https://www.familysearch.org/es/global" target="_blank" rel="noopener noreferrer">FamilySearch</a></span></p>
+        </div>`;
+    }
+
     function renderPersonDetailsInRightPanel(person, docId) {
-        if (!person) {
-            // Mostrar mensaje de bienvenida con el enlace a FamilySearch
-            rightDetailsDiv.innerHTML = `
-                <div class="empty-detail">
-                    <strong>Legado familiar</strong>
-                    <span class="sub-message">Selecciona un ancestro para ver sus datos.</span>
-                    <div class="familysearch-link">
-                        Recopilación de registros utilizando la base 
-                        <a href="https://www.familysearch.org/es/global" target="_blank" rel="noopener noreferrer">FamilySearch</a>.
-                    </div>
-                </div>
-            `;
-            return;
-        }
+        if (!person) { resetRightPanelToWelcome(); return; }
+        const isNew = docId !== lastDetailId;
+        lastDetailId = docId;
         const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim() || "Ancestro sin nombre";
-        const birthYearDisplay = person.birthYear ? person.birthYear : (extractYear(person.birthDate) || "?");
-        const birthPlace = person.birthPlace ? person.birthPlace : "No especificado";
-        const deathDateFormatted = person.deathDate ? formatDateToDMY(person.deathDate) : "—";
-        const birthDateFormatted = person.birthDate ? formatDateToDMY(person.birthDate) : "Desconocida";
-        const deathPlace = person.deathPlace ? person.deathPlace : "No especificado";
-        const ageString = calculateAgeStringForSearch(person);
-        
-        let genderText = "", genderStyle = "", nameColorStyle = "";
-        if (person.gender === 'female') {
-            genderText = "Mujer";
-            genderStyle = "color: #D43F87; font-weight: 800;";
-            nameColorStyle = "color: #D43F87;";
-        } else if (person.gender === 'male') {
-            genderText = "Hombre";
-            genderStyle = "color: #1E6FDF; font-weight: 800;";
-            nameColorStyle = "color: #1E6FDF;";
-        } else {
-            genderText = "Sin especificar";
-            genderStyle = "color: #2A5C4A; font-weight: 600;";
-            nameColorStyle = "color: #1C3F32;";
-        }
+        const g = person.gender === 'female' ? 'female' : person.gender === 'male' ? 'male' : 'none';
+        const genderText = { female: 'Mujer', male: 'Hombre', none: 'Sin especificar' }[g];
+        const birthYear = person.birthYear ? person.birthYear : (extractYear(person.birthDate) || "?");
+        const deathYear = getDeathYear(person);
+        const age = calculateAgeNumber(person.birthDate, person.deathDate);
+        let endLabel = '?', caption = '', alive = false;
+        if (deathYear !== null) { endLabel = deathYear; if (age !== null) caption = `Falleció a los ${age} años`; }
+        else if (age !== null && age <= 110) { endLabel = 'Hoy'; alive = true; caption = `Edad actual: ${age} años`; }
+        else if (age !== null) { caption = 'Sin fecha de fallecimiento registrada'; }
+        const fact = (label, date, emptyDate, place) => `<div class="fact"><span class="fact-label">${label}</span><span class="fact-date${date ? '' : ' is-unknown'}">${date || emptyDate}</span><span class="fact-place${place ? '' : ' is-unknown'}">${escapeHtml(place || 'No especificado')}</span></div>`;
 
-        let actionButtons = `<div class="action-buttons"><button class="btn btn-print" id="printBtn">Imprimir</button>`;
-        if (isEditingAllowed) {
-            actionButtons += `<button class="btn btn-edit" id="editBtn">Editar</button>`;
-        }
-        actionButtons += `</div>`;
-
-        let bioHtml = actionButtons + `
+        let html = `<div class="detail-top"><span class="gender-chip g-${g}">${genderText}</span><div class="action-buttons"><button class="btn btn-print" id="printBtn" type="button">Imprimir</button>${isEditingAllowed ? '<button class="btn btn-edit" id="editBtn" type="button">Editar</button>' : ''}</div></div>
             <div class="detail-text" id="printableArea">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 0.5rem;">
-                    <strong style="font-size:1.6rem; ${nameColorStyle}">${escapeHtml(fullName)}</strong>
-                    <span style="background:#EFF5F2; padding:0.3rem 1rem; border-radius: 40px; font-size:0.85rem; font-weight:600; color:#1C3F32; white-space: nowrap;">${escapeHtml(ageString)}</span>
+                <h2 class="person-name">${escapeHtml(fullName)}</h2>
+                <div class="lifeline${alive ? ' is-alive' : ''}">
+                    <span class="ll-year">${birthYear}</span>
+                    <span class="ll-track"><i class="ll-dot"></i><i class="ll-line"></i><i class="ll-dot ll-end"></i></span>
+                    <span class="ll-year ll-year-end">${endLabel}</span>
+                    ${caption ? `<span class="ll-caption">${escapeHtml(caption)}</span>` : ''}
                 </div>
-                <p><span style="background:#EFF5F2; padding:0.2rem 0.8rem; border-radius:30px; font-size:0.85rem;">Nacido/a en ${birthYearDisplay} · <span style="${genderStyle}">${genderText}</span></span></p>
-                <p><span class="birth-date-bold">Fecha de nacimiento:</span> ${birthDateFormatted}<br>
-                <strong>Lugar de nacimiento:</strong> ${escapeHtml(birthPlace)}<br>
-                <strong>Fecha de fallecimiento:</strong> ${deathDateFormatted}<br>
-                <strong>Lugar de fallecimiento:</strong> ${escapeHtml(deathPlace)}</p>
-        `;
+                <div class="facts">
+                    ${fact('Nació', person.birthDate ? formatDateToDMY(person.birthDate) : '', 'Desconocida', person.birthPlace)}
+                    ${fact('Falleció', person.deathDate ? formatDateToDMY(person.deathDate) : '', '—', person.deathPlace)}
+                </div>`;
         if (person.biography && person.biography.trim() !== "") {
-            bioHtml += `<div class="detail-highlight"><strong>Reseña biográfica:</strong><br>${escapeHtml(person.biography)}</div>`;
+            html += `<section class="detail-highlight"><h3>Reseña biográfica</h3><p>${escapeHtml(person.biography)}</p></section>`;
         } else {
-            bioHtml += `<div class="detail-highlight">${escapeHtml(fullName)} forma parte del legado familiar. Sus huellas perduran en la memoria.</div>`;
+            html += `<section class="detail-highlight is-placeholder"><p>${escapeHtml(fullName)} forma parte del legado familiar. Sus huellas perduran en la memoria.</p></section>`;
         }
-        
-        const photos = person.photos || [];
-        if (photos.length > 0) {
-            bioHtml += `<div class="photos-container">`;
-            photos.forEach(photoUrl => {
-                if (photoUrl && photoUrl.trim() !== "") {
-                    bioHtml += `<div class="photo-item"><img src="${escapeHtml(photoUrl)}" alt="Familiar" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23EFF5F2%22%2F%3E%3Ctext%20x%3D%2275%22%20y%3D%2275%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%237B9689%22%20font-size%3D%2212%22%3EImagen no disponible%3C%2Ftext%3E%3C%2Fsvg%3E';"></div>`;
-                }
-            });
-            bioHtml += `</div>`;
-        } else {
-            bioHtml += `<div class="photos-container" style="justify-content:center;"><span style="color:#7B9689; font-style:italic;">Sin fotografías aún. Puedes añadir URLs en edición.</span></div>`;
-        }
-        bioHtml += `</div>`;
-        rightDetailsDiv.innerHTML = bioHtml;
+        const photos = (person.photos || []).filter(u => u && u.trim() !== "");
+        html += `<div class="photos-container">` + (photos.length
+            ? photos.map((u, i) => `<div class="photo-item" style="--pi:${i}"><img src="${escapeHtml(u).replace(/"/g, '&quot;')}" alt="Fotografía de ${escapeHtml(fullName)}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23E9E3D2%22%2F%3E%3Ctext%20x%3D%2275%22%20y%3D%2275%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%237C877F%22%20font-size%3D%2212%22%3EImagen%20no%20disponible%3C%2Ftext%3E%3C%2Fsvg%3E';"></div>`).join('')
+            : `<p class="photos-empty">${isEditingAllowed ? 'Sin fotografías aún. Agrégalas desde Editar.' : 'Sin fotografías registradas.'}</p>`) + `</div></div>`;
+
+        rightDetailsDiv.className = 'details-container has-person' + (isNew ? ' enter' : '');
+        rightDetailsDiv.innerHTML = html;
+        if (isNew) rightDetailsDiv.scrollTop = 0;
 
         if (isEditingAllowed) {
             document.getElementById('editBtn')?.addEventListener('click', () => openEditModal(docId, person));
@@ -429,7 +520,7 @@
 
     function openEditModal(docId, person) {
         if (!isEditingAllowed) {
-            alert("Debes iniciar sesión para editar el árbol genealógico.");
+            showToast("Debes iniciar sesión para editar el árbol genealógico.", 'error');
             return;
         }
         document.getElementById('modalTitle').textContent = 'Editar ancestro';
@@ -472,12 +563,12 @@
         document.getElementById('editPhoto2').value = photos[1] || '';
         document.getElementById('editPhoto3').value = photos[2] || '';
         document.getElementById('editPhoto4').value = photos[3] || '';
-        editModal.style.display = 'flex';
+        editModal.classList.add('active');
     }
 
     function openCreateModal() {
         if (!isEditingAllowed) {
-            alert("Debes iniciar sesión para agregar nuevos ancestros.");
+            showToast("Debes iniciar sesión para agregar nuevos ancestros.", 'error');
             return;
         }
         document.getElementById('modalTitle').textContent = 'Nuevo ancestro';
@@ -495,13 +586,13 @@
         document.getElementById('editPhoto2').value = '';
         document.getElementById('editPhoto3').value = '';
         document.getElementById('editPhoto4').value = '';
-        editModal.style.display = 'flex';
+        editModal.classList.add('active');
     }
 
     async function savePersonChanges() {
         if (!isEditingAllowed) {
-            alert("No tienes permisos para editar. Inicia sesión.");
-            editModal.style.display = 'none';
+            showToast("No tienes permisos para editar. Inicia sesión.", 'error');
+            editModal.classList.remove('active');
             return;
         }
         const updatedData = {
@@ -529,21 +620,23 @@
         try {
             if (currentSelectedId) {
                 await db.collection("persons").doc(currentSelectedId).update(updatedData);
-                editModal.style.display = 'none';
+                editModal.classList.remove('active');
                 await loadAndGroupPersons();
                 const updatedPerson = allPersons.find(p => p.id === currentSelectedId)?.person;
                 if (updatedPerson) renderPersonDetailsInRightPanel(updatedPerson, currentSelectedId);
+                showToast('Cambios guardados', 'success');
                 applyCardSelection(currentSelectedId);
             } else {
                 const docRef = await db.collection("persons").add(updatedData);
-                editModal.style.display = 'none';
+                editModal.classList.remove('active');
                 await loadAndGroupPersons();
                 const newId = docRef.id;
+                showToast('Ancestro agregado', 'success');
                 const newCard = document.querySelector(`.card-module[data-id="${newId}"]`);
                 if (newCard) newCard.click();
                 else { currentSelectedId = newId; const np = allPersons.find(p => p.id === newId)?.person; if(np) renderPersonDetailsInRightPanel(np, newId); applyCardSelection(newId); }
             }
-        } catch (error) { alert("Error al guardar: " + error.message); }
+        } catch (error) { showToast("Error al guardar: " + error.message, 'error'); }
     }
 
     function applyCardSelection(selectedDocId) {
@@ -580,10 +673,13 @@
 
     function renderGroupedCards(groupsArray) {
         if (!groupsArray.length || groupsArray.every(g => g.items.length === 0)) {
-            groupsContainer.innerHTML = `<div class="empty-message" style="padding:1.5rem; text-align:center; color:#4A6A5C;">🔍 No se encontraron ancestros que coincidan con la búsqueda.</div>`;
+            groupsContainer.innerHTML = `<div class="list-message">No se encontraron ancestros que coincidan con tu búsqueda.</div>`;
             return;
         }
         let globalHtml = '';
+        let ci = 0;
+        const intro = !introPlayed;
+        introPlayed = true;
         for (let group of groupsArray) {
             if (!group.items.length) continue;
             group.items.sort((a,b) => (a.person.birthYear ?? extractYear(a.person.birthDate) ?? 9999) - (b.person.birthYear ?? extractYear(b.person.birthDate) ?? 9999));
@@ -596,15 +692,23 @@
                 if (person.gender === 'male') genderClass = 'card-male';
                 else if (person.gender === 'female') genderClass = 'card-female';
                 else genderClass = 'card-default';
-                cardsHtml += `<div class="card-module ${genderClass}" data-id="${item.id}"><div class="birth-year-badge">${escapeHtml(String(year))}</div><div class="full-name-card">${escapeHtml(fullName)}</div></div>`;
+                cardsHtml += `<div class="card-module ${genderClass}" data-id="${item.id}" role="button" tabindex="0" style="--ci:${Math.min(ci++, 14)}"><span class="card-avatar" aria-hidden="true">${escapeHtml(fullName.charAt(0).toUpperCase())}</span><span class="card-body"><span class="full-name-card">${escapeHtml(fullName)}</span>${person.birthPlace ? `<span class="card-place">${escapeHtml(person.birthPlace)}</span>` : ''}</span><span class="card-year">${escapeHtml(String(year))}</span></div>`;
             }
-            globalHtml += `<div class="year-group"><div class="group-title">${escapeHtml(group.label)}</div><div class="group-cards">${cardsHtml}</div></div>`;
+            globalHtml += `<section class="year-group"><h2 class="group-title">${escapeHtml(group.label)}<span class="group-count">${group.items.length}</span></h2><div class="group-cards">${cardsHtml}</div></section>`;
         }
         groupsContainer.innerHTML = globalHtml;
+        groupsContainer.classList.toggle('list-intro', intro);
         document.querySelectorAll('.card-module').forEach(card => {
             const docId = card.getAttribute('data-id');
             const found = allPersons.find(p => p.id === docId);
-            if (found) card.addEventListener('click', (e) => { e.stopPropagation(); onPersonCardClick(found.person, docId); });
+            if (found) {
+                const open = () => {
+                    onPersonCardClick(found.person, docId);
+                    if (window.matchMedia('(max-width: 768px)').matches) rightDetailsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                card.addEventListener('click', (e) => { e.stopPropagation(); open(); });
+                card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+            }
         });
     }
 
@@ -627,16 +731,10 @@
     }
 
     function resetRightPanelToWelcome() {
-        rightDetailsDiv.innerHTML = `
-            <div class="empty-detail">
-                <strong>Legado familiar</strong>
-                <span class="sub-message">Selecciona un ancestro para ver sus datos.</span>
-                <div class="familysearch-link">
-                    Recopilación de registros utilizando la base 
-                    <a href="https://www.familysearch.org/es/global" target="_blank" rel="noopener noreferrer">FamilySearch</a>.
-                </div>
-            </div>
-        `;
+        lastDetailId = null;
+        if (rightDetailsDiv.classList.contains('is-empty')) return;
+        rightDetailsDiv.className = 'details-container is-empty';
+        rightDetailsDiv.innerHTML = welcomeHtml();
     }
 
     function getFilteredPersons() {
@@ -647,6 +745,9 @@
 
     function refreshFilteredView() {
         const filtered = getFilteredPersons();
+        const meta = document.getElementById('resultsMeta');
+        if (meta) { const total = allPersons.length; meta.textContent = !total ? '' : (currentSearchTerm.trim() ? `${filtered.length} de ${total} ancestros` : `${total} ${total === 1 ? 'ancestro' : 'ancestros'}`); }
+        clearSearchBtn?.classList.toggle('show', !!(searchInput && searchInput.value));
         const grouped = groupPersonsByYearRange(filtered);
         renderGroupedCards(grouped);
         syncSelectionAfterRender();
@@ -667,11 +768,11 @@
 
     async function loadAndGroupPersons() {
         try {
-            groupsContainer.innerHTML = "Cargando...";
+            if (!allPersons.length) groupsContainer.innerHTML = '<div class="list-message">Cargando ancestros…</div>';
             const snapshot = await db.collection("persons").get();
             if (snapshot.empty) {
                 allPersons = [];
-                groupsContainer.innerHTML = "No hay registros.";
+                groupsContainer.innerHTML = '<div class="list-message">Aún no hay ancestros registrados.</div>';
                 resetRightPanelToWelcome();
                 return;
             }
@@ -704,7 +805,7 @@
             }
         } catch (error) {
             console.error(error);
-            groupsContainer.innerHTML = `Error: ${error.message}`;
+            groupsContainer.innerHTML = `<div class="list-message">No se pudo cargar la lista: ${escapeHtml(error.message)}</div>`;
         }
     }
 
@@ -726,7 +827,7 @@
     function updateUIBasedOnAuth(user) {
         isEditingAllowed = !!user;
         if (user) {
-            authStatusContainer.innerHTML = `<span>✅ Editando como ${user.email}</span>`;
+            authStatusContainer.innerHTML = `<i class="status-dot on" aria-hidden="true"></i><span>Editando como ${escapeHtml(user.email || '')}</span>`;
             newPersonBtn.style.display = 'inline-flex';
             // Si ya hay detalles visibles, refrescar para mostrar botón Editar
             if (currentSelectedId) {
@@ -734,7 +835,7 @@
                 if (personObj) renderPersonDetailsInRightPanel(personObj, currentSelectedId);
             }
         } else {
-            authStatusContainer.innerHTML = `<span>🔍 Modo solo lectura</span> <a class="login-link" id="loginLink">Iniciar sesión</a>`;
+            authStatusContainer.innerHTML = `<i class="status-dot" aria-hidden="true"></i><span>Solo lectura</span><a class="login-link" id="loginLink">Iniciar sesión</a>`;
             newPersonBtn.style.display = 'none';
             // Ocultar botón editar si estaba visible
             if (currentSelectedId) {
@@ -753,14 +854,15 @@
     });
 
     // Eventos
-    document.getElementById('modalCancel')?.addEventListener('click', () => editModal.style.display = 'none');
+    document.getElementById('modalCancel')?.addEventListener('click', () => editModal.classList.remove('active'));
     document.getElementById('modalSave')?.addEventListener('click', savePersonChanges);
-    window.addEventListener('click', (e) => { if (e.target === editModal) editModal.style.display = 'none'; });
+    window.addEventListener('click', (e) => { if (e.target === editModal) editModal.classList.remove('active'); });
     document.querySelector('.title-origen')?.addEventListener('click', () => { currentSelectedId = null; resetRightPanelToWelcome(); applyCardSelection(null); });
     document.getElementById('resetListBtn')?.addEventListener('click', resetToListFirst);
     newPersonBtn?.addEventListener('click', openCreateModal);
     searchInput?.addEventListener('input', (e) => { currentSearchTerm = e.target.value; refreshFilteredView(); });
     clearSearchBtn?.addEventListener('click', () => { currentSearchTerm = ""; if (searchInput) searchInput.value = ""; refreshFilteredView(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') editModal.classList.remove('active'); });
 </script>
 </body>
 </html>
