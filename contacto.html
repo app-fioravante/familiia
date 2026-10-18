@@ -1,638 +1,340 @@
+<!-- contacto.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Contacto</title>
-    <!-- Google Fonts & Font Awesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Contacto | Genealogía Fioravante</title>
+<meta name="theme-color" content="#0C211D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink-900:#0C211D;--leaf:#6FD6AE;--leaf-deep:#1F7A60;--honey:#F0C27A;--honey-soft:#EBD3A4;--paper:#F6F2E8;--mist:#9DB5AB;--text-dark:#10231E;--muted-dark:#5E6E67;--line-paper:#E4DDCC;--danger:#B3372B;--font-display:'Instrument Serif','Iowan Old Style','Palatino Linotype',Georgia,serif;--font-main:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--ease-out:cubic-bezier(.22,1,.36,1)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{-webkit-appearance:none;appearance:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--honey);outline-offset:3px}
+body{background:var(--ink-900);color:var(--paper);font-family:var(--font-main);font-size:16px;line-height:1.5;min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased}
+.stage-bg{position:fixed;inset:0;overflow:hidden;background:radial-gradient(90% 80% at 50% 40%,rgba(27,68,57,.8),transparent 70%),linear-gradient(160deg,#0F2B25,#0A1B18)}
+.aurora{position:absolute;border-radius:50%;will-change:transform}
+.a1{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(47,160,125,.24),transparent 65%);animation:drift-a 28s ease-in-out infinite alternate}
+.a2{width:60vmax;height:60vmax;right:-20vmax;bottom:-30vmax;background:radial-gradient(circle,rgba(240,194,123,.12),transparent 65%);animation:drift-b 34s ease-in-out infinite alternate}
+@keyframes drift-a{to{transform:translate(8vmax,6vmax) scale(1.08)}}
+@keyframes drift-b{to{transform:translate(-7vmax,-5vmax) scale(1.12)}}
+.stage-bg::after{content:'';position:absolute;inset:0;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.page{position:relative;z-index:1;min-height:100vh;min-height:100dvh;max-width:1200px;margin:0 auto;padding:clamp(1.4rem,4vw,3rem);display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem,5vw,5rem);align-items:center}
 
-        body {
-            background-color: #F5F7F5;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
-        }
+/* Introducción */
+.intro{animation:panel-in .9s var(--ease-out) backwards}
+@keyframes panel-in{from{opacity:0;transform:translateX(-18px)}}
+.hero-title{font-family:var(--font-display);font-weight:400;font-size:clamp(3.6rem,9vw,7.2rem);line-height:.95;letter-spacing:-.025em}
+.hero-title span{display:inline-block;cursor:default;transition:transform .45s var(--ease-out),color .3s,text-shadow .3s;animation:letter-in 1s var(--ease-out) calc(var(--i) * 70ms + 250ms) backwards,letter-wave 6.5s ease-in-out calc(2.8s + var(--i) * 95ms) infinite}
+.hero-title span:hover{color:var(--honey);transform:translateY(-.07em);text-shadow:0 0 34px rgba(240,194,123,.6)}
+@keyframes letter-in{from{opacity:0;transform:translateY(.3em) rotate(2deg);filter:blur(14px)}}
+@keyframes letter-wave{8%{color:#FFE7BD;text-shadow:0 0 34px rgba(240,194,123,.65)}18%{color:var(--paper);text-shadow:0 0 0 rgba(240,194,123,0)}}
+.tag{margin-top:.9rem;font-family:var(--font-display);font-style:italic;font-size:clamp(1.3rem,2.4vw,1.8rem);line-height:1.15;color:var(--honey-soft);animation:hint-in .9s var(--ease-out) 1.1s backwards}
+@keyframes hint-in{from{opacity:0;transform:translateY(12px)}}
+.lead{max-width:44ch;margin-top:1.5rem;color:rgba(246,242,232,.86);font-size:1.08rem;line-height:1.7;animation:hint-in .9s var(--ease-out) 1.3s backwards}
+.wa-card{display:inline-flex;align-items:center;gap:.9rem;margin-top:1.8rem;padding:.8rem 1.3rem .8rem .8rem;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--paper);text-decoration:none;font-size:.95rem;font-weight:500;line-height:1.3;transition:background .25s,border-color .25s,transform .4s var(--ease-out);animation:hint-in .9s var(--ease-out) 1.5s backwards}
+.wa-card:hover{background:rgba(255,255,255,.11);border-color:rgba(111,214,174,.45);transform:translateY(-2px)}
+.wa-card svg{width:44px;height:44px;flex:none;padding:10px;border-radius:50%;background:rgba(111,214,174,.14);color:var(--leaf)}
 
-        /* Contenedor principal con efecto glass y borde característico */
-        .contact-container {
-            background: rgba(255, 255, 255, 0.68);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid #2A5C4A;
-            border-radius: 28px;
-            padding: 3rem 2.5rem;
-            max-width: 1100px;
-            width: 100%;
-            box-shadow: 0 20px 36px rgba(0, 0, 0, 0.08);
-            transition: all 0.2s;
-        }
+/* Hoja del formulario */
+.sheet{padding:clamp(1.4rem,3vw,2.4rem);border-radius:28px;color:var(--text-dark);background:linear-gradient(180deg,#FBF9F3,#F4EFE3);box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 40px 80px -20px rgba(0,0,0,.6),0 0 90px -30px rgba(111,214,174,.35);animation:sheet-in .8s var(--ease-out) .2s backwards}
+@keyframes sheet-in{from{opacity:0;transform:translateY(18px) scale(.985)}}
+.sheet :focus-visible{outline-color:var(--leaf-deep)}
+.sheet h2{margin-bottom:1.2rem;font-family:var(--font-display);font-weight:400;font-size:2.1rem;line-height:1.05;letter-spacing:-.01em}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.input-group{position:relative}
+.input-group.full{grid-column:1/-1}
+.input-group input,.input-group select,.input-group textarea{width:100%;height:58px;padding:22px 16px 6px;border:1.5px solid #DDD6C6;border-radius:16px;background:#fff;color:var(--text-dark);font-size:1rem;transition:border-color .25s,box-shadow .25s}
+.input-group textarea{height:auto;min-height:130px;padding-top:28px;resize:vertical;line-height:1.5}
+.input-group select{-webkit-appearance:none;appearance:none;padding-right:40px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E6E67' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/18px}
+.input-group input:hover,.input-group select:hover,.input-group textarea:hover{border-color:#C9C1AE}
+.input-group input:focus,.input-group select:focus,.input-group textarea:focus{outline:none;border-color:var(--leaf-deep);box-shadow:0 0 0 4px rgba(31,122,96,.14)}
+.input-group label{position:absolute;left:17px;top:29px;transform:translateY(-50%);color:#7C877F;font-size:1rem;pointer-events:none;transition:top .2s var(--ease-out),font-size .2s var(--ease-out),color .2s,transform .2s var(--ease-out)}
+.input-group.is-area label{top:24px;transform:none}
+.input-group.is-static label,.input-group input:focus+label,.input-group input:not(:placeholder-shown)+label,.input-group textarea:focus+label,.input-group textarea:not(:placeholder-shown)+label{top:11px;transform:none;font-size:.72rem;font-weight:600}
+.input-group input:focus+label,.input-group textarea:focus+label,.input-group select:focus+label{color:var(--leaf-deep)}
+.err{display:none;margin:.3rem 0 0 .4rem;color:var(--danger);font-size:.8rem;font-weight:500}
+.input-group.invalid .err{display:block}
+.input-group.invalid input,.input-group.invalid select,.input-group.invalid textarea{border-color:var(--danger)}
+.input-group.invalid input:focus,.input-group.invalid select:focus,.input-group.invalid textarea:focus{box-shadow:0 0 0 4px rgba(179,55,43,.14)}
+.btn-main{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin-top:.4rem;padding:.9rem 1rem;border:1.5px solid transparent;border-radius:16px;background:linear-gradient(180deg,#1A4A3F,#0F2F28);color:var(--paper);font-weight:600;font-size:1rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 12px 24px -10px rgba(15,47,40,.7);transition:transform .3s var(--ease-out),opacity .25s}
+.btn-main:hover{transform:translateY(-2px)}
+.btn-main:active{transform:scale(.98)}
+.btn-main:disabled{opacity:.7;pointer-events:none}
+.btn-main svg{width:18px;height:18px}
+.spin{display:none;width:16px;height:16px;border:2px solid rgba(246,242,232,.35);border-top-color:var(--paper);border-radius:50%;animation:spin .8s linear infinite}
+.btn-main.loading .spin{display:block}
+.btn-main.loading .send{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-        /* Grid principal: info + formulario */
-        .contact-layout {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 3rem;
-            align-items: start;
-        }
+.city-group{position:relative}
+.suggest{position:absolute;z-index:5;top:62px;left:0;min-width:100%;width:max-content;max-width:min(24rem,84vw);max-height:240px;overflow-y:auto;padding:6px;list-style:none;border-radius:16px;background:#fff;border:1.5px solid #DDD6C6;box-shadow:0 24px 40px -16px rgba(12,33,29,.35)}
+.suggest[hidden]{display:none}
+.suggest li{display:flex;flex-direction:column;padding:.55rem .75rem;border-radius:11px;cursor:pointer;line-height:1.25}
+.suggest li b{font-weight:600}
+.suggest li span{color:var(--muted-dark);font-size:.82rem}
+.suggest li.active,.suggest li[role=option]:hover{background:rgba(31,122,96,.1)}
+.suggest li.hint{cursor:default;padding:.5rem .75rem .6rem;color:var(--muted-dark);font-size:.8rem;font-weight:500}
+.count{display:block;margin:.3rem .4rem 0;text-align:right;color:var(--muted-dark);font-size:.78rem}
+.count.full{color:#8A5A12;font-weight:600}
 
-        /* Columna izquierda (texto) */
-        .contact-info {
-            text-align: left;
-        }
+/* Avisos */
+.custom-toast{position:fixed;left:0;right:0;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));z-index:1500;display:flex;align-items:center;gap:10px;width:fit-content;max-width:min(92vw,440px);margin-inline:auto;padding:11px 18px 11px 14px;border-radius:999px;background:rgba(12,33,29,.94);border:1px solid rgba(255,255,255,.12);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 18px 40px -14px rgba(0,0,0,.7);color:var(--paper);font-size:.88rem;font-weight:500;line-height:1.3;pointer-events:none;animation:toast-life 3.4s var(--ease-out) forwards}
+.custom-toast svg{width:18px;height:18px;flex:none}
+.custom-toast.success svg{color:var(--leaf)}
+.custom-toast.error svg{color:#FF9A90}
+.custom-toast.error{border-color:rgba(255,138,128,.35)}
+@keyframes toast-life{0%{opacity:0;transform:translateY(14px) scale(.96)}8%,88%{opacity:1;transform:none}100%{opacity:0;transform:translateY(6px)}}
 
-        .info-title {
-            color: #1C3F32;
-            font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            letter-spacing: -0.3px;
-        }
-
-        .info-description {
-            color: #2A5C4A;
-            font-weight: 400;
-            font-size: 1.05rem;
-            line-height: 1.65;
-        }
-
-        /* Columna derecha (wrapper) */
-        .contact-form-wrapper {
-            text-align: left;
-        }
-
-        .main-text {
-            color: #1C3F32;
-            font-weight: 700;
-            font-size: 1.3rem;
-            margin-bottom: 1.75rem;
-            line-height: 1.3;
-            border-left: 4px solid #2A5C4A;
-            padding-left: 1rem;
-        }
-
-        /* Contenedor flexible: formulario + bloque whatsapp lateral */
-        .form-and-sidebar {
-            display: flex;
-            gap: 2rem;
-            align-items: flex-start;
-            flex-wrap: wrap;
-        }
-
-        /* Formulario ocupa la mayor parte */
-        .contact-form {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-
-        /* Bloque lateral WhatsApp (al margen derecho) */
-        .whatsapp-sidebar {
-            flex-shrink: 0;
-            width: 190px;
-            background: rgba(42, 92, 74, 0.08);
-            backdrop-filter: blur(4px);
-            border-radius: 28px;
-            padding: 1.2rem 0.8rem;
-            text-align: center;
-            border: 1px solid rgba(42, 92, 74, 0.35);
-            transition: all 0.2s ease;
-        }
-
-        .whatsapp-sidebar:hover {
-            background: rgba(42, 92, 74, 0.15);
-            border-color: #2A5C4A;
-        }
-
-        .whatsapp-link {
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.6rem;
-            color: #1C3F32;
-        }
-
-        .whatsapp-link i {
-            font-size: 2.8rem;
-            color: #25D366;
-            transition: transform 0.2s;
-        }
-
-        .whatsapp-link span {
-            font-size: 0.85rem;
-            font-weight: 500;
-            line-height: 1.3;
-            color: #1C3F32;
-        }
-
-        .whatsapp-link:hover i {
-            transform: scale(1.05);
-        }
-
-        /* Estilos campos formulario */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .form-group label {
-            color: #1C3F32;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1px solid #D0E0D8;
-            border-radius: 20px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            background: rgba(255, 255, 255, 0.9);
-            outline: none;
-            transition: all 0.2s ease;
-            color: #10261E;
-        }
-
-        /* Select con custom arrow */
-        .form-group select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232A5C4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1.2rem;
-            padding-right: 2.5rem;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #2A5C4A;
-            box-shadow: 0 0 0 3px rgba(42, 92, 74, 0.15);
-        }
-
-        .btn-submit {
-            background: #2A5C4A;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            padding: 0.9rem;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 0.4rem;
-            text-align: center;
-            letter-spacing: 0.3px;
-        }
-
-        .btn-submit:hover {
-            background: #1C3F32;
-            transform: scale(0.99);
-        }
-
-        .btn-submit:disabled {
-            background: #9eb7ae;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* MODAL FLOTANTE CENTRAL (toast / modal) */
-        .modal-success {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 1.2rem 2rem;
-            border-radius: 60px;
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2), 0 0 0 1000px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: #1C3F32;
-            border-left: 6px solid #2A5C4A;
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.96);
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-        }
-
-        .modal-success i {
-            font-size: 1.6rem;
-            color: #25D366;
-        }
-
-        /* Responsive: pantallas menores */
-        @media (max-width: 850px) {
-            .contact-container {
-                padding: 2rem 1.5rem;
-            }
-            .contact-layout {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            .info-title {
-                font-size: 1.7rem;
-            }
-            .main-text {
-                font-size: 1.2rem;
-                border-left: 3px solid #2A5C4A;
-            }
-            .form-and-sidebar {
-                flex-direction: column;
-            }
-            .whatsapp-sidebar {
-                width: 100%;
-                flex-direction: row;
-                justify-content: center;
-                padding: 0.9rem;
-            }
-            .whatsapp-link {
-                flex-direction: row;
-                justify-content: center;
-                gap: 0.8rem;
-            }
-            .whatsapp-link i {
-                font-size: 2rem;
-            }
-            .whatsapp-link span {
-                font-size: 0.9rem;
-            }
-            .modal-success {
-                padding: 0.8rem 1.5rem;
-                font-size: 1rem;
-                white-space: normal;
-                text-align: center;
-                border-radius: 40px;
-                max-width: 85%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .modal-success {
-                font-size: 0.9rem;
-                padding: 0.7rem 1.2rem;
-            }
-        }
-
-        /* Pequeño ajuste para el textarea */
-        textarea {
-            resize: vertical;
-        }
-    </style>
+@media (max-width:850px){.page{grid-template-columns:1fr;align-items:start;gap:2rem}.hero-title{font-size:clamp(3.4rem,18vw,5rem)}}
+@media (max-width:520px){.form-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}}
+</style>
 </head>
 <body>
+<div class="stage-bg" aria-hidden="true"><i class="aurora a1"></i><i class="aurora a2"></i></div>
+<main class="page">
+    <section class="intro">
+        <h1 class="hero-title" id="heroTitle" aria-label="Contacto">Contacto</h1>
+        <p class="tag">Aplicación web de Genealogía Fioravante</p>
+        <p class="lead">Podés enviar tus sugerencias, biografía, fotos, anécdotas, documentos o datos que aún no se encuentren registrados en esta aplicación de genealogía. ¡Tu colaboración enriquece la historia familiar!</p>
+        <a class="wa-card" href="https://wa.me/5493764850728" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.4 8.4 0 01-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.4 8.4 0 013.8-.9h.5a8.5 8.5 0 018 8v.5z"/><path d="M9.2 9.4c.2 2 2.4 4.2 4.4 4.4l1.3-1.1-1.6-1-.7.5c-.6-.3-1.2-.9-1.5-1.5l.5-.7-1-1.6z"/></svg>
+            <span>Podés comunicarte por WhatsApp también.</span>
+        </a>
+    </section>
 
-<div class="contact-container">
-    <div class="contact-layout">
-        <!-- COLUMNA IZQUIERDA: información -->
-        <div class="contact-info">
-            <h1 class="info-title">Contacto</h1>
-            <p class="info-description">
-                Podés enviar tus sugerencias, biografía, fotos, anécdotas, documentos o datos que aún no se encuentren registrados en esta aplicación de genealogía. ¡Tu colaboración enriquece la historia familiar!
-            </p>
-        </div>
-
-        <!-- COLUMNA DERECHA: formulario + bloque whatsapp lateral -->
-        <div class="contact-form-wrapper">
-            <p class="main-text">
-                Aplicación web de Genealogía Fioravante
-            </p>
-
-            <!-- Contenedor flexible: form + bloque whatsapp (al margen derecho) -->
-            <div class="form-and-sidebar">
-                <!-- FORMULARIO (sin action nativa, manejado con fetch) -->
-                <form id="contactForm" class="contact-form">
-                    <!-- Campos ocultos para formsubmit.co -->
-                    <input type="hidden" name="_subject" value="Nuevo mensaje desde la App Genealogía Fioravante">
-                    <!-- No agregamos _next ni _captcha para evitar redirección, usamos fetch -->
-
-                    <div class="form-group">
-                        <label for="nombre">Tu nombre y apellido completo:</label>
-                        <input type="text" id="nombre" name="Nombre" required autocomplete="name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ciudad">Ciudad:</label>
-                        <input type="text" id="ciudad" name="Ciudad" required autocomplete="off">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pais">País:</label>
-                        <select id="pais" name="Pais" required>
-                            <option value="" disabled selected>Selecciona tu país</option>
-                            <optgroup label="América del Sur">
-                                <option value="Argentina">Argentina</option>
-                                <option value="Bolivia">Bolivia</option>
-                                <option value="Brasil">Brasil</option>
-                                <option value="Chile">Chile</option>
-                                <option value="Colombia">Colombia</option>
-                                <option value="Ecuador">Ecuador</option>
-                                <option value="Paraguay">Paraguay</option>
-                                <option value="Perú">Perú</option>
-                                <option value="Uruguay">Uruguay</option>
-                                <option value="Venezuela">Venezuela</option>
-                            </optgroup>
-                            <optgroup label="América Central y Caribe">
-                                <option value="Costa Rica">Costa Rica</option>
-                                <option value="Cuba">Cuba</option>
-                                <option value="Guatemala">Guatemala</option>
-                                <option value="Panamá">Panamá</option>
-                                <option value="Puerto Rico">Puerto Rico</option>
-                                <option value="República Dominicana">República Dominicana</option>
-                            </optgroup>
-                            <optgroup label="América del Norte">
-                                <option value="Canadá">Canadá</option>
-                                <option value="Estados Unidos">Estados Unidos</option>
-                                <option value="México">México</option>
-                            </optgroup>
-                            <optgroup label="Europa">
-                                <option value="Alemania">Alemania</option>
-                                <option value="España">España</option>
-                                <option value="Francia">Francia</option>
-                                <option value="Italia">Italia</option>
-                                <option value="Países Bajos">Países Bajos</option>
-                                <option value="Portugal">Portugal</option>
-                                <option value="Reino Unido">Reino Unido</option>
-                                <option value="Suiza">Suiza</option>
-                            </optgroup>
-                            <optgroup label="Asia">
-                                <option value="China">China</option>
-                                <option value="Corea del Sur">Corea del Sur</option>
-                                <option value="Emiratos Árabes Unidos">Emiratos Árabes Unidos</option>
-                                <option value="India">India</option>
-                                <option value="Israel">Israel</option>
-                                <option value="Japón">Japón</option>
-                            </optgroup>
-                            <optgroup label="África">
-                                <option value="Egipto">Egipto</option>
-                                <option value="Marruecos">Marruecos</option>
-                                <option value="Nigeria">Nigeria</option>
-                                <option value="Sudáfrica">Sudáfrica</option>
-                            </optgroup>
-                            <optgroup label="Oceanía">
-                                <option value="Australia">Australia</option>
-                                <option value="Nueva Zelanda">Nueva Zelanda</option>
-                            </optgroup>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="Email" required autocomplete="email">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="asunto">Asunto del Mensaje:</label>
-                        <input type="text" id="asunto" name="Asunto" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="mensaje">Mensaje:</label>
-                        <textarea id="mensaje" name="Mensaje" rows="4" required placeholder="Escribe tu mensaje aquí..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-submit" id="submitBtn">
-                        <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Enviar tu mensaje
-                    </button>
-                </form>
-
-                <!-- BLOQUE WHATSAPP (lateral derecho) -->
-                <div class="whatsapp-sidebar">
-                    <a href="https://wa.me/5493764850728" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
-                        <i class="fab fa-whatsapp"></i>
-                        <span>Podés comunicarte por WhatsApp también.</span>
-                    </a>
-                </div>
+    <section class="sheet">
+        <h2>Envía tu mensaje</h2>
+        <form id="contactForm" novalidate>
+            <input type="hidden" name="_subject" value="Nuevo mensaje desde la App Genealogía Fioravante">
+            <input type="hidden" name="_template" value="table">
+            <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none">
+            <div class="form-grid">
+                <div class="input-group full"><input type="text" id="nombre" name="Nombre" placeholder=" " autocomplete="name" required><label for="nombre">Nombre y apellido completo</label><small class="err" id="err-nombre"></small></div>
+                <div class="input-group city-group"><input type="text" id="ciudad" name="Ciudad" placeholder=" " autocomplete="off" maxlength="80" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cityList" required><label for="ciudad">Ciudad</label><small class="err" id="err-ciudad"></small><ul class="suggest" id="cityList" role="listbox" aria-label="Ciudades sugeridas" hidden></ul></div>
+                <div class="input-group is-static"><select id="pais" name="Pais" autocomplete="country-name" required><option value="" disabled selected>Selecciona tu país</option></select><label for="pais">País</label><small class="err" id="err-pais"></small></div>
+                <div class="input-group full"><input type="text" id="email" name="Email" placeholder=" " inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required><label for="email">Email</label><small class="err" id="err-email"></small></div>
+                <div class="input-group full"><input type="text" id="asunto" name="Asunto" placeholder=" " maxlength="120" required><label for="asunto">Asunto del mensaje</label><small class="err" id="err-asunto"></small><small class="count" id="count-asunto">0 / 10 palabras</small></div>
+                <div class="input-group full is-area"><textarea id="mensaje" name="Mensaje" rows="4" placeholder=" " maxlength="1200" required></textarea><label for="mensaje">Mensaje</label><small class="err" id="err-mensaje"></small><small class="count" id="count-mensaje">0 / 100 palabras</small></div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL FLOTANTE (éxito) -->
-<div id="successModal" class="modal-success" style="display: none;">
-    <i class="fas fa-check-circle"></i>
-    <span>Haz enviado tu mensaje con exito!!!</span>
-</div>
+            <button type="submit" class="btn-main" id="submitBtn"><svg class="send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3L10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z"/></svg><i class="spin" aria-hidden="true"></i><span id="btnLabel">Enviar tu mensaje</span></button>
+        </form>
+    </section>
+</main>
 
 <script>
-    (function() {
-        // -------- AUTOCOMPLETADO DE PAÍS SEGÚN CIUDAD (funcionalidad original mejorada) --------
-        const cityToCountryMap = {
-            // Argentina
-            'posadas': 'Argentina', 'buenos aires': 'Argentina', 'cordoba': 'Argentina', 'rosario': 'Argentina', 'mendoza': 'Argentina', 'obera': 'Argentina', 'eldorado': 'Argentina',
-            'la plata': 'Argentina', 'salta': 'Argentina', 'tucumán': 'Argentina', 'tucuman': 'Argentina',
-            // Brasil
-            'sao paulo': 'Brasil', 'são paulo': 'Brasil', 'rio de janeiro': 'Brasil', 'brasilia': 'Brasil', 'curitiba': 'Brasil', 'belo horizonte': 'Brasil', 'salvador': 'Brasil',
-            // Uruguay
-            'montevideo': 'Uruguay', 'punta del este': 'Uruguay', 'colonia': 'Uruguay',
-            // Paraguay
-            'asuncion': 'Paraguay', 'asunción': 'Paraguay', 'encarnacion': 'Paraguay', 'encarnación': 'Paraguay', 'ciudad del este': 'Paraguay',
-            // Chile
-            'santiago': 'Chile', 'valparaiso': 'Chile', 'viña del mar': 'Chile', 'concepción': 'Chile', 'concepcion': 'Chile',
-            // España
-            'madrid': 'España', 'barcelona': 'España', 'valencia': 'España', 'sevilla': 'España', 'zaragoza': 'España', 'malaga': 'España',
-            // Italia
-            'roma': 'Italia', 'milan': 'Italia', 'milán': 'Italia', 'florencia': 'Italia', 'venecia': 'Italia', 'napoles': 'Italia', 'turin': 'Italia',
-            // Estados Unidos
-            'miami': 'Estados Unidos', 'new york': 'Estados Unidos', 'nueva york': 'Estados Unidos', 'los angeles': 'Estados Unidos', 'washington': 'Estados Unidos', 'chicago': 'Estados Unidos', 'houston': 'Estados Unidos',
-            // México
-            'mexico df': 'México', 'ciudad de mexico': 'México', 'cdmx': 'México', 'guadalajara': 'México', 'monterrey': 'México', 'puebla': 'México',
-            // Colombia
-            'bogota': 'Colombia', 'bogotá': 'Colombia', 'medellin': 'Colombia', 'cali': 'Colombia', 'barranquilla': 'Colombia',
-            // Perú
-            'lima': 'Perú', 'cusco': 'Perú', 'arequipa': 'Perú',
-            // Francia
-            'paris': 'Francia', 'parís': 'Francia', 'lyon': 'Francia', 'marsella': 'Francia',
-            // Reino Unido
-            'londres': 'Reino Unido', 'london': 'Reino Unido', 'manchester': 'Reino Unido', 'birmingham': 'Reino Unido',
-            // Alemania
-            'berlin': 'Alemania', 'berlín': 'Alemania', 'munich': 'Alemania', 'hamburgo': 'Alemania',
-            // Portugal
-            'lisboa': 'Portugal', 'oporto': 'Portugal',
-            // Japón
-            'tokio': 'Japón', 'tokyo': 'Japón', 'osaka': 'Japón',
-            // China
-            'pekin': 'China', 'beijing': 'China', 'shanghai': 'China',
-            // Australia
-            'sidney': 'Australia', 'sydney': 'Australia', 'melbourne': 'Australia', 'brisbane': 'Australia',
-            // Otros
-            'viena': 'Austria', 'bruselas': 'Bélgica', 'amsterdam': 'Países Bajos', 'berna': 'Suiza', 'zurich': 'Suiza'
-        };
+(() => {
+    const $ = id => document.getElementById(id);
+    const ENDPOINT = 'https://formsubmit.co/setiposadas@gmail.com';
+    const form = $('contactForm'), btn = $('submitBtn'), ciudad = $('ciudad'), pais = $('pais');
 
-        const ciudadInput = document.getElementById('ciudad');
-        const paisSelect = document.getElementById('pais');
+    // Todos los países (nombres en español del propio navegador)
+    const ISO = 'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK YE YT ZA ZM ZW';
+    const dn = typeof Intl.DisplayNames === 'function' ? new Intl.DisplayNames(['es'], { type: 'region' }) : null;
+    const COUNTRIES = ISO.split(' ').map(code => ({ code, name: dn ? dn.of(code) : code })).filter(c => !dn || c.name !== c.code).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    const NAME = Object.fromEntries(COUNTRIES.map(c => [c.code, c.name]));
+    pais.insertAdjacentHTML('beforeend', COUNTRIES.map(c => `<option value="${c.name}" data-code="${c.code}">${c.name}</option>`).join(''));
+    const setCountry = code => { const o = [...pais.options].find(o => o.dataset.code === code); if (o) { pais.value = o.value; setError('pais', ''); } };
 
-        if (ciudadInput && paisSelect) {
-            ciudadInput.addEventListener('input', function() {
-                let valorCiudad = this.value.toLowerCase().trim();
-                if (cityToCountryMap[valorCiudad]) {
-                    paisSelect.value = cityToCountryMap[valorCiudad];
-                }
-            });
+    // Respaldo si no hay conexión con el buscador de ciudades
+    const CITIES = {
+        AR: 'posadas,buenos aires,cordoba,rosario,mendoza,obera,eldorado,la plata,salta,tucuman', BR: 'sao paulo,rio de janeiro,brasilia,curitiba,belo horizonte,salvador',
+        UY: 'montevideo,punta del este,colonia', PY: 'asuncion,encarnacion,ciudad del este', CL: 'santiago,valparaiso,vina del mar,concepcion',
+        ES: 'madrid,barcelona,valencia,sevilla,zaragoza,malaga', IT: 'roma,milan,florencia,venecia,napoles,turin', US: 'miami,new york,nueva york,los angeles,washington,chicago,houston',
+        MX: 'mexico df,ciudad de mexico,cdmx,guadalajara,monterrey,puebla', CO: 'bogota,medellin,cali,barranquilla', PE: 'lima,cusco,arequipa', FR: 'paris,lyon,marsella',
+        GB: 'londres,london,manchester,birmingham', DE: 'berlin,munich,hamburgo', PT: 'lisboa,oporto', JP: 'tokio,tokyo,osaka', CN: 'pekin,beijing,shanghai',
+        AU: 'sidney,sydney,melbourne,brisbane', AT: 'viena', BE: 'bruselas', NL: 'amsterdam', CH: 'berna,zurich'
+    };
+    const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const esc = s => String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    const LOOKUP = {};
+    Object.entries(CITIES).forEach(([c, list]) => list.split(',').forEach(x => LOOKUP[x] = c));
+
+    // Título animado letra por letra
+    $('heroTitle').innerHTML = [...'Contacto'].map((c, i) => `<span style="--i:${i}" aria-hidden="true">${c}</span>`).join('');
+
+    // Ciudad → país, con opciones cuando hay ciudades homónimas
+    const list = $('cityList');
+    let options = [], active = -1, ctrl = null, timer = null, paisTouched = false;
+    pais.addEventListener('change', () => { paisTouched = true; });
+    function closeList() { list.hidden = true; ciudad.setAttribute('aria-expanded', 'false'); ciudad.removeAttribute('aria-activedescendant'); active = -1; }
+    function setActive(i) {
+        active = i;
+        list.querySelectorAll('[role=option]').forEach((li, k) => li.classList.toggle('active', k === i));
+        if (i >= 0) ciudad.setAttribute('aria-activedescendant', 'opt-' + i); else ciudad.removeAttribute('aria-activedescendant');
+    }
+    function choose(i) {
+        const o = options[i];
+        if (!o) return;
+        ciudad.value = o.name;
+        setError('ciudad', '');
+        setCountry(o.country_code);
+        closeList();
+    }
+    function showList(items) {
+        options = items;
+        const same = items.filter(o => norm(o.name) === norm(ciudad.value));
+        const multi = new Set(same.map(o => o.country_code)).size > 1;
+        list.innerHTML = (multi ? '<li class="hint" role="presentation">Hay ciudades con este nombre en varios países. Elige la tuya:</li>' : '') +
+            items.map((o, i) => `<li role="option" id="opt-${i}" data-i="${i}"><b>${esc(o.name)}</b><span>${esc([o.admin1, NAME[o.country_code]].filter(Boolean).join(', '))}</span></li>`).join('');
+        list.hidden = !items.length;
+        ciudad.setAttribute('aria-expanded', String(!!items.length));
+        active = -1;
+    }
+    async function searchCity(q) {
+        ctrl?.abort();
+        ctrl = new AbortController();
+        try {
+            const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=10&language=es&format=json`, { signal: ctrl.signal });
+            if (!r.ok) throw new Error('Respuesta ' + r.status);
+            const seen = new Set();
+            const items = ((await r.json()).results || [])
+                .filter(o => NAME[o.country_code])
+                .filter(o => { const k = [o.name, o.admin1, o.country_code].join('|'); return !seen.has(k) && seen.add(k); })
+                .slice(0, 6);
+            if (items.length && !paisTouched) setCountry(items[0].country_code);
+            showList(items);
+        } catch (e) {
+            if (e.name === 'AbortError') return;
+            const c = LOOKUP[norm(q)];
+            if (c && !paisTouched) setCountry(c);
         }
+    }
+    ciudad.addEventListener('input', () => {
+        clearTimeout(timer);
+        const q = ciudad.value.trim();
+        if (q.length < 2) { ctrl?.abort(); closeList(); return; }
+        const c = LOOKUP[norm(q)];
+        if (c && !paisTouched) setCountry(c);
+        timer = setTimeout(() => searchCity(q), 300);
+    });
+    ciudad.addEventListener('keydown', e => {
+        if (list.hidden || !options.length) return;
+        const n = options.length;
+        if (e.key === 'ArrowDown') { e.preventDefault(); setActive((active + 1) % n); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((active - 1 + n) % n); }
+        else if (e.key === 'Enter' && active >= 0) { e.preventDefault(); choose(active); }
+        else if (e.key === 'Escape') closeList();
+    });
+    ciudad.addEventListener('blur', closeList);
+    list.addEventListener('mousedown', e => e.preventDefault());
+    list.addEventListener('click', e => { const li = e.target.closest('[data-i]'); if (li) choose(+li.dataset.i); });
 
-        // -------- ENVÍO CON FETCH + MODAL FLOTANTE (sin recarga) --------
-        const form = document.getElementById('contactForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const modal = document.getElementById('successModal');
-        let timeoutId = null;
+    // Límite de palabras: asunto 10, mensaje 100
+    const LIMITS = { asunto: 10, mensaje: 100 };
+    const wordCount = v => (v.match(/\S+/g) || []).length;
+    function updateCount(name) {
+        const n = wordCount($(name).value);
+        $('count-' + name).textContent = `${n} / ${LIMITS[name]} palabras`;
+        $('count-' + name).classList.toggle('full', n >= LIMITS[name]);
+    }
+    Object.keys(LIMITS).forEach(name => $(name).addEventListener('input', () => {
+        const el = $(name), re = /\S+/g;
+        let m, n = 0;
+        while ((m = re.exec(el.value))) if (++n > LIMITS[name]) { el.value = el.value.slice(0, m.index).trimEnd(); break; }
+        updateCount(name);
+    }));
 
-        // Función para mostrar el modal de éxito y auto-ocultarlo tras 3 segundos
-        function showSuccessModal() {
-            if (timeoutId) clearTimeout(timeoutId);
-            // Resetear cualquier animación/display previo
-            modal.style.display = 'flex';
-            modal.style.opacity = '1';
-            // Ocultar automáticamente después de 3 segundos
-            timeoutId = setTimeout(() => {
-                modal.style.display = 'none';
-                timeoutId = null;
-            }, 3000);
+    // Email: solo una dirección, en minúsculas, sin espacios ni caracteres no permitidos, máximo 254
+    const email = $('email');
+    function cleanEmail(v) {
+        v = v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9.!#$%&'*+\/=?^_`{|}~@-]/g, '');
+        const i = v.indexOf('@');
+        if (i > -1) v = v.slice(0, i + 1) + v.slice(i + 1).replace(/[^a-z0-9.-]/g, '');
+        return v.slice(0, 254);
+    }
+    email.addEventListener('input', () => {
+        const old = email.value, pos = email.selectionStart, v = cleanEmail(old);
+        if (v !== old) { email.value = v; const p = Math.max(0, pos - (old.length - v.length)); email.setSelectionRange(p, p); }
+    });
+    email.addEventListener('paste', e => {
+        const m = (e.clipboardData || window.clipboardData).getData('text').match(/[a-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-z0-9-]+(\.[a-z0-9-]+)+/i);
+        if (!m) return;
+        e.preventDefault();
+        email.value = cleanEmail(m[0]);
+        email.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Avisos
+    const ICONS = {
+        success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.8 2.8L16 9.5"/></svg>',
+        error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.3v.01"/></svg>'
+    };
+    function toast(message, kind = 'success') {
+        document.querySelectorAll('.custom-toast').forEach(t => t.remove());
+        const t = document.createElement('div');
+        t.className = 'custom-toast ' + kind;
+        t.setAttribute('role', 'status');
+        t.innerHTML = ICONS[kind];
+        const s = document.createElement('span');
+        s.textContent = message;
+        t.appendChild(s);
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3400);
+    }
+
+    // Validación por campo
+    const EMAIL = /^[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/;
+    const RULES = {
+        nombre: v => v ? '' : 'Escribe tu nombre y apellido.',
+        ciudad: v => v ? '' : 'Indica tu ciudad.',
+        pais: v => v ? '' : 'Selecciona tu país.',
+        email: v => !v ? 'Escribe tu email.' : v.length > 254 ? 'El email no puede superar los 254 caracteres.' : v.split('@')[0].length > 64 ? 'La parte anterior a la @ no puede superar los 64 caracteres.' : EMAIL.test(v) ? '' : 'Ingresa un solo email válido, por ejemplo nombre@correo.com.',
+        asunto: v => v ? '' : 'Escribe un asunto.',
+        mensaje: v => v ? '' : 'Escribe tu mensaje.'
+    };
+    function setError(name, msg) {
+        const el = $(name);
+        el.closest('.input-group').classList.toggle('invalid', !!msg);
+        $('err-' + name).textContent = msg;
+        el.setAttribute('aria-invalid', !!msg);
+        if (msg) el.setAttribute('aria-describedby', 'err-' + name); else el.removeAttribute('aria-describedby');
+    }
+    function validate() {
+        let first = null;
+        for (const [name, rule] of Object.entries(RULES)) {
+            const msg = rule($(name).value.trim());
+            setError(name, msg);
+            if (msg && !first) first = $(name);
         }
+        return first;
+    }
+    ['input', 'change'].forEach(ev => form.addEventListener(ev, e => {
+        if (e.target.id in RULES && e.target.closest('.invalid')) setError(e.target.id, RULES[e.target.id](e.target.value.trim()));
+    }));
 
-        // Función para limpiar el formulario después del envío exitoso
-        function resetFormFields() {
+    function setLoading(on) {
+        btn.disabled = on;
+        btn.classList.toggle('loading', on);
+        $('btnLabel').textContent = on ? 'Enviando…' : 'Enviar tu mensaje';
+    }
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const bad = validate();
+        if (bad) { bad.focus(); toast('Revisa los campos marcados.', 'error'); return; }
+        setLoading(true);
+        try {
+            const res = await fetch(ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+            if (!res.ok) throw new Error('Respuesta ' + res.status);
             form.reset();
-            // Luego de reset, aseguramos que el select quede en placeholder (primera opción deshabilitada)
-            // El reset() deja el select en el valor por defecto (el option disabled selected)
-            // pero algunos navegadores podrían no resetear select con valores dinámicos; lo forzamos
-            paisSelect.value = '';  // para que quede el placeholder "Selecciona tu país"
-            // Adicionalmente, se limpia cualquier autocompletado visual
+            paisTouched = false;
+            Object.keys(LIMITS).forEach(updateCount);
+            closeList();
+            toast('Mensaje enviado. ¡Gracias por tu colaboración!');
+        } catch (err) {
+            console.error('Error al enviar el mensaje:', err);
+            toast('No se pudo enviar. Inténtalo nuevamente.', 'error');
+        } finally {
+            setLoading(false);
         }
-
-        // Función para deshabilitar/habilitar botón durante el envío
-        function setButtonLoading(isLoading) {
-            if (isLoading) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enviando...';
-            } else {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Enviar tu mensaje';
-            }
-        }
-
-        // Interceptar envío del formulario
-        if (form) {
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                // Validación rápida de campos requeridos (HTML5 ya lo hace, pero reforzamos)
-                const nombre = document.getElementById('nombre')?.value.trim();
-                const ciudad = ciudadInput?.value.trim();
-                const email = document.getElementById('email')?.value.trim();
-                const asunto = document.getElementById('asunto')?.value.trim();
-                const mensaje = document.getElementById('mensaje')?.value.trim();
-
-                if (!nombre || !ciudad || !email || !asunto || !mensaje) {
-                    // Mostrar alerta sutil nativa? No se pide modal de error, pero para UX podemos mostrar algo simple.
-                    // Sin embargo mejor usar un modal rápido de advertencia? No es requisito, pero para robustez:
-                    const warningModal = document.createElement('div');
-                    warningModal.className = 'modal-success';
-                    warningModal.style.background = '#fff2e8';
-                    warningModal.style.borderLeftColor = '#c95a2e';
-                    warningModal.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#c95a2e;"></i><span>Por favor, completa todos los campos.</span>';
-                    document.body.appendChild(warningModal);
-                    warningModal.style.display = 'flex';
-                    setTimeout(() => {
-                        warningModal.style.display = 'none';
-                        warningModal.remove();
-                    }, 2000);
-                    return;
-                }
-
-                // Validar formato email básico (opcional)
-                const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
-                if (!emailRegex.test(email)) {
-                    const emailError = document.createElement('div');
-                    emailError.className = 'modal-success';
-                    emailError.style.background = '#fff2e8';
-                    emailError.style.borderLeftColor = '#c95a2e';
-                    emailError.innerHTML = '<i class="fas fa-envelope"></i><span>Email inválido. Ingresa una dirección correcta.</span>';
-                    document.body.appendChild(emailError);
-                    emailError.style.display = 'flex';
-                    setTimeout(() => {
-                        emailError.style.display = 'none';
-                        emailError.remove();
-                    }, 2000);
-                    return;
-                }
-
-                // Preparar datos para enviar a formsubmit.co
-                const formData = new FormData(form);
-                // Añadir campo adicional para evitar redirección (formsubmit acepta el parámetro _ajax? pero con fetch ya es asíncrono)
-                // No es necesario agregar _redirect porque no redirigirá.
-                // URL de destino (la misma del action original)
-                const submitUrl = 'https://formsubmit.co/setiposadas@gmail.com';
-
-                setButtonLoading(true);
-
-                try {
-                    const response = await fetch(submitUrl, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-                    // Formsubmit devuelve respuesta JSON si el accept está presente, o redirección.
-                    // Consideramos cualquier respuesta 2xx como exitosa.
-                    if (response.ok || response.status === 200 || response.status === 201) {
-                        // Mostrar modal de éxito
-                        showSuccessModal();
-                        // Limpiar todos los campos del formulario
-                        resetFormFields();
-                    } else {
-                        // Respuesta no exitosa
-                        throw new Error(`Error en envío: ${response.status}`);
-                    }
-                } catch (err) {
-                    console.error('Error al enviar mensaje:', err);
-                    // Mostrar modal de error opcional (suave, no bloqueante)
-                    const errorModal = document.createElement('div');
-                    errorModal.className = 'modal-success';
-                    errorModal.style.background = '#fff2f0';
-                    errorModal.style.borderLeftColor = '#c7362b';
-                    errorModal.innerHTML = '<i class="fas fa-times-circle" style="color:#c7362b;"></i><span>Error al enviar. Intentalo nuevamente.</span>';
-                    document.body.appendChild(errorModal);
-                    errorModal.style.display = 'flex';
-                    setTimeout(() => {
-                        errorModal.style.display = 'none';
-                        errorModal.remove();
-                    }, 2500);
-                } finally {
-                    setButtonLoading(false);
-                }
-            });
-        }
-
-        // Aseguramos que el modal no tenga fugas visuales al hacer clic en overlay (solo desaparece después de 3 segundos)
-        // Si se hace clic fuera? No es necesario porque no tiene overlay opaco, pero es solo toast central.
-        // Además, para preservar la experiencia, cualquier clic en el modal no hace nada (se cierra por timeout).
-    })();
+    });
+})();
 </script>
 </body>
 </html>
