@@ -439,6 +439,89 @@
         .genealogy-title-right:hover { background: rgba(255, 255, 255, .07); color: var(--paper); }
         .title-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* ───────── Botón Créditos + popover flotante ───────── */
+        .credits-trigger-wrap {
+            position: relative;
+            flex: none;
+            display: flex;
+            align-items: center;
+        }
+        .credits-trigger {
+            height: 40px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 999px;
+            background: transparent;
+            color: var(--mist);
+            font-size: .85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background .25s, color .25s;
+        }
+        .credits-trigger:hover { background: rgba(255, 255, 255, .07); color: var(--paper); }
+        .credits-trigger:active { background: rgba(255, 255, 255, .12); }
+
+        .credit-popover {
+            position: absolute;
+            bottom: calc(100% + 12px);
+            right: 0;
+            z-index: 300;
+            width: max-content;
+            max-width: min(280px, calc(100vw - 24px));
+            padding: 10px 14px 13px;
+            border-radius: 16px;
+            background: rgba(12, 33, 29, .92);
+            border: 1px solid rgba(255, 255, 255, .14);
+            box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .1);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            color: var(--paper);
+            text-align: left;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: opacity .35s ease, transform .35s var(--ease-out), visibility .35s;
+            pointer-events: none;
+        }
+        .credit-popover.show {
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+        }
+        /* Flecha que apunta al botón */
+        .credit-popover::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 22px;
+            width: 10px; height: 10px;
+            margin-top: -5px;
+            background: rgba(12, 33, 29, .92);
+            border-right: 1px solid rgba(255, 255, 255, .14);
+            border-bottom: 1px solid rgba(255, 255, 255, .14);
+            transform: rotate(45deg);
+        }
+        .credit-line { display: block; line-height: 1.35; }
+        .credit-title {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1px;
+        }
+        .credit-value { font-size: .8rem; font-weight: 500; }
+        .credit-value.muted { color: var(--mist); font-weight: 400; font-size: .74rem; margin-top: 3px; }
+        .credit-timer {
+            position: absolute;
+            left: 14px; right: 14px; bottom: 0;
+            height: 2px;
+            border-radius: 2px;
+            background: var(--honey);
+            transform-origin: left;
+            transform: scaleX(1);
+        }
+
         .btn-exit {
             display: inline-flex;
             align-items: center;
@@ -732,6 +815,7 @@
             }
             .genealogy-title-right svg { opacity: 1; }
             .welcome-area { max-width: 62%; }
+            .credits-trigger { padding: 0 10px; font-size: .8rem; }
         }
         @media (max-width: 640px) {
             :root { --dock-h: 64px; --dock-gap: 10px; }
@@ -745,12 +829,14 @@
             .floating-menu { left: 10px; }
             .birthday-card h3 { font-size: 1.8rem; }
             .birthday-card .birthday-name { font-size: 1.6rem; }
+            .credits-trigger { height: 38px; padding: 0 9px; font-size: .76rem; }
         }
         @media (max-width: 400px) {
             .home-hint { max-width: 100%; gap: .45rem; padding: 8px 14px 8px 12px; font-size: .85rem; }
             .btn-exit span { display: none; }
             .btn-exit { width: 42px; padding: 0; justify-content: center; }
             .role-chip { display: none; }
+            .credits-trigger { padding: 0 8px; font-size: .72rem; }
         }
 
         /* ───────── Escritorio: la app ocupa toda la pantalla, sin scroll ───────── */
@@ -845,6 +931,16 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.2L12 4l8.5 7.2"/><path d="M6 9.8V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.8"/></svg>
             <span class="title-text">Archivo Genealógico <strong>Fioravante</strong> · Argentina</span>
         </button>
+
+        <div class="credits-trigger-wrap">
+            <button class="credits-trigger" id="creditsBtn" type="button" aria-label="Ver créditos">Créditos</button>
+            <div class="credit-popover" id="creditPopover" role="status" aria-live="polite">
+                <span class="credit-line credit-title">Desarrollo y Programación:</span>
+                <span class="credit-line credit-value">Rómulo Fioravante</span>
+                <span class="credit-line credit-value muted">Posadas Argentina 2026 v.1</span>
+                <i class="credit-timer" id="creditTimerBar" aria-hidden="true"></i>
+            </div>
+        </div>
 
         <button class="btn-exit" id="exitButton" type="button" aria-label="Salir">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4.5h4A1.5 1.5 0 0119.5 6v12a1.5 1.5 0 01-1.5 1.5h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg>
@@ -1308,6 +1404,38 @@
         });
     });
 
+    // ───────── Botón Créditos + popover flotante ─────────
+    const creditsBtn = document.getElementById('creditsBtn');
+    const creditPopover = document.getElementById('creditPopover');
+    const creditTimerBar = document.getElementById('creditTimerBar');
+    let creditsHideTimer = null;
+
+    function showCreditsPopover() {
+        if (!creditPopover) return;
+        clearTimeout(creditsHideTimer);
+        creditPopover.classList.add('show');
+
+        // Reinicia la barra de tiempo para que siempre dure 2 s desde el último clic
+        if (creditTimerBar) {
+            creditTimerBar.style.transition = 'none';
+            creditTimerBar.style.transform = 'scaleX(1)';
+            void creditTimerBar.offsetWidth;
+            creditTimerBar.style.transition = 'transform 2s linear';
+            creditTimerBar.style.transform = 'scaleX(0)';
+        }
+
+        creditsHideTimer = setTimeout(() => {
+            creditPopover.classList.remove('show');
+        }, 2000);
+    }
+
+    if (creditsBtn) {
+        creditsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showCreditsPopover();
+        });
+    }
+
     // ───────── Cerrar sesión ─────────
     const alertModal = document.getElementById('alertModal');
     const cancelModalBtn = document.getElementById('modalCancelBtn');
@@ -1344,7 +1472,10 @@
     // Tocar el título (o el espacio libre del dock) vuelve al inicio
     const bottomPanel = document.querySelector('.bottom-panel');
     bottomPanel.addEventListener('click', (e) => {
-        if (!e.target.closest('.welcome-area') && !e.target.closest('.menu-wrapper') && !e.target.closest('.btn-exit')) {
+        if (!e.target.closest('.welcome-area') &&
+            !e.target.closest('.menu-wrapper') &&
+            !e.target.closest('.btn-exit') &&
+            !e.target.closest('.credits-trigger-wrap')) {
             showImage();
         }
     });
