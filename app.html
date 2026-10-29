@@ -753,6 +753,39 @@
             .role-chip { display: none; }
         }
 
+        /* ───────── Escritorio: la app ocupa toda la pantalla, sin scroll ───────── */
+        @media (min-width: 760px) {
+            :root { --dock-gap: 0px; }
+            .main-empty { padding: 0; overflow: hidden; }
+            .iframe-container {
+                max-width: none;
+                width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .bottom-panel {
+                width: 100%;
+                margin: 0;
+                padding: 0 clamp(12px, 1.6vw, 24px) env(safe-area-inset-bottom, 0px);
+                border-radius: 0;
+                border-width: 1px 0 0;
+                background: rgba(12, 33, 29, .92);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 -14px 40px -22px rgba(0, 0, 0, .7);
+            }
+            .floating-menu {
+                left: clamp(12px, 1.6vw, 24px);
+                max-height: calc(100dvh - var(--dock-h) - 40px);
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+        }
+        /* Pantallas de escritorio bajas: el menú se compacta para que quepa entero */
+        @media (min-width: 760px) and (max-height: 720px) {
+            .menu-item { padding: 6px 12px; }
+            .mi-ico { width: 30px; height: 30px; }
+            .menu-sep { margin: 3px 12px; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: .001ms !important;
@@ -836,15 +869,16 @@
 <div class="floating-menu" id="floatingMenu">
     <ul>
         <li style="--i:0"><button type="button" class="menu-item" data-section="arbol"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M7.2 12c4 0 4-6 9.6-6M7.2 12c4 0 4 6 9.6 6"/></svg></span><span class="mi-label">Árbol completo</span></button></li>
-        <li style="--i:1"><button type="button" class="menu-item" data-section="origen"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.500 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.500-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="mi-label">Origen del Apellido</span></button></li>
+        <li style="--i:1"><button type="button" class="menu-item" data-section="linea-tiempo"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12h17"/><circle cx="7" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="17" cy="12" r="1.7" fill="currentColor"/><path d="M7 10.2V6.5M12 13.8v3.7M17 10.2V6.5"/></svg></span><span class="mi-label">Línea del Tiempo</span></button></li>
+        <li style="--i:2"><button type="button" class="menu-item" data-section="origen"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.500 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.500-6 0-8 1.5zM12 6.5v13"/></svg></span><span class="mi-label">Origen del Apellido</span></button></li>
         <li class="menu-sep" role="separator"></li>
-        <li style="--i:2"><button type="button" class="menu-item" data-section="argentina"><span class="mi-ico" aria-hidden="true"><span class="mi-code">AR</span></span><span class="mi-label">Argentina</span></button></li>
-        <li style="--i:3"><button type="button" class="menu-item" data-section="brasil"><span class="mi-ico" aria-hidden="true"><span class="mi-code">BR</span></span><span class="mi-label">Brasil</span></button></li>
-        <li style="--i:4"><button type="button" class="menu-item" data-section="italia"><span class="mi-ico" aria-hidden="true"><span class="mi-code">IT</span></span><span class="mi-label">Italia</span></button></li>
+        <li style="--i:3"><button type="button" class="menu-item" data-section="argentina"><span class="mi-ico" aria-hidden="true"><span class="mi-code">AR</span></span><span class="mi-label">Argentina</span></button></li>
+        <li style="--i:4"><button type="button" class="menu-item" data-section="brasil"><span class="mi-ico" aria-hidden="true"><span class="mi-code">BR</span></span><span class="mi-label">Brasil</span></button></li>
+        <li style="--i:5"><button type="button" class="menu-item" data-section="italia"><span class="mi-ico" aria-hidden="true"><span class="mi-code">IT</span></span><span class="mi-label">Italia</span></button></li>
         <li class="menu-sep" role="separator"></li>
-        <li style="--i:5"><button type="button" class="menu-item" data-section="mapas"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14"/></svg></span><span class="mi-label">Mapas</span></button></li>
-        <li style="--i:6"><button type="button" class="menu-item" data-section="recuerdos"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10.5" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></span><span class="mi-label">Recuerdos</span></button></li>
-        <li style="--i:7"><button type="button" class="menu-item" data-section="contacto"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5l8 6 8-6"/></svg></span><span class="mi-label">Contacto</span></button></li>
+        <li style="--i:6"><button type="button" class="menu-item" data-section="mapas"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4zM9 4v14M15 6v14"/></svg></span><span class="mi-label">Mapas</span></button></li>
+        <li style="--i:7"><button type="button" class="menu-item" data-section="recuerdos"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10.5" r="1.6"/><path d="M4 17l5-4.5 3.5 3 3-2.5 4.5 4"/></svg></span><span class="mi-label">Recuerdos</span></button></li>
+        <li style="--i:8"><button type="button" class="menu-item" data-section="contacto"><span class="mi-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M4 7.5l8 6 8-6"/></svg></span><span class="mi-label">Contacto</span></button></li>
     </ul>
 </div>
 
@@ -1237,6 +1271,7 @@
 
     const SECTION_URLS = {
         arbol: 'arbol.html',
+        'linea-tiempo': 'https://app-fioravante.github.io/familiia/linea-tiempo',
         origen: 'https://app-fioravante.github.io/familiia/origen.html',
         mapas: 'https://app-fioravante.github.io/familiia/mapas.html',
         argentina: 'https://app-fioravante.github.io/familiia/argentina.html',
