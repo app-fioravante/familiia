@@ -204,6 +204,11 @@
             letter-spacing: -.025em;
             color: var(--paper);
             white-space: nowrap;
+            /* Permite recibir clics aunque .hero tenga pointer-events:none */
+            pointer-events: auto;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         .brand-name.settled { animation: settle 1.6s ease-out; }
         @keyframes settle {
@@ -521,12 +526,13 @@
         /* ───────── Tarjeta de créditos (aviso temporal) ───────── */
         .floating-credit-modal {
             position: fixed;
-            top: calc(20px + env(safe-area-inset-top, 0px));
-            right: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            left: calc(20px + env(safe-area-inset-left, 0px));
             z-index: 10000;
-            min-width: 176px;
-            padding: 13px 16px 15px;
-            border-radius: 18px;
+            width: max-content;
+            max-width: min(280px, calc(100vw - 24px));
+            padding: 10px 14px 13px;
+            border-radius: 16px;
             background: rgba(255, 255, 255, .07);
             border: 1px solid rgba(255, 255, 255, .14);
             box-shadow: 0 16px 40px -12px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .1);
@@ -539,20 +545,24 @@
             animation: credit-in .7s var(--ease-out) backwards;
         }
         .credit-line { display: block; line-height: 1.35; }
-        .credit-label { font-size: .7rem; color: var(--mist); margin-top: 7px; }
-        .credit-label:first-child { margin-top: 0; }
-        .credit-value { font-size: .84rem; font-weight: 500; }
-        .credit-value.muted { color: var(--mist); font-weight: 400; margin-top: 7px; }
+        .credit-title {
+            font-size: .8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1px;
+        }
+        .credit-value { font-size: .8rem; font-weight: 500; }
+        .credit-value.muted { color: var(--mist); font-weight: 400; font-size: .74rem; margin-top: 3px; }
         .credit-timer {
             position: absolute;
-            left: 16px; right: 16px; bottom: 0;
+            left: 14px; right: 14px; bottom: 0;
             height: 2px;
             border-radius: 2px;
             background: var(--honey);
             transform-origin: left;
             animation: credit-timer 2s linear forwards;
         }
-        @keyframes credit-in { from { opacity: 0; transform: translateX(24px); } }
+        @keyframes credit-in { from { opacity: 0; transform: translate(-24px, 24px); } }
         @keyframes credit-timer { to { transform: scaleX(0); } }
 
         /* ───────── Móvil ───────── */
@@ -577,14 +587,10 @@
                 background: rgba(16, 35, 30, .15);
             }
             .auth-card h2 { font-size: 2.4rem; }
-            .floating-credit-modal { top: 12px; right: 12px; }
-        }
-        [data-layout="v"] .floating-credit-modal {
-            top: auto;
-            right: 12px; left: 12px;
-            bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-            margin-inline: auto;
-            width: fit-content;
+            .floating-credit-modal {
+                bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+                left: calc(12px + env(safe-area-inset-left, 0px));
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -630,11 +636,9 @@
 </div>
 
 <div id="infoCreditModal" class="floating-credit-modal" role="status">
-    <span class="credit-line credit-label">Diseño y programación</span>
+    <span class="credit-line credit-title">Desarrollo y Programación:</span>
     <span class="credit-line credit-value">Rómulo Fioravante</span>
-    <span class="credit-line credit-label">Versión</span>
-    <span class="credit-line credit-value">1.0.2026</span>
-    <span class="credit-line credit-value muted">Posadas, Misiones</span>
+    <span class="credit-line credit-value muted">Posadas Argentina 2026 v.1</span>
     <i class="credit-timer" aria-hidden="true"></i>
 </div>
 
@@ -988,18 +992,55 @@
         });
     }
 
-    // ───────── Aviso de créditos: desaparece a los 2 segundos ─────────
+    // ───────── Aviso de créditos: aparece 2 s y se puede reabrir tocando el título ─────────
     const modalElement = document.getElementById('infoCreditModal');
-    if (modalElement) {
-        setTimeout(() => {
-            modalElement.style.opacity = '0';
-            modalElement.style.transform = 'translateY(-10px)';
+    const creditTimerEl = modalElement ? modalElement.querySelector('.credit-timer') : null;
+    let creditHideTimeout = null;
 
-            setTimeout(() => {
-                if (modalElement && modalElement.remove) modalElement.remove();
-                else if (modalElement && modalElement.style) modalElement.style.display = 'none';
-            }, 400);
-        }, 2000);
+    function hideCreditModal() {
+        if (!modalElement) return;
+        modalElement.style.opacity = '0';
+        modalElement.style.transform = 'translate(-10px, 10px)';
+        modalElement.style.pointerEvents = 'none';
+        clearTimeout(creditHideTimeout);
+        creditHideTimeout = setTimeout(() => {
+            if (modalElement) modalElement.style.visibility = 'hidden';
+        }, 420);
+    }
+
+    function showCreditModal() {
+        if (!modalElement) return;
+        clearTimeout(creditHideTimeout);
+        modalElement.style.visibility = 'visible';
+        modalElement.style.pointerEvents = '';
+
+        // Reinicia la barra de tiempo (la animación CSS tiene fill: forwards)
+        if (creditTimerEl) {
+            creditTimerEl.style.animation = 'none';
+            void creditTimerEl.offsetWidth;
+            creditTimerEl.style.animation = 'credit-timer 2s linear forwards';
+        }
+
+        // Reaparece con la transición de opacity/transform ya definida en CSS
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                if (!modalElement) return;
+                modalElement.style.opacity = '1';
+                modalElement.style.transform = 'none';
+            });
+        });
+
+        // Vuelve a ocultarse tras 2 s
+        creditHideTimeout = setTimeout(hideCreditModal, 2000);
+    }
+
+    if (modalElement) {
+        creditHideTimeout = setTimeout(hideCreditModal, 2000);
+    }
+
+    // Al pulsar sobre el título "Fioravante" se reabre el aviso de créditos
+    if (titleEl) {
+        titleEl.addEventListener('click', showCreditModal);
     }
 
     auth.onAuthStateChanged((user) => {
