@@ -475,13 +475,19 @@
         .btn-primary:active { transform: translateY(0) scale(.99); }
         .btn-primary[disabled] { opacity: .7; cursor: progress; transform: none; }
 
-        .btn-invited {
-            background: transparent;
+        .btn-google {
+            background: #FFFFFF;
             border: 1.5px solid #D6CEBB;
             color: var(--text-dark);
         }
-        .btn-invited:hover { background: rgba(31, 122, 96, .07); border-color: var(--leaf-deep); transform: translateY(-2px); }
-        .btn-invited:active { transform: translateY(0) scale(.99); }
+        .btn-google:hover {
+            background: #F8F9FA;
+            border-color: #4285F4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -6px rgba(66, 133, 244, .35);
+        }
+        .btn-google:active { transform: translateY(0) scale(.99); }
+        .btn-google:disabled { opacity: .7; cursor: progress; transform: none; }
 
         .divider {
             display: flex;
@@ -899,11 +905,28 @@
 
     const ICON_ALERT = `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v4.5M10 13.6v.01"/></svg>`;
 
+    // Errores de autenticación traducidos
+    const AUTH_ERROR_MESSAGES = {
+        'auth/user-not-found': 'No existe cuenta con este correo.',
+        'auth/wrong-password': 'Contraseña incorrecta.',
+        'auth/invalid-credential': 'Correo o contraseña incorrectos.',
+        'auth/invalid-email': 'Correo inválido.',
+        'auth/too-many-requests': 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.',
+        'auth/network-request-failed': 'Sin conexión. Revisa tu internet.',
+        'auth/account-exists-with-different-credential': 'Este correo ya está registrado con contraseña. Inicia sesión con tu contraseña y luego vincula Google.',
+        'auth/popup-closed-by-user': 'Ventana cerrada. Inténtalo de nuevo.',
+        'auth/popup-blocked': 'El navegador bloqueó la ventana. Permite las ventanas emergentes.',
+        'auth/cancelled-popup-request': 'Operación cancelada.',
+        'auth/operation-not-supported-in-this-environment': 'Este navegador no soporta este método de acceso.',
+        'auth/unauthorized-domain': 'Dominio no autorizado en Firebase. Agrégalo en Authentication > Settings > Authorized domains.',
+        'auth/operation-not-allowed': 'Proveedor no habilitado en Firebase.'
+    };
+
     function showError(containerId, message) {
         const container = document.getElementById(containerId);
         if (container) {
             container.innerHTML = `<div class="error-message" role="alert">${ICON_ALERT}<span>${message}</span></div>`;
-            setTimeout(() => { const c = document.getElementById(containerId); if (c) c.innerHTML = ''; }, 4000);
+            setTimeout(() => { const c = document.getElementById(containerId); if (c) c.innerHTML = ''; }, 5000);
         }
     }
 
@@ -911,6 +934,12 @@
         window.location.href = "app.html";
     }
 
+    // Detección simple de móvil/entorno donde los popups suelen fallar
+    function isMobileOrUnsupported() {
+        return /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // ───────── Vista de login ─────────
     function renderLoginView() {
         authPanel.innerHTML = `
             <div class="auth-card">
@@ -943,13 +972,19 @@
 
                 <div class="divider"><span>o</span></div>
 
-                <button type="button" class="btn btn-invited" id="guestBtn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-                    Ingresar como invitado
+                <button type="button" class="btn btn-google" id="googleBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continuar con Google
                 </button>
             </div>
         `;
 
+        // Toggle mostrar/ocultar contraseña
         const passInput = document.getElementById('loginPassword');
         const toggleBtn = document.getElementById('togglePass');
         toggleBtn.addEventListener('click', () => {
@@ -959,6 +994,7 @@
             toggleBtn.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
         });
 
+        // Login con correo/contraseña
         document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
@@ -974,22 +1010,52 @@
                 await auth.signInWithEmailAndPassword(email, password);
                 redirectToApp();
             } catch (error) {
-                const messages = {
-                    'auth/user-not-found': 'No existe cuenta con este correo.',
-                    'auth/wrong-password': 'Contraseña incorrecta.',
-                    'auth/invalid-credential': 'Correo o contraseña incorrectos.',
-                    'auth/invalid-email': 'Correo inválido.',
-                    'auth/too-many-requests': 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.',
-                    'auth/network-request-failed': 'Sin conexión. Revisa tu internet.'
-                };
-                showError('loginFeedback', messages[error.code] || error.message);
+                showError('loginFeedback', AUTH_ERROR_MESSAGES[error.code] || error.message);
                 submitBtn.disabled = false;
             }
         });
 
-        document.getElementById('guestBtn').addEventListener('click', () => {
-            redirectToApp();
+        // Login con Google
+        const googleBtn = document.getElementById('googleBtn');
+        googleBtn.addEventListener('click', async () => {
+            const fbDiv = document.getElementById('loginFeedback');
+            fbDiv.innerHTML = `<div class="success-message"><i class="spinner"></i><span>Conectando con Google…</span></div>`;
+            googleBtn.disabled = true;
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+
+            try {
+                if (isMobileOrUnsupported()) {
+                    // En móviles, redirección es más fiable que popup
+                    await auth.signInWithRedirect(provider);
+                    // No hacemos nada más: la página se navegará
+                } else {
+                    await auth.signInWithPopup(provider);
+                    // onAuthStateChanged se encargará del redirect
+                }
+            } catch (error) {
+                showError('loginFeedback', AUTH_ERROR_MESSAGES[error.code] || error.message);
+                googleBtn.disabled = false;
+            }
         });
+
+        // Mostrar errores de redirección (si los hay) una vez renderizada la vista
+        checkRedirectError();
+    }
+
+    // Manejo de errores de redirección (para móviles que usan signInWithRedirect)
+    let redirectCheckDone = false;
+    async function checkRedirectError() {
+        if (redirectCheckDone) return;
+        redirectCheckDone = true;
+        try {
+            await auth.getRedirectResult();
+        } catch (error) {
+            if (error && error.code) {
+                showError('loginFeedback', AUTH_ERROR_MESSAGES[error.code] || error.message);
+            }
+        }
     }
 
     // ───────── Aviso de créditos: aparece 2 s y se puede reabrir tocando el título ─────────
@@ -1043,6 +1109,7 @@
         titleEl.addEventListener('click', showCreditModal);
     }
 
+    // ───────── Estado de autenticación ─────────
     auth.onAuthStateChanged((user) => {
         if (user) {
             redirectToApp();
